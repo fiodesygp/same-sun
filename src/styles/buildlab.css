@@ -1,0 +1,18 @@
+/* touch-action must sit on the svg itself: browsers ignore it on shapes inside, and a drag would scroll the page instead */
+.lab svg { width: 100%; height: auto; display: block; touch-action: none; user-select: none; -webkit-user-select: none }
+.term { cursor: pointer }
+.term circle.hit { fill: transparent }
+.term.sel circle.ring { stroke: var(--sun); stroke-width: 4 }
+.term:focus, .wire:focus { outline: none }
+.term:focus-visible circle.ring { stroke: var(--sun); stroke-width: 5 }
+.wire { cursor: pointer }
+.wire:focus-visible { stroke: rgba(242, 183, 5, .45) }
+.spin.rev .blades { animation-direction: reverse }
+.status { font-weight: 600; padding: 10px 12px; border-radius: 10px; background: var(--bg) }
+.status.ok { background: var(--green-soft) }
+.status.warn { background: var(--sun-soft) }
+.levels { flex-wrap: nowrap }
+.seg.levels button { flex: 1 1 0; padding: 8px 4px; min-width: 0; white-space: nowrap; font-size: 15px }
+.real { border: 1px solid var(--green); background: var(--green-soft); border-radius: 12px; padding: 12px }
+.real p, .lab-goal { margin: 6px 0 0 }
+.lab-goal { font-size: 17px }
