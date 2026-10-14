@@ -1,0 +1,56 @@
+{
+  "_about": "Same Sun simulation constants, ported from docs/prototype/same-sun-prototype.html. Numbers are made up to feel right, not measured; tune them with the real kit. Units: sunlight W/m2, power W, energy Wh, temperature degF, soil moisture and tank as shares of a full pot (0-1).",
+
+  "hours": { "start": 6, "end": 19 },
+  "sMax": 1000,
+  "eta": 0.15,
+  "panels": {
+    "small": { "area": 0.005, "cover": 0.32 },
+    "big":   { "area": 0.012, "cover": 0.62 },
+    "both":  { "area": 0.017, "cover": 0.86 }
+  },
+  "heightSideLight": { "low": 0, "mid": 0.22, "high": 0.4 },
+  "gapShare": { "none": 0, "small": 0.2, "wide": 0.4 },
+  "diffuse": 0.18,
+  "loads": { "fan": 0.4, "led": 0.05, "pump": 0.9 },
+
+  "airTempPeakHour": 15,
+  "fanCooling": 5,
+  "domeHeat": 2,
+  "heightCooling": { "low": 0, "mid": 1.5, "high": 3 },
+  "leafHeat": 11,
+
+  "startMoisture": 0.6,
+  "handWaterTo": 0.72,
+  "nightLoss": 0.05,
+  "soilLoss": { "base": 0.006, "light": 0.016, "heat": 0.0008, "heatAbove": 70 },
+  "pumpFlow": 0.06,
+  "tankSize": { "small": 1.2, "large": 3.0 },
+  "wilt": 0.25,
+  "dryBelow": 0.42,
+  "fieldCapacity": 0.85,
+  "soggyGrowth": 0.55,
+
+  "growMax": 1.0,
+  "heatZeroAbove": 20,
+
+  "weather": {
+    "october": { "min": 64, "max": 90, "sunPeak": 52 },
+    "july":    { "min": 88, "max": 110, "sunPeak": 78 }
+  },
+  "crops": {
+    "lettuce": { "sat": 420, "hi": 75, "stress": 85, "water": 1.0 },
+    "basil":   { "sat": 560, "hi": 85, "stress": 95, "water": 1.0 },
+    "bean":    { "sat": 620, "hi": 85, "stress": 95, "water": 1.05 },
+    "chili":   { "sat": 820, "hi": 90, "stress": 100, "water": 0.8 }
+  },
+
+  "fixed": { "tilt": 30, "gap": "small", "priority": "fan", "trigger": 0.45, "tank": "large" },
+  "bestPanel": { "panels": "both", "tiltFrom": 0, "tiltTo": 45, "tiltStep": 5 },
+
+  "challenges": {
+    "heat": { "set": { "weather": "july", "days": 7, "crop": "basil" }, "foodTimesNoPanel": 2, "minFood": 0.05 },
+    "fan":  { "set": { "weather": "october", "days": 1 }, "needs": "fan", "fromHour": 12, "toHour": 17 },
+    "tank": { "set": { "weather": "october", "days": 7 }, "needs": "pump", "maxDryHours": 30, "maxSoggyHours": 4 }
+  }
+}
