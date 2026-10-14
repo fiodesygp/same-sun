@@ -17,7 +17,7 @@ export const Results = forwardRef<HTMLDivElement, { run: Run }>(function Results
   const actual = compareToFullSun(s)
   const rule = pickRule(d, r, s)
   const crop = t(`crops.${d.crop}`)
-  const vars = { ...rule.vars, crop: rule.id === 'hot' ? crop : crop.toLowerCase() }
+  const vars = { ...rule.vars, crop: crop.toLowerCase() }
   const passed = challenge ? passesChallenge(challenge, r, s) : null
 
   const word = (g: 'more' | 'same' | 'less') => t(`results.word.${g}`)

@@ -933,32 +933,47 @@ function finish() {
 /* ---------- feedback ---------- */
 let hintStep = 0, lastRule = null;
 const pct = x => Math.round(x * 100);
+// Pick the cause that cost the most growth over sunny hours (light, heat or water), then the
+// next step the player can take. Same logic as src/sim/feedback.ts in the app.
+const FEEDBACK = { sunnyAbove: 300, bigLoss: 0.3, lowEnergy: 0.4, tankEmptyBelow: 0.0001 };
 function pickRule(r, s, d) {
-  const crop = MODEL.crops[d.crop];
-  const hot = r.hours.filter(x => x.hot).length, dry = r.hours.filter(x => x.dry && x.S > 0).length, soggy = r.hours.filter(x => x.soggy).length;
-  const fanH = r.hours.filter(x => x.on.fan).length / r.daily.length, sunny = r.hours.filter(x => x.S > 300);
-  const light = sunny.reduce((a, x) => a + x.L / x.S, 0) / Math.max(1, sunny.length);
-  const flAvg = sunny.reduce((a, x) => a + x.fl, 0) / Math.max(1, sunny.length);
-  const emptyDay = d.water !== 'hand' ? r.hours.findIndex(x => x.tank <= 0.0001) : -1;
-  const pumpUser = d.water !== 'hand';
-  if (pumpUser && soggy >= 6) return { why: `The soil stayed soggy for ${soggy} hours. Too much water makes roots soggy, and soggy roots grow slowly.`,
-    next: 'How could the pump water only when the soil is dry?', hints: ['Look at the watering choices again.', 'The Smart pump checks the soil before it waters.', 'Try Smart pump with the setting near 45%.'] };
-  if (pumpUser && emptyDay >= 0 && dry >= 4) return { why: `The tank ran dry on day ${r.hours[emptyDay].day + 1} at ${r.hours[emptyDay].h}:00, then the soil dried out.`,
-    next: 'How could the same water last longer?', hints: ['Where does the water go on a hot day?', 'Shade slows drying, so the same water lasts longer.', 'Try both panels with the pump on.'] };
-  if (dry >= 4) return { why: `The soil got too dry for ${dry} sunny hours, mostly in the afternoon. Thirsty plants stop growing.`,
-    next: 'What would slow the soil from drying, or add water during the day?', hints: ['Where does the water go on a hot afternoon?', 'Shade slows drying. The pump can water while the sun shines.', 'Turn on the pump, and use a big panel to power it.'] };
-  if (hot >= 3) return { why: `Leaves got hotter than ${crop.stress} °F for ${hot} hours. ${crop.name} gets stressed above that.`,
-    next: `What could keep the leaves cooler during the hottest hours?`, hints: ['When is the sun strongest? What is above the plant then?', 'More shade and a running fan both cool the leaves.', 'Try a big panel or both panels, with the fan on.'] };
-  if (flAvg < 0.8 && r.shade > 0.25) return { why: `Your ${crop.name.toLowerCase()} got about ${pct(light)}% of the sun under the panels, and it wanted more light to grow fast.`,
-    next: 'How could you give the plant more light and still make energy?', hints: ['Light can sneak in from the sides.', 'A high panel lets more side light in. A smaller panel makes less shade.', 'Try the panel set high, or the small panel.'] };
-  if (d.loads.fan && fanH < 5 && d.panels !== 'none') return { why: `The fan only ran about ${Math.round(fanH)} hours a day. The panel did not make enough power for it most of the day.`,
-    next: 'How could your panel make more power?', hints: ['Bigger panels catch more sunlight.', 'The fan needs more power than a small panel makes in the morning and evening.', 'Try the big panel or both panels.'] };
-  if (d.panels !== 'none' && s.energy < 0.4) return { why: `Your panel made ${pct(s.energy)}% of the energy the best setup can make.`,
+  const crop = MODEL.crops[d.crop], name = crop.name.toLowerCase();
+  const sunny = r.hours.filter(x => x.S > FEEDBACK.sunnyAbove), n = Math.max(1, sunny.length);
+  if (d.panels !== 'none' && s.food > s.fullSun && s.energy < FEEDBACK.lowEnergy) return { why: `Your plant did well, but your panel made only ${pct(s.energy)}% of the energy the best setup can make.`,
     next: 'Can you make more energy and still keep the plant happy?', hints: ['Which panel catches the most sun?', 'More panel area means more energy, but also more shade.', 'Try both panels set high.'] };
-  if (d.panels === 'none') return { why: 'With no panel, the plant gets all the sun and you make no energy.',
-    next: 'What happens to the plant if you add a panel above it?', hints: ['Shade can help or hurt. It depends on the plant and the heat.', 'Try a small panel first, then compare.', 'Try the big panel set high.'] };
-  return { why: `A good balance: the plant stayed comfortable and the panel made ${pct(s.energy)}% of the best energy.`,
-    next: 'Can you raise one score without dropping the other?', hints: ['Change just one thing, then run again and compare.', 'Try the other panel height, or a different panel size.', 'Compare Big + high with Both + high.'] };
+  const loss = { light: sunny.reduce((a, x) => a + 1 - x.fl, 0) / n, heat: sunny.reduce((a, x) => a + 1 - x.ft, 0) / n, water: sunny.reduce((a, x) => a + 1 - x.fw, 0) / n };
+  const cause = ['light', 'heat', 'water'].reduce((a, b) => loss[b] > loss[a] ? b : a);
+  if (loss[cause] < FEEDBACK.bigLoss) return d.panels === 'none'
+    ? { why: 'Your plant grew fine in full sun, but with no panel you made no energy.',
+        next: 'What happens to the plant if you add a panel above it?', hints: ['Shade can help or hurt. It depends on the plant and the heat.', 'Try a small panel first, then compare.', 'Try the big panel set high.'] }
+    : { why: `A good balance: nothing held the plant back much, and the panel made ${pct(s.energy)}% of the best energy.`,
+        next: 'Can you raise one score without dropping the other?', hints: ['Change just one thing, then run again and compare.', 'Try the other panel height, or a different panel size.', 'Compare Big + high with Both + high.'] };
+  if (cause === 'light') {
+    const light = sunny.reduce((a, x) => a + x.L / x.S, 0) / n;
+    return { why: `Your ${name} got about ${pct(light)}% of the sun under the panels. It wanted more light to grow fast.`,
+      next: 'How could you give the plant more light and still make energy?', hints: ['Light can sneak in from the sides.', 'A high panel lets more side light in. A smaller panel makes less shade.', 'Try the panel set high, or the small panel.'] };
+  }
+  if (cause === 'heat') {
+    const hours = sunny.filter(x => x.Tl > crop.hi).length;
+    const why = `Leaves were above ${crop.hi} °F for ${hours} sunny hours. That is too warm for ${name} to grow well.`;
+    if (d.panels === 'none' || d.panels === 'small') return { why, next: 'What could shade the plant during the hottest hours?',
+      hints: ['When is the sun strongest? What is above the plant then?', 'A bigger panel makes more shade, and shade cools the leaves.', 'Try the big panel or both panels.'] };
+    if (!d.loads.fan) return { why, next: 'Your panel makes power. What could it run to cool the leaves?',
+      hints: ['Moving air carries heat away from the leaves.', 'A running fan cools the leaves by a few degrees.', 'Turn on the fan.'] };
+    if (d.height === 'low') return { why, next: 'How could hot air escape from under the panel?',
+      hints: ['Hot air gets trapped under a low panel.', 'A high panel lets hot air out and side light in.', 'Set the panel high.'] };
+    if (d.crop === 'chili') return { why: `Leaves were above ${crop.hi} °F for ${hours} sunny hours. Even chili pepper grows slowly when it is that hot.`,
+      next: 'This heat is tough for any plant. Did your setup still beat the plant with no panel?',
+      hints: ['Look at the black line on the Food bar.', 'Shade, a high panel and the fan each cool the leaves a little.', 'Compare your score with the no-panel score above.'] };
+    return { why, next: 'Your setup already gives shade and wind. Which plant handles heat best?',
+      hints: ['Some plants like it hot. Read the hint under each plant.', 'Chili pepper handles heat better than lettuce or basil.', 'Try chili pepper with the same setup.'] };
+  }
+  const empty = d.water !== 'hand' ? r.hours.findIndex(x => x.tank <= FEEDBACK.tankEmptyBelow) : -1;
+  if (empty >= 0) return { why: `The tank ran dry on day ${r.hours[empty].day + 1} at ${r.hours[empty].h}:00, then the soil dried out.`,
+    next: 'How could the same water last longer?', hints: ['Where does the water go on a hot day?', 'Shade slows drying, so the same water lasts longer.', 'Try both panels with the pump on.'] };
+  return { why: `The soil got too dry for ${sunny.filter(x => x.dry).length} sunny hours. Thirsty plants stop growing.`,
+    next: 'How could the soil stay wet longer during the day?',
+    hints: ['Where does the water go on a hot afternoon?', 'Shade slows drying. The pump only runs when the panel has power left after the fan.', 'Try both panels with the pump on and the fan off.'] };
 }
 function showResults() {
   const { r, s, design: d, pred: p } = run;

@@ -50,15 +50,10 @@
 
   "feedback": {
     "sameWithin": 0.03,
-    "soggyHours": 6,
-    "tankEmptyBelow": 0.0001,
-    "dryHours": 4,
-    "hotHours": 3,
     "sunnyAbove": 300,
-    "lowLightFactor": 0.8,
-    "lowLightShade": 0.25,
-    "fanHoursPerDay": 5,
-    "lowEnergy": 0.4
+    "bigLoss": 0.3,
+    "lowEnergy": 0.4,
+    "tankEmptyBelow": 0.0001
   },
 
   "challenges": {
