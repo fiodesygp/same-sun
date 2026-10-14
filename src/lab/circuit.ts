@@ -30,11 +30,13 @@ export interface Eval {
   led: boolean
   ledRev: boolean
   pump: Dir
+  /** fan and LED wired one after the other between + and - (a chain) */
+  series: boolean
 }
 
 export function evaluate(wires: Wire[], parts: Part[]): Eval {
   const f = nets(wires), pos = f('p+'), neg = f('p-')
-  const out: Eval = { short: pos === neg && wires.length > 0, motor: 0, led: false, ledRev: false, pump: 0 }
+  const out: Eval = { short: pos === neg && wires.length > 0, motor: 0, led: false, ledRev: false, pump: 0, series: false }
   if (out.short) return out
   const dir = (p: Part): Dir => {
     const [a, b] = PART_TERMS[p]
@@ -47,7 +49,27 @@ export function evaluate(wires: Wire[], parts: Part[]): Eval {
     out.ledRev = d === -1
   }
   if (parts.includes('pump')) out.pump = dir('pump')
+  if (parts.includes('motor') && parts.includes('led')) out.series = isSeries(f, pos, neg)
   return out
+}
+
+/**
+ * A chain: + reaches one part, that part's other end joins the second part, and the second
+ * part's other end reaches -. Either part can come first, each either way round, and the
+ * middle joint must not touch + or - (or it would be a parallel or shorted circuit).
+ */
+function isSeries(f: (t: TermId) => TermId, pos: TermId, neg: TermId) {
+  const ends = (p: Part): [TermId, TermId][] => {
+    const [a, b] = PART_TERMS[p]
+    return [[a, b], [b, a]]
+  }
+  for (const [first, second] of [['motor', 'led'], ['led', 'motor']] as const)
+    for (const [in1, out1] of ends(first))
+      for (const [in2, out2] of ends(second)) {
+        const mid = f(out1)
+        if (f(in1) === pos && mid === f(in2) && f(out2) === neg && mid !== pos && mid !== neg) return true
+      }
+  return false
 }
 
 export type StatusId =
@@ -83,7 +105,7 @@ export function labStatus(level: number, wires: Wire[], selected: boolean, sunOn
       if (ev.motor) return s('bothFanOnly', 'warn')
       if (ev.led) return s('bothLedOnly', 'warn')
       if (ev.ledRev) return s('bothLedBackwards', 'warn')
-      if (wires.length >= 3) return s('bothSeries', 'warn')
+      if (ev.series) return s('bothSeries', 'warn')
       return s('bothNothing')
   }
 }

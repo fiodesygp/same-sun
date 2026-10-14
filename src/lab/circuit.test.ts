@@ -78,6 +78,27 @@ describe('labStatus', () => {
     expect(labStatus(BOTH, [['p+', 'mA'], ['mB', 'lL'], ['lS', 'p-']], false, true)).toMatchObject({ id: 'bothSeries', done: false })
     expect(labStatus(BOTH, [['p+', 'mA']], false, true).id).toBe('bothNothing')
   })
+
+  it('calls it a chain only when fan and LED are really in series', () => {
+    const chains: Wire[][] = [
+      [['p+', 'mA'], ['mB', 'lL'], ['lS', 'p-']], // fan first
+      [['p+', 'lL'], ['lS', 'mB'], ['mA', 'p-']], // LED first, motor turned round
+      [['p-', 'mB'], ['mA', 'lS'], ['lL', 'p+']] // drawn from the - side, LED backwards
+    ]
+    for (const w of chains) expect(labStatus(BOTH, w, false, true)).toMatchObject({ id: 'bothSeries', tone: 'warn' })
+  })
+
+  it('a working parallel circuit with one wire removed is not a chain', () => {
+    const parallel: Wire[] = [['p+', 'mA'], ['p-', 'mB'], ['mA', 'lL'], ['mB', 'lS']]
+    expect(labStatus(BOTH, parallel, false, true).id).toBe('bothOk')
+    expect(labStatus(BOTH, parallel.slice(1), false, true).id).toBe('bothNothing')
+    expect(labStatus(BOTH, [parallel[0], parallel[1], parallel[3]], false, true).id).toBe('bothFanOnly')
+  })
+
+  it('three loose wires are not a chain', () => {
+    expect(labStatus(BOTH, [['p+', 'mA'], ['mB', 'lL'], ['lS', 'mA']], false, true).id).toBe('bothNothing')
+    expect(labStatus(BOTH, [['p+', 'mA'], ['mB', 'lL'], ['p-', 'mA']], false, true).id).not.toBe('bothSeries')
+  })
 })
 
 describe('levelTerms', () => {

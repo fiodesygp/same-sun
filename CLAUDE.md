@@ -48,6 +48,7 @@
 - Spanish: `es.json` has the same keys as `en.json`, with English text as placeholders for now. Claude drafts the Spanish later; a native speaker on the team reviews it before launch.
 - Reading level: 7th grade (ages 12-13). Keep the prototype's wording.
 - Naming: the tab label is "Growth Story". The page heading and the Home card say "Growth Story Card". In code, use `growthStory` for the component, files and storage keys. Never "plan" or "journal".
+- Build Lab layout: the app (`src/views/buildLab/Board.tsx`) is the reference, not the prototype. Terminals were spread for 44 px targets; do not copy them back into `docs/prototype`.
 
 ## Workflow
 - Work in small steps.
