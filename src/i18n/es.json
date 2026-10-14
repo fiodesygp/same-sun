@@ -1,0 +1,18 @@
+{
+  "app.name": "Same Sun",
+  "app.tagline": "miniAgriPV game · prototype",
+  "tabs.label": "Game sections",
+  "tabs.home": "Home",
+  "tabs.sunDay": "Sun Day",
+  "tabs.buildLab": "Build Lab",
+  "tabs.growthStory": "Growth Story",
+  "home.eyebrow": "Girl Scouts Beyond Bars × ASU Mary Lou Fulton College for Teaching and Learning Innovation",
+  "home.title": "Grow food. Make energy. Share the same sun.",
+  "sunDay.eyebrow": "Design · Predict · Test · Explain",
+  "sunDay.title": "Can one sunny spot grow food and make energy?",
+  "buildLab.eyebrow": "Build Lab",
+  "buildLab.title": "Wire it up",
+  "growthStory.eyebrow": "Growth Story Card",
+  "growthStory.title": "How my project grew",
+  "common.comingSoon": "This part is coming soon."
+}

@@ -1,0 +1,21 @@
+/* Design tokens copied from docs/prototype/same-sun-prototype.html :root (light and dark). */
+:root {
+  --bg: #F4F6F2; --surface: #FFFFFF; --line: #DCE3DA; --ink: #17241D; --muted: #5A6B60;
+  --green: #0B6B47; --green-soft: #E3F1EA; --sun: #F2B705; --sun-soft: #FFF4CC; --maroon: #8C1D40;
+  --red: #D9362B; --black-wire: #2B2F2C; --good: #1E7F4F; --warn: #B26A00; --bad: #B3261E;
+  --sky-day: #BFE3F2; --sky-dawn: #F7D7A8; --ground: #C9A779; --ground-dark: #A8865A;
+  --scene-ink: #2B2F2C; --panel: #1B3E66; --panel-cell: #4F7FB0; --post: #8A7A62; --dome: rgba(140,200,235,.22);
+  --pot: #B8693E; --leaf: #3E9B4F; --leaf-dry: #B9A54A; --water: #3E8FD1;
+  --display: "Montserrat", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --radius: 14px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1613; --surface: #17211C; --line: #2A3A31; --ink: #E7EFE9; --muted: #9DB0A4;
+  --green: #4FC48F; --green-soft: #183327; --sun: #F5C83A; --sun-soft: #3A3113; --maroon: #E07A9B;
+  --good: #5ED39A; --warn: #F0B04A; --bad: #FF8A80; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0F1613; --surface: #17211C; --line: #2A3A31; --ink: #E7EFE9; --muted: #9DB0A4;
+  --green: #4FC48F; --green-soft: #183327; --sun: #F5C83A; --sun-soft: #3A3113; --maroon: #E07A9B;
+  --good: #5ED39A; --warn: #F0B04A; --bad: #FF8A80; color-scheme: dark }
