@@ -1,0 +1,53 @@
+/* on phones the two columns become one list: scene, gauges, controls, prediction, results */
+@media (max-width: 860px) {
+  .sunday > .stack { display: contents }
+  .sunday .scene-wrap { order: 1 } .sunday .gauges { order: 2 } .sunday #chips { order: 3 }
+  .sunday #controls { order: 4 } .sunday #predictCard { order: 5 } .sunday #results { order: 6 }
+}
+.playbar { display: flex; gap: 10px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); flex-wrap: wrap }
+.clock { font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; margin-left: auto; color: var(--muted) }
+.progress { flex-basis: 100%; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden }
+.progress i { display: block; height: 100%; width: 0; background: var(--sun) }
+
+.gauges { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px }
+@media (max-width: 520px) { .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.g { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; min-width: 0 }
+.g span { display: block; font-size: 12px; color: var(--muted); font-weight: 600 }
+.g b { font-family: var(--display); font-size: 22px; font-variant-numeric: tabular-nums }
+.g em { font-style: normal; font-size: 12px; font-weight: 700 }
+.meter { height: 6px; border-radius: 9px; background: var(--line); margin-top: 6px; overflow: hidden }
+.meter i { display: block; height: 100%; background: var(--green); width: 0 }
+.chips { display: flex; gap: 6px; flex-wrap: wrap }
+.chip { font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); background: var(--surface) }
+.chip.on { background: var(--sun-soft); border-color: var(--sun); color: var(--ink) }
+
+.ctl { display: grid; gap: 14px }
+.ctl h3 { font-size: 15px; display: flex; align-items: center; gap: 8px }
+.ctl h3::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--sun) }
+.group { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 12px }
+.goal { background: var(--sun-soft); border: 1px solid var(--sun); border-radius: 12px; padding: 10px 12px; font-size: 15px; margin-top: 8px }
+
+.predict { border: 2px dashed var(--sun); background: var(--sun-soft) }
+.predict p { margin: 4px 0 10px }
+.predict .because { margin-top: 12px }
+
+#results:focus { outline: none }
+.score { display: grid; gap: 10px; margin-top: 10px }
+.sbar { display: grid; grid-template-columns: 70px minmax(0, 1fr) 52px; align-items: center; gap: 10px; font-weight: 700 }
+.sbar .track { position: relative; height: 16px; background: var(--bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--line) }
+.sbar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 8px }
+.sbar .ref { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink) }
+.sbar span:last-child { text-align: right; font-variant-numeric: tabular-nums }
+.total { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap }
+.total b { font-family: var(--display); font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums }
+.fb { display: grid; gap: 10px; margin-top: 4px }
+.fb div { border-left: 4px solid var(--line); padding: 2px 0 2px 12px }
+.fb .k { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--muted) }
+.fb .why { border-color: var(--sun) }
+.fb .next { border-color: var(--green) }
+.badge { display: inline-block; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 99px }
+.badge.pass { background: var(--green-soft); color: var(--good) }
+.badge.fail { background: var(--sun-soft); color: var(--warn) }
+.ladder { font-size: 15px; display: grid; gap: 6px; margin-top: 10px }
+.ladder p { margin: 0; padding: 8px 12px; background: var(--bg); border-radius: 10px }
+#results .row { margin-top: 10px }

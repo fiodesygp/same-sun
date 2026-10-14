@@ -1,0 +1,19 @@
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: clamp(16px, 4vw, 36px) }
+@media (max-width: 860px) { .hero { grid-template-columns: minmax(0, 1fr) } }
+.hero-text { display: grid; gap: 14px; min-width: 0 }
+.big { font-size: clamp(30px, 5.4vw, 48px); line-height: 1.05; font-weight: 800; letter-spacing: -.015em }
+.dq { border: 2px solid var(--green); border-radius: var(--radius); padding: 12px 16px }
+.dq p { margin: 4px 0 0; font-family: var(--display); font-weight: 700; font-size: clamp(17px, 2.2vw, 21px); line-height: 1.25 }
+.h2 { font-size: clamp(20px, 3vw, 26px); margin-bottom: 12px }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+@media (max-width: 760px) { .trio { grid-template-columns: minmax(0, 1fr) } }
+.steps { margin-top: 12px }
+.feat { color: var(--green); display: grid; gap: 6px; align-content: start }
+.feat h3, .step-title { color: var(--ink); font-size: 17px; font-family: var(--display); font-weight: 700 }
+.feat p, .step-text { color: var(--ink); margin: 0 }
+.step { text-align: left; cursor: pointer; display: grid; gap: 6px; align-content: start; font: inherit }
+.step:hover { border-color: var(--green) }
+.step .tag { justify-self: start; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; background: var(--green); color: var(--surface); padding: 3px 10px; border-radius: 6px }
+.step:nth-child(2) .tag { background: var(--sun); color: #17241D }
+.step:nth-child(3) .tag { background: var(--maroon); color: var(--surface) }
+.step .go { font-weight: 700; color: var(--green); font-size: 14px }

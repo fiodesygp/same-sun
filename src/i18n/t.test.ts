@@ -20,3 +20,10 @@ describe('i18n', () => {
     expect(t('tabs.growthStory')).toBe(es['tabs.growthStory'])
   })
 })
+
+describe('t() slots', () => {
+  it('fills {name} slots and leaves unknown ones alone', () => {
+    expect(t('chips.tank', { n: 40 })).toBe('Tank 40%')
+    expect(t('sunDay.clock', { hour: 9 })).toBe('9:00 · Day {day}')
+  })
+})

@@ -5,14 +5,21 @@ import { GrowthStory } from './views/GrowthStory'
 import { Home } from './views/Home'
 import { SunDay } from './views/SunDay'
 
-const VIEWS: Record<TabId, () => React.JSX.Element> = { home: Home, sunDay: SunDay, buildLab: BuildLab, growthStory: GrowthStory }
-
 export function App() {
   const [tab, setTab] = useState<TabId>('home')
 
   function select(id: TabId) {
     setTab(id)
     window.scrollTo(0, 0)
+    // buttons inside a page (Start Sun Day, ...) hide themselves, so keep focus on the new tab
+    document.getElementById(`t-${id}`)?.focus()
+  }
+
+  const views: Record<TabId, React.ReactNode> = {
+    home: <Home onGo={select} />,
+    sunDay: <SunDay />,
+    buildLab: <BuildLab />,
+    growthStory: <GrowthStory />
   }
 
   // every view stays mounted (hidden when inactive) so a tab keeps its state when you switch away
@@ -20,14 +27,11 @@ export function App() {
     <>
       <Header tab={tab} onSelect={select} />
       <main>
-        {TABS.map(({ id }) => {
-          const View = VIEWS[id]
-          return (
-            <section key={id} className="view" id={`v-${id}`} role="tabpanel" aria-labelledby={`t-${id}`} hidden={tab !== id}>
-              <View />
-            </section>
-          )
-        })}
+        {TABS.map(({ id }) => (
+          <section key={id} className={`view ${id}`} id={`v-${id}`} role="tabpanel" aria-labelledby={`t-${id}`} hidden={tab !== id}>
+            {views[id]}
+          </section>
+        ))}
       </main>
     </>
   )

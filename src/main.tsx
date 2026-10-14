@@ -4,6 +4,8 @@ import { App } from './App'
 import './styles/fonts.css'
 import './styles/tokens.css'
 import './styles/app.css'
+import './styles/home.css'
+import './styles/sunday.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

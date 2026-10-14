@@ -936,7 +936,7 @@ const pct = x => Math.round(x * 100);
 function pickRule(r, s, d) {
   const crop = MODEL.crops[d.crop];
   const hot = r.hours.filter(x => x.hot).length, dry = r.hours.filter(x => x.dry && x.S > 0).length, soggy = r.hours.filter(x => x.soggy).length;
-  const fanH = r.hours.filter(x => x.on.fan).length / r.days, sunny = r.hours.filter(x => x.S > 300);
+  const fanH = r.hours.filter(x => x.on.fan).length / r.daily.length, sunny = r.hours.filter(x => x.S > 300);
   const light = sunny.reduce((a, x) => a + x.L / x.S, 0) / Math.max(1, sunny.length);
   const flAvg = sunny.reduce((a, x) => a + x.fl, 0) / Math.max(1, sunny.length);
   const emptyDay = d.water !== 'hand' ? r.hours.findIndex(x => x.tank <= 0.0001) : -1;

@@ -48,6 +48,19 @@
   "fixed": { "tilt": 30, "gap": "small", "priority": "fan", "trigger": 0.45, "tank": "large" },
   "bestPanel": { "panels": "both", "tiltFrom": 0, "tiltTo": 45, "tiltStep": 5 },
 
+  "feedback": {
+    "sameWithin": 0.03,
+    "soggyHours": 6,
+    "tankEmptyBelow": 0.0001,
+    "dryHours": 4,
+    "hotHours": 3,
+    "sunnyAbove": 300,
+    "lowLightFactor": 0.8,
+    "lowLightShade": 0.25,
+    "fanHoursPerDay": 5,
+    "lowEnergy": 0.4
+  },
+
   "challenges": {
     "heat": { "set": { "weather": "july", "days": 7, "crop": "basil" }, "needs": "fan", "foodTimesNoPanel": 2, "minFood": 0.05 },
     "fan":  { "set": { "weather": "october", "days": 1 }, "needs": "fan", "fromHour": 12, "toHour": 17 },
