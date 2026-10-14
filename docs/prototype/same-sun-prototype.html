@@ -1,0 +1,1359 @@
+<title>Same Sun</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: app bar + 3 tabs; Sun Day = scene & results column beside a controls column, stacked on phones. Matches the miniAgriPV site: deep green, sun yellow, Fulton maroon. */
+:root {
+  --bg: #F4F6F2; --surface: #FFFFFF; --line: #DCE3DA; --ink: #17241D; --muted: #5A6B60;
+  --green: #0B6B47; --green-soft: #E3F1EA; --sun: #F2B705; --sun-soft: #FFF4CC; --maroon: #8C1D40;
+  --red: #D9362B; --black-wire: #2B2F2C; --good: #1E7F4F; --warn: #B26A00; --bad: #B3261E;
+  --sky-day: #BFE3F2; --sky-dawn: #F7D7A8; --ground: #C9A779; --ground-dark: #A8865A;
+  --scene-ink: #2B2F2C; --panel: #1B3E66; --panel-cell: #4F7FB0; --post: #8A7A62; --dome: rgba(140,200,235,.22);
+  --pot: #B8693E; --leaf: #3E9B4F; --leaf-dry: #B9A54A; --water: #3E8FD1;
+  --display: "Montserrat", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1613; --surface: #17211C; --line: #2A3A31; --ink: #E7EFE9; --muted: #9DB0A4;
+  --green: #4FC48F; --green-soft: #183327; --sun: #F5C83A; --sun-soft: #3A3113; --maroon: #E07A9B;
+  --good: #5ED39A; --warn: #F0B04A; --bad: #FF8A80; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0F1613; --surface: #17211C; --line: #2A3A31; --ink: #E7EFE9; --muted: #9DB0A4;
+  --green: #4FC48F; --green-soft: #183327; --sun: #F5C83A; --sun-soft: #3A3113; --maroon: #E07A9B;
+  --good: #5ED39A; --warn: #F0B04A; --bad: #FF8A80; color-scheme: dark }
+
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0 }
+button { font: inherit; color: inherit }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; border-radius: 8px }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line) }
+.bar-in { max-width: 1120px; margin: 0 auto; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap }
+.brand { display: flex; align-items: center; gap: 10px; margin-right: auto }
+.brand svg { flex: none }
+.brand b { font-family: var(--display); font-weight: 800; font-size: 20px; letter-spacing: -.01em }
+.brand small { display: block; font-size: 12px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; font-weight: 600 }
+.tabs { display: flex; flex: 1 1 auto; justify-content: space-between; gap: 4px; background: var(--bg); padding: 4px; border-radius: 999px; overflow-x: auto; max-width: 100% }
+.tab { border: 0; background: transparent; padding: 8px 12px; flex: 1 0 auto; border-radius: 999px; font-weight: 700; white-space: nowrap; cursor: pointer; min-height: 40px }
+.tab[aria-selected="true"] { background: var(--green); color: var(--surface) }
+
+main { max-width: 1120px; margin: 0 auto; padding-block: 16px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.view { display: grid; gap: 16px }
+.cols { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start }
+@media (max-width: 860px) {
+  .sunday > .stack { display: contents }
+  .sunday .scene-wrap { order: 1 } .sunday .gauges { order: 2 } .sunday #chips { order: 3 }
+  .sunday #controls { order: 4 } .sunday #predictCard { order: 5 } .sunday #results { order: 6 }
+}
+@media (max-width: 900px) { .tabs { flex-basis: 100% } }
+@media (max-width: 480px) { .tab { padding: 8px 9px; font-size: 15px } .tabs { flex-basis: 100% } }
+@media (max-width: 860px) { .cols { grid-template-columns: minmax(0, 1fr) } }
+.stack { display: grid; gap: 16px; min-width: 0 }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0 }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green) }
+.lede { color: var(--muted); margin: 4px 0 0; max-width: 60ch }
+
+/* scene */
+.scene-wrap { padding: 0; overflow: hidden }
+.scene { display: block; width: 100%; height: auto; background: var(--sky-day) }
+.playbar { display: flex; gap: 10px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); flex-wrap: wrap }
+.btn { border: 2px solid var(--green); background: var(--green); color: var(--surface); font-weight: 700; padding: 10px 18px; border-radius: 999px; cursor: pointer; min-height: 44px; display: inline-flex; align-items: center; gap: 8px }
+.btn.ghost { background: transparent; color: var(--green) }
+.btn:disabled { opacity: .45; cursor: not-allowed }
+.clock { font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; margin-left: auto; color: var(--muted) }
+.progress { flex-basis: 100%; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden }
+.progress i { display: block; height: 100%; width: 0; background: var(--sun) }
+
+.gauges { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px }
+@media (max-width: 520px) { .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.g { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; min-width: 0 }
+.g span { display: block; font-size: 12px; color: var(--muted); font-weight: 600 }
+.g b { font-family: var(--display); font-size: 22px; font-variant-numeric: tabular-nums }
+.g em { font-style: normal; font-size: 12px; font-weight: 700 }
+.meter { height: 6px; border-radius: 9px; background: var(--line); margin-top: 6px; overflow: hidden }
+.meter i { display: block; height: 100%; background: var(--green); width: 0 }
+.chips { display: flex; gap: 6px; flex-wrap: wrap }
+.chip { font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); background: var(--surface) }
+.chip.on { background: var(--sun-soft); border-color: var(--sun); color: var(--ink) }
+
+/* controls */
+.ctl { display: grid; gap: 14px }
+.ctl h3 { font-size: 15px; display: flex; align-items: center; gap: 8px }
+.ctl h3::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--sun) }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0 }
+legend { font-size: 14px; font-weight: 700; margin-bottom: 6px; padding: 0 }
+.seg { display: flex; flex-wrap: wrap; gap: 6px }
+.seg button { border: 1.5px solid var(--line); background: var(--surface); padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: 600; min-height: 44px; flex: 1 1 auto }
+.seg button[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft); color: var(--ink); box-shadow: inset 0 0 0 1px var(--green) }
+.seg button:disabled { opacity: .4; cursor: not-allowed }
+.row { display: flex; gap: 10px; align-items: center }
+input[type=range] { width: 100%; accent-color: var(--green); min-height: 32px }
+.val { font-family: var(--display); font-weight: 700; min-width: 3.5ch; text-align: right; font-variant-numeric: tabular-nums }
+.hint { font-size: 13px; color: var(--muted); margin: 4px 0 0 }
+.group { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 12px }
+select { font: inherit; width: 100%; padding: 10px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); min-height: 44px }
+.goal { background: var(--sun-soft); border: 1px solid var(--sun); border-radius: 12px; padding: 10px 12px; font-size: 15px }
+
+/* predict & results */
+.predict { border: 2px dashed var(--sun); background: var(--sun-soft) }
+.predict p { margin: 4px 0 10px }
+.score { display: grid; gap: 10px }
+.sbar { display: grid; grid-template-columns: 70px minmax(0, 1fr) 52px; align-items: center; gap: 10px; font-weight: 700 }
+.sbar .track { position: relative; height: 16px; background: var(--bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--line) }
+.sbar .fill { position: absolute; inset: 0 auto 0 0; border-radius: 8px }
+.sbar .ref { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink) }
+.sbar span:last-child { text-align: right; font-variant-numeric: tabular-nums }
+.total { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap }
+.total b { font-family: var(--display); font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums }
+.fb { display: grid; gap: 10px; margin-top: 4px }
+.fb div { border-left: 4px solid var(--line); padding: 2px 0 2px 12px }
+.fb .k { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--muted) }
+.fb .why { border-color: var(--sun) }
+.fb .next { border-color: var(--green) }
+.badge { display: inline-block; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 99px }
+.badge.pass { background: var(--green-soft); color: var(--good) }
+.badge.fail { background: var(--sun-soft); color: var(--warn) }
+.ladder { font-size: 15px; display: grid; gap: 6px }
+.ladder p { margin: 0; padding: 8px 12px; background: var(--bg); border-radius: 10px }
+
+/* build lab */
+.lab svg { width: 100%; height: auto; display: block; touch-action: manipulation }
+.term { cursor: pointer }
+.term circle.hit { fill: transparent }
+.term.sel circle.ring { stroke: var(--sun); stroke-width: 4 }
+.wire { cursor: pointer }
+.status { font-weight: 600; padding: 10px 12px; border-radius: 10px; background: var(--bg) }
+.status.ok { background: var(--green-soft) }
+.status.warn { background: var(--sun-soft) }
+.levels { display: flex; gap: 6px; flex-wrap: nowrap }
+.levels button { flex: 1 1 0; padding: 8px 4px; min-width: 0; white-space: nowrap; font-size: 15px }
+.real { border: 1px solid var(--green); background: var(--green-soft); border-radius: 12px; padding: 12px }
+
+/* plan */
+.plan-card { border: 2px solid var(--green); border-radius: var(--radius); padding: 16px; background: var(--surface); font-size: 18px }
+.plan-card p { margin: 0 0 8px }
+.plan-card strong { color: var(--green) }
+table { width: 100%; border-collapse: collapse; font-size: 15px }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted) }
+.tablewrap { overflow-x: auto }
+.empty { color: var(--muted); font-style: italic }
+.foot { font-size: 13px; color: var(--muted) }
+
+/* home */
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: clamp(16px, 4vw, 36px) }
+@media (max-width: 860px) { .hero { grid-template-columns: minmax(0, 1fr) } }
+.hero-text { display: grid; gap: 14px; min-width: 0 }
+.big { font-size: clamp(30px, 5.4vw, 48px); line-height: 1.05; font-weight: 800; letter-spacing: -.015em }
+.eyebrow.maroon { color: var(--maroon) }
+.dq { border: 2px solid var(--green); border-radius: var(--radius); padding: 12px 16px }
+.dq p { margin: 4px 0 0; font-family: var(--display); font-weight: 700; font-size: clamp(17px, 2.2vw, 21px); line-height: 1.25 }
+.h2 { font-size: clamp(20px, 3vw, 26px); margin-bottom: 12px }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+@media (max-width: 760px) { .trio { grid-template-columns: minmax(0, 1fr) } }
+.feat { color: var(--green); display: grid; gap: 6px; align-content: start }
+.feat h3, .step h3 { color: var(--ink); font-size: 17px }
+.feat p, .step p { color: var(--ink); margin: 0 }
+.step { text-align: left; cursor: pointer; display: grid; gap: 6px; align-content: start; font: inherit }
+.step:hover { border-color: var(--green) }
+.step .tag { justify-self: start; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; background: var(--green); color: var(--surface); padding: 3px 10px; border-radius: 6px }
+.step:nth-child(2) .tag { background: var(--sun); color: #17241D }
+.step:nth-child(3) .tag { background: var(--maroon); color: var(--surface) }
+.step .go { font-weight: 700; color: var(--green); font-size: 14px }
+
+/* journal */
+.journal .jform, .journal .jview { display: grid; gap: 14px; min-width: 0 }
+.journal .jview { max-width: 680px }
+.jcols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+.opt { font-weight: 400; color: var(--muted); font-size: 13px }
+.newbtn { justify-self: start; font-size: 17px; padding: 12px 22px }
+.newbtn span { font-size: 22px; line-height: 1 }
+.back { justify-self: start; border: 0; background: none; color: var(--green); font-weight: 700; cursor: pointer; padding: 6px 0; min-height: 40px }
+.linkbtn { border: 0; background: none; color: var(--muted); text-decoration: underline; cursor: pointer; font-size: 15px; min-height: 40px; padding: 4px 6px }
+.linkbtn.danger { color: var(--bad) }
+.stepbtns { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px }
+@media (max-width: 460px) { .stepbtns { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
+.stepbtns button { border: 2px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 4px; min-height: 52px; cursor: pointer; font-weight: 700; font-size: 14px; line-height: 1.15 }
+.stepbtns button small { display: block; font-weight: 400; font-size: 12px; color: var(--muted) }
+.stepbtns button.s[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft) }
+.stepbtns button.h[aria-pressed="true"] { border-color: var(--sun); background: var(--sun-soft) }
+.photo-drop { display: grid; place-items: center; min-height: 120px; border: 2px dashed var(--line); border-radius: 12px; background: var(--bg); cursor: pointer; overflow: hidden; color: var(--muted); font-weight: 600; text-align: center; padding: 10px; gap: 6px }
+.photo-drop:hover { border-color: var(--green) }
+.photo-drop img { max-height: 240px; width: auto; border-radius: 8px }
+textarea { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); resize: vertical }
+.starters { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px }
+.starters button { border: 1px dashed var(--green); background: transparent; color: var(--green); border-radius: 99px; padding: 5px 10px; font-size: 14px; font-weight: 600; cursor: pointer; min-height: 34px }
+.formmsg { font-weight: 600; color: var(--muted) }
+.jsteps { display: grid; gap: 18px }
+.jstep h3 { font-size: 15px; display: flex; align-items: center; gap: 8px; margin-bottom: 8px }
+.jstep h3 .n { font-family: var(--body); font-weight: 600; color: var(--muted); font-size: 13px }
+.dot { width: 12px; height: 12px; border-radius: 3px; flex: none }
+.dot.s { background: var(--green) } .dot.h { background: var(--sun) }
+.jstep .none { color: var(--muted); font-style: italic; font-size: 14px; margin: 0 0 0 20px }
+.erow { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px; cursor: pointer; font: inherit; color: inherit; margin-bottom: 8px }
+.erow:hover { border-color: var(--green) }
+.erow .thumb { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; background: var(--bg); display: grid; place-items: center; color: var(--muted); font-size: 24px }
+.erow .txt { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.35 }
+.erow .when { font-size: 13px; color: var(--muted) }
+.erow .chev { color: var(--green); font-weight: 700 }
+.jview .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.jview img { width: 100%; border-radius: 12px; max-height: 70vh; object-fit: contain; background: var(--bg) }
+.jview p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 18px; line-height: 1.5 }
+.stag { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px }
+.stag.s { background: var(--green); color: var(--surface) } .stag.h { background: var(--sun); color: #17241D }
+.when { font-size: 14px; color: var(--muted) }
+details summary { cursor: pointer }
+.exnote { background: var(--sun-soft); border: 1px solid var(--sun); border-radius: 12px; padding: 10px 14px; font-size: 15px }
+.exbadge { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 6px; border: 1px dashed var(--warn); color: var(--warn); margin-right: 6px }
+.erow.ex { border-style: dashed }
+
+@keyframes spin { to { transform: rotate(360deg) } }
+.blades { transform-box: fill-box; transform-origin: center }
+.spin .blades { animation: spin .5s linear infinite }
+.spin.rev .blades { animation-direction: reverse }
+@keyframes drip { 0% { opacity: 0; transform: translateY(-6px) } 30% { opacity: 1 } 100% { opacity: 0; transform: translateY(10px) } }
+.drop { animation: drip 1s ease-in infinite }
+.drop:nth-child(2) { animation-delay: .33s } .drop:nth-child(3) { animation-delay: .66s }
+@keyframes flow { to { stroke-dashoffset: -16 } }
+.air { stroke-dasharray: 6 10; animation: flow .5s linear infinite }
+@media (prefers-reduced-motion: reduce) { .spin .blades, .drop, .air { animation: none } }
+</style>
+
+<header class="bar"><div class="bar-in">
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="11" r="7" fill="#F2B705"/><rect x="4" y="18" width="26" height="5" rx="1.5" fill="#1B3E66" transform="rotate(-8 17 20)"/><path d="M17 33 V25 M17 28 q-5 -1 -6 -5 q5 0 6 5 M17 27 q5 -1 6 -5 q-5 0 -6 5" stroke="#3E9B4F" stroke-width="2" fill="#3E9B4F"/></svg>
+    <div><b>Same Sun</b><small>miniAgriPV game · prototype</small></div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Game sections">
+    <button class="tab" role="tab" id="t-home" aria-selected="true" aria-controls="v-home">Home</button>
+    <button class="tab" role="tab" id="t-sun" aria-selected="false" aria-controls="v-sun">Sun Day</button>
+    <button class="tab" role="tab" id="t-lab" aria-selected="false" aria-controls="v-lab">Build Lab</button>
+    <button class="tab" role="tab" id="t-plan" aria-selected="false" aria-controls="v-plan">Growth Story</button>
+  </nav>
+</div></header>
+
+<main>
+<!-- ================= HOME ================= -->
+<section class="view home" id="v-home" role="tabpanel" aria-labelledby="t-home">
+  <div class="hero">
+    <div class="hero-text">
+      <div class="eyebrow maroon">Girl Scouts Beyond Bars × ASU Mary Lou Fulton College for Teaching and Learning Innovation</div>
+      <h1 class="big">Grow food. Make energy. Share the same sun.</h1>
+      <p class="lede">In Same Sun you build a mini agrivoltaic system: a small solar panel set above a plant, so one sunny spot makes energy and grows food. Test your ideas here, then try them on your real kit.</p>
+      <div class="dq">
+        <div class="eyebrow">Our driving question</div>
+        <p>How can one sunny space grow food and make energy at the same time?</p>
+      </div>
+      <div class="row" style="flex-wrap:wrap">
+        <button class="btn" type="button" data-go="t-sun">Start Sun Day</button>
+        <button class="btn ghost" type="button" data-go="t-lab">Wire it in Build Lab</button>
+      </div>
+    </div>
+    <div class="card scene-wrap hero-art">
+      <svg class="scene" id="heroScene" viewBox="0 0 360 230" role="img" aria-label="A solar panel on posts above a seedling in a pot, with a small fan beside it"></svg>
+    </div>
+  </div>
+
+  <div>
+    <h2 class="h2">What is a mini agrivoltaic system?</h2>
+    <div class="trio">
+      <div class="card feat">
+        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 2v4M14 22v4M2 14h4M22 14h4M5.5 5.5l2.8 2.8M19.7 19.7l2.8 2.8M5.5 22.5l2.8-2.8M19.7 8.3l2.8-2.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <h3>Panel above</h3>
+        <p>A small solar panel turns sunlight into electricity that lights an LED or spins a tiny fan.</p>
+      </div>
+      <div class="card feat">
+        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 26V13M14 15c-6 0-8-4-8-8 5 0 8 3 8 8zM14 13c0-5 3-8 8-8 0 4-2 8-8 8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <h3>Plants below</h3>
+        <p>Seedlings grow in the panel’s shade, which can shelter them from desert heat.</p>
+      </div>
+      <div class="card feat">
+        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M5 25V9l18-4v20M5 13h18M11 25v-6h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <h3>You design it</h3>
+        <p>You choose panel size, height and plant, then test what works and why.</p>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h2 class="h2">How to play</h2>
+    <p class="lede">Three parts. Each one matches something you do with your real kit.</p>
+    <div class="trio steps">
+      <button class="card step" type="button" data-go="t-sun">
+        <span class="tag">Sun Day</span>
+        <h3>Design and test</h3>
+        <p>Pick a plant and a panel, guess what will happen, then watch a sunny day in under a minute.</p>
+        <span class="go">Open Sun Day →</span>
+      </button>
+      <button class="card step" type="button" data-go="t-lab">
+        <span class="tag">Build Lab</span>
+        <h3>Wire it up</h3>
+        <p>Connect the panel to the fan and LED. Red goes to +, black goes to −.</p>
+        <span class="go">Open Build Lab →</span>
+      </button>
+      <button class="card step" type="button" data-go="t-plan">
+        <span class="tag">Growth Story Card</span>
+        <h3>Show your work</h3>
+        <p>Add a photo and a few words each time you work on your project, then open them again any time.</p>
+        <span class="go">Open my Growth Story Card →</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SUN DAY ================= -->
+<section class="view" id="v-sun" role="tabpanel" aria-labelledby="t-sun" hidden>
+  <div>
+    <div class="eyebrow">Design · Predict · Test · Explain</div>
+    <h1 style="font-size:clamp(24px,4vw,34px)">Can one sunny spot grow food and make energy?</h1>
+    <p class="lede">Set up your panels above a seedling, guess what will happen, then run a sunny Arizona day and see how your plant and your panel did.</p>
+  </div>
+  <div class="cols sunday">
+    <div class="stack">
+      <div class="card scene-wrap">
+        <svg class="scene" id="scene" viewBox="0 0 360 230" role="img" aria-label="Side view of the plant, dome, panels, fan and water tank"></svg>
+        <div class="playbar">
+          <button class="btn" id="play" type="button"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1 L13 7 L2 13 Z" fill="currentColor"/></svg><span id="playLabel">Run the day</span></button>
+          <button class="btn ghost" id="skip" type="button" hidden>Skip to results</button>
+          <span class="clock" id="clock" aria-live="off">6:00 · Day 1</span>
+          <div class="progress" aria-hidden="true"><i id="prog"></i></div>
+        </div>
+      </div>
+      <div class="gauges" aria-live="polite">
+        <div class="g"><span>Energy made</span><b id="gE">0</b> <em>Wh</em></div>
+        <div class="g"><span>Leaf temperature</span><b id="gT">–</b> <em id="gTs"></em></div>
+        <div class="g"><span>Soil water</span><b id="gM">–</b> <em id="gMs"></em><div class="meter"><i id="gMm"></i></div></div>
+        <div class="g"><span>Plant growth</span><b id="gG">0%</b><div class="meter"><i id="gGm"></i></div></div>
+      </div>
+      <div class="chips" id="chips" aria-label="What is running now"></div>
+
+      <div class="card predict" id="predictCard">
+        <div class="eyebrow" style="color:var(--warn)">Before you test</div>
+        <h2 style="font-size:18px">Make a prediction</h2>
+        <p>Compared with the same plant in full sun with no panel, your plant will grow…</p>
+        <div class="seg" id="predGuess" role="group" aria-label="Your guess">
+          <button type="button" data-v="more" aria-pressed="false">More</button>
+          <button type="button" data-v="same" aria-pressed="false">About the same</button>
+          <button type="button" data-v="less" aria-pressed="false">Less</button>
+        </div>
+        <p style="margin-top:12px">…because</p>
+        <div class="seg" id="predWhy" role="group" aria-label="Your reason">
+          <button type="button" data-v="the shade keeps it cool" aria-pressed="false">the shade keeps it cool</button>
+          <button type="button" data-v="it needs lots of light" aria-pressed="false">it needs lots of light</button>
+          <button type="button" data-v="the fan cools it" aria-pressed="false">the fan cools it</button>
+          <button type="button" data-v="the pump keeps the soil wet" aria-pressed="false">the pump keeps the soil wet</button>
+        </div>
+      </div>
+
+      <div class="card" id="results" hidden>
+        <div class="eyebrow">Results</div>
+        <div class="total"><b id="rTotal">0</b><span>Sun Score out of 200</span><span id="rBadge"></span></div>
+        <p class="hint" id="rRef"></p>
+        <div class="score" style="margin-top:10px">
+          <div class="sbar"><span>Food</span><div class="track"><div class="fill" id="rFood" style="background:var(--leaf)"></div><div class="ref" id="rFoodRef" title="Full-sun plant"></div></div><span id="rFoodV"></span></div>
+          <div class="sbar"><span>Energy</span><div class="track"><div class="fill" id="rEn" style="background:var(--sun)"></div></div><span id="rEnV"></span></div>
+        </div>
+        <p class="hint">The black line on Food marks a plant in full sun with no panel. Food is out of a perfect day; Energy is out of the best panel setup.</p>
+        <div class="fb">
+          <div><span class="k">Your prediction</span><span id="fPred"></span></div>
+          <div><span class="k">What happened</span><span id="fWhat"></span></div>
+          <div class="why"><span class="k">Why</span><span id="fWhy"></span></div>
+          <div class="next"><span class="k">Try next</span><span id="fNext"></span></div>
+        </div>
+        <div class="ladder" id="ladder" style="margin-top:10px"></div>
+        <div class="row" style="margin-top:10px; flex-wrap:wrap">
+          <button class="btn ghost" id="hintBtn" type="button">Need a hint?</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ctl" id="controls">
+      <fieldset>
+        <legend><label for="challenge">Play mode</label></legend>
+        <select id="challenge" aria-describedby="goal">
+          <option value="free">Free play</option>
+          <option value="heat">Challenge 1: Beat the heat</option>
+          <option value="fan">Challenge 2: Fan all afternoon</option>
+          <option value="tank">Challenge 3: Water by itself all week</option>
+        </select>
+        <div class="goal" id="goal" hidden style="margin-top:8px"></div>
+      </fieldset>
+
+      <div class="group">
+        <h3>1 · Pick a plant and a day</h3>
+        <fieldset><legend>Plant</legend><div class="seg" data-key="crop">
+          <button type="button" data-v="lettuce">Lettuce</button><button type="button" data-v="basil">Basil</button><button type="button" data-v="chili">Chili pepper</button></div>
+          <p class="hint" id="cropHint"></p></fieldset>
+        <fieldset><legend>Weather</legend><div class="seg" data-key="weather">
+          <button type="button" data-v="october">Sunny day, 90 °F</button><button type="button" data-v="july">Heat wave, 110 °F</button></div></fieldset>
+        <fieldset><legend>How long</legend><div class="seg" data-key="days">
+          <button type="button" data-v="1">1 day</button><button type="button" data-v="7">1 week</button></div></fieldset>
+      </div>
+
+      <div class="group">
+        <h3>2 · Set up your panel</h3>
+        <fieldset><legend>Panel size</legend><div class="seg" data-key="panels">
+          <button type="button" data-v="none">No panel</button><button type="button" data-v="small">Small</button>
+          <button type="button" data-v="large">Big</button><button type="button" data-v="both">Both</button></div>
+          <p class="hint">Bigger panels make more energy, and more shade.</p></fieldset>
+        <fieldset><legend>Panel height</legend><div class="seg" data-key="height">
+          <button type="button" data-v="low">Low</button><button type="button" data-v="high">High</button></div>
+          <p class="hint">A high panel lets more light in from the sides.</p></fieldset>
+      </div>
+
+      <div class="group">
+        <h3>3 · Use the energy</h3>
+        <fieldset><legend>Turn on</legend><div class="seg" data-key="loads" data-multi="1">
+          <button type="button" data-v="fan">Fan to cool the plant</button><button type="button" data-v="pump">Pump to water the plant</button></div>
+          <p class="hint" id="waterHint"></p></fieldset>
+      </div>
+      <p class="foot">Prototype numbers are made up to feel right, not measured. The team will tune them with the real kit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= BUILD LAB ================= -->
+<section class="view" id="v-lab" role="tabpanel" aria-labelledby="t-lab" hidden>
+  <div>
+    <div class="eyebrow">Build Lab</div>
+    <h1 style="font-size:clamp(24px,4vw,34px)">Wire it up</h1>
+    <p class="lede">Tap a metal dot, then tap another dot to join them with a wire. Tap a wire to remove it. Turn on the sun to test.</p>
+  </div>
+  <div class="cols">
+    <div class="card lab stack">
+      <div class="levels seg" id="levels" role="group" aria-label="Level">
+        <button type="button" data-l="0" aria-pressed="true">1 · Fan</button>
+        <button type="button" data-l="1" aria-pressed="false">2 · LED</button>
+        <button type="button" data-l="2" aria-pressed="false">3 · Both</button>
+        <button type="button" data-l="3" aria-pressed="false">4 · Pump</button>
+      </div>
+      <svg id="lab" viewBox="0 0 360 270" role="img" aria-label="Wiring board"></svg>
+      <div class="row" style="flex-wrap:wrap">
+        <button class="btn" id="sunBtn" type="button" aria-pressed="false">Turn on the sun</button>
+        <button class="btn ghost" id="resetBtn" type="button">Clear wires</button>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card">
+        <div class="eyebrow">Goal</div>
+        <p id="labGoal" style="margin:6px 0 0; font-size:17px"></p>
+      </div>
+      <div class="status" id="labStatus" aria-live="polite">Tap a dot to start a wire.</div>
+      <div class="real" id="labReal" hidden>
+        <div class="eyebrow">Try it for real</div>
+        <p id="labRealText" style="margin:6px 0 0"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MY PLAN ================= -->
+<section class="view journal" id="v-plan" role="tabpanel" aria-labelledby="t-plan" hidden>
+  <div>
+    <div class="eyebrow">Growth Story Card</div>
+    <h1 style="font-size:clamp(24px,4vw,34px)">How my project grew</h1>
+    <p class="lede">Add a photo and a few words each time you work on your project. Your entries show up under My entries. Tap one to open it again.</p>
+  </div>
+
+  <!-- add an entry + my entries -->
+  <div id="jListView" class="cols jcols">
+  <form id="jForm" class="card jform" novalidate>
+    <h2 style="font-size:20px" id="jFormTitle">New entry</h2>
+    <fieldset><legend>Which step?</legend>
+      <div class="stepbtns" id="jStage" role="group" aria-label="Project step"></div>
+    </fieldset>
+    <fieldset><legend>Photo <span class="opt">optional</span></legend>
+      <label class="photo-drop" for="jPhoto">
+        <img id="jPrev" alt="" hidden>
+        <span id="jDropText">Tap to add a photo</span>
+      </label>
+      <input type="file" id="jPhoto" accept="image/*" class="sr">
+      <div class="row" style="justify-content:space-between; flex-wrap:wrap">
+        <span class="hint" style="margin:0">Show your plant, panel or wires. No faces or names.</span>
+        <button type="button" class="linkbtn" id="jPhotoClear" hidden>Remove photo</button>
+      </div>
+    </fieldset>
+    <fieldset><legend><label for="jStory">What happened?</label></legend>
+      <textarea id="jStory" rows="5" maxlength="1200" placeholder="What did you do? What did you notice?"></textarea>
+      <div class="starters" id="jStarters" aria-label="Sentence starters"></div>
+    </fieldset>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn" type="submit" id="jSave">Save</button>
+      <button class="linkbtn" type="button" id="jCancel" hidden>Cancel edit</button>
+      <span class="formmsg" id="jMsg" role="status"></span>
+    </div>
+  </form>
+    <div class="stack">
+      <h2 class="h2" style="margin:0">My entries</h2>
+      <div id="jList" class="jsteps"></div>
+      <details class="card">
+        <summary><b>My Sun Day tests</b></summary>
+        <div class="tablewrap" style="margin-top:10px"><table><thead><tr><th>Design</th><th>I guessed</th><th>It grew</th><th>Sun Score</th></tr></thead><tbody id="runs"></tbody></table></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- open one entry -->
+  <article id="jView" class="card jview" hidden>
+    <button class="back" type="button" data-back>← Back to my Growth Story Card</button>
+    <div class="meta"><span class="stag" id="vTag"></span><span class="when" id="vWhen"></span></div>
+    <img id="vImg" alt="" hidden>
+    <p id="vStory"></p>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn ghost" type="button" id="vEdit">Edit</button>
+      <button class="linkbtn danger" type="button" id="vDel">Delete</button>
+    </div>
+  </article>
+</section>
+</main>
+
+<script>
+// ===== Same Sun simulation (pure functions) =====
+const MODEL = {
+  sMax: 1000,             // W/m2 at solar noon, clear Arizona sky
+  eta: 0.15,              // panel efficiency
+  panels: {               // area m2 and share of the plant they can shade
+    small: { area: 0.005, cover: 0.32 },
+    large: { area: 0.012, cover: 0.62 },
+    both:  { area: 0.017, cover: 0.86 }
+  },
+  heightSideLight: { low: 0.0, mid: 0.22, high: 0.4 },
+  gapShare: { none: 0, small: 0.2, wide: 0.4 },
+  diffuse: 0.18,          // share of sun that still reaches the plant under a panel
+  loads: { fan: 0.40, led: 0.05, pump: 0.90 },   // watts needed to run
+  fanCooling: 5,          // degF
+  domeHeat: 2,            // degF
+  heightCooling: { low: 0, mid: 1.5, high: 3 }, // degF, hot air escapes under higher panels
+  leafHeat: 11,           // degF added at full sun
+  pumpFlow: 0.06,         // soil moisture added per pumping hour
+  tankSize: { small: 1.2, large: 3.0 },
+  handWaterTo: 0.72,
+  fieldCapacity: 0.85, wilt: 0.25,
+  nightLoss: 0.05,
+  growMax: 1.0,
+  weather: {
+    october: { label: 'October', min: 64, max: 90, sunPeak: 52 },
+    july:    { label: 'July heat wave', min: 88, max: 110, sunPeak: 78 }
+  },
+  crops: {
+    lettuce: { name: 'Lettuce', sat: 420, hi: 75, stress: 85, water: 1.0 },
+    basil:   { name: 'Basil', sat: 560, hi: 85, stress: 95, water: 1.0 },
+    bean:    { name: 'Bush bean', sat: 620, hi: 85, stress: 95, water: 1.05 },
+    chili:   { name: 'Chili pepper', sat: 820, hi: 90, stress: 100, water: 0.8 }
+  }
+};
+
+const H0 = 6, H1 = 19;
+const rad = d => d * Math.PI / 180;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function sunAt(h, w) {
+  const x = Math.sin(Math.PI * (h - H0) / (H1 - H0));
+  const s = Math.max(0, x);
+  return { S: MODEL.sMax * s, elev: w.sunPeak * s };
+}
+function airTemp(h, w) {
+  const mid = (w.min + w.max) / 2, amp = (w.max - w.min) / 2;
+  return mid + amp * Math.cos(2 * Math.PI * (h - 15) / 24);
+}
+function shadeShare(d) {
+  if (d.panels === 'none') return 0;
+  const p = MODEL.panels[d.panels];
+  const gap = d.panels === 'both' ? MODEL.gapShare[d.gap] : 0;
+  return p.cover * (1 - gap) * (1 - MODEL.heightSideLight[d.height]);
+}
+function panelPower(h, d, w) {
+  if (d.panels === 'none') return 0;
+  const { S, elev } = sunAt(h, w);
+  if (S <= 0) return 0;
+  const ideal = 90 - elev;
+  const tf = Math.max(0, Math.cos(rad(d.tilt - ideal)));
+  return S * MODEL.panels[d.panels].area * MODEL.eta * tf;
+}
+
+function simulate(d, wKey, days) {
+  const w = MODEL.weather[wKey], crop = MODEL.crops[d.crop];
+  const c = shadeShare(d);
+  let M = 0.6, tank = d.water === 'hand' ? 0 : MODEL.tankSize[d.tank];
+  const hours = [], daily = [];
+  let growth = 0;
+  for (let day = 0; day < days; day++) {
+    if (day > 0) M = Math.max(0, M - MODEL.nightLoss);
+    if (d.water === 'hand') M = Math.max(M, MODEL.handWaterTo);
+    let dE = 0, dG = 0;
+    for (let h = H0; h <= H1; h++) {
+      const { S, elev } = sunAt(h, w);
+      const L = S * (1 - c) + MODEL.diffuse * S * c;
+      const P = panelPower(h, d, w);
+      // share power by priority
+      let avail = P;
+      const on = { fan: false, led: false, pump: false };
+      const wantsPump = d.loads.pump && d.water !== 'hand' && tank > 0 &&
+        (d.water === 'sun' || M < d.trigger);
+      const order = d.priority === 'pump' ? ['pump', 'fan', 'led'] : ['fan', 'pump', 'led'];
+      for (const k of order) {
+        if (!d.loads[k]) continue;
+        if (k === 'pump' && !wantsPump) continue;
+        if (avail >= MODEL.loads[k]) { on[k] = true; avail -= MODEL.loads[k]; }
+      }
+      const Ta = airTemp(h, w);
+      const Tl = Ta - MODEL.heightCooling[d.height] + MODEL.domeHeat + MODEL.leafHeat * (L / 1000) - (on.fan ? MODEL.fanCooling : 0);
+      // water
+      let pumped = 0;
+      if (on.pump) { pumped = Math.min(MODEL.pumpFlow, tank); tank -= pumped; M += pumped; }
+      const loss = crop.water * (0.006 + 0.016 * (L / 1000) + 0.0008 * Math.max(0, Tl - 70));
+      M = clamp(M - loss, 0, 1);
+      // growth
+      const fl = Math.min(1, L / crop.sat);
+      const top = crop.stress + 20;
+      const ft = Tl <= crop.hi ? 1 : Tl >= top ? 0 : 1 - (Tl - crop.hi) / (top - crop.hi);
+      const fw = M < MODEL.wilt ? 0 : M < 0.42 ? (M - MODEL.wilt) / (0.42 - MODEL.wilt)
+        : M > MODEL.fieldCapacity ? 0.55 : 1;
+      const g = S > 0 ? MODEL.growMax * fl * ft * fw : 0;
+      growth += g; dE += P; dG += g;
+      hours.push({ day, h, S, elev, L, P, Ta, Tl, M, tank, pumped, g, growth, on, fl, ft, fw,
+        hot: Tl > crop.stress, dry: M < 0.42, soggy: M > MODEL.fieldCapacity });
+    }
+    daily.push({ energy: dE, growth: dG });
+  }
+  const energy = daily.reduce((a, b) => a + b.energy, 0);
+  return { hours, daily, energy, growth, shade: c };
+}
+
+function baselineFood(d, wKey, days) {
+  return simulate({ ...d, panels: 'none', water: 'hand', loads: { fan: false, led: false, pump: false } }, wKey, days).growth;
+}
+function baselineEnergy(wKey, days) {
+  // both panels, best fixed tilt
+  let best = 0;
+  for (let t = 0; t <= 45; t += 5) {
+    const r = simulate({ panels: 'both', height: 'mid', gap: 'none', tilt: t, crop: 'basil', water: 'hand', tank: 'small',
+      trigger: 0.4, priority: 'fan', loads: { fan: false, led: false, pump: false } }, wKey, days);
+    best = Math.max(best, r.energy);
+  }
+  return best;
+}
+function idealGrowth(cropKey, wKey, days) {
+  // a perfect day: full sun, never too hot, never too dry
+  const crop = MODEL.crops[cropKey]; let n = 0;
+  for (let h = H0; h <= H1; h++) n += Math.min(1, sunAt(h, MODEL.weather[wKey]).S / crop.sat);
+  return n * days * MODEL.growMax;
+}
+function score(d, wKey, days, r) {
+  const ideal = idealGrowth(d.crop, wKey, days);
+  const food = r.growth / ideal;
+  const fullSun = baselineFood(d, wKey, days) / ideal;
+  const energy = r.energy / Math.max(0.001, baselineEnergy(wKey, days));
+  return { food, energy, total: food + energy, fullSun };
+}
+
+if (typeof module !== 'undefined') module.exports = { MODEL, simulate, score, baselineFood };
+
+</script>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('samesun:' + k); return v ? JSON.parse(v) : d } catch (e) { return d } },
+  set(k, v) { try { localStorage.setItem('samesun:' + k, JSON.stringify(v)) } catch (e) {} }
+};
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- tabs ---------- */
+const tabs = [['t-home', 'v-home'], ['t-sun', 'v-sun'], ['t-lab', 'v-lab'], ['t-plan', 'v-plan']];
+tabs.forEach(([t, v]) => $(t).addEventListener('click', () => {
+  tabs.forEach(([t2, v2]) => { $(t2).setAttribute('aria-selected', t2 === t); $(v2).hidden = v2 !== v });
+  if (v === 'v-plan') { renderRuns(); renderJournal(); showJ('list') }
+  window.scrollTo(0, 0);
+}));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => $(b.dataset.go).click()));
+
+/* ---------- design state ----------
+   Players see only: plant, weather, days, panel size, height, fan, pump.
+   Everything else is fixed here so the game stays simple. */
+const FIXED = { tilt: 30, gap: 'small', priority: 'fan', trigger: 0.45, tank: 'large' };
+const D = Object.assign({
+  crop: 'basil', weather: 'october', days: '1', panels: 'large', height: 'low',
+  loads: { fan: true, led: false, pump: false }
+}, store.get('design2', {}), FIXED);
+D.water = D.loads.pump ? 'smart' : 'hand';
+let challenge = 'free';
+let pred = { guess: null, why: null };
+
+const CH = {
+  heat: { set: { weather: 'july', days: '7', crop: 'basil' }, text: 'Heat wave week with basil. Grow at least twice as much as basil with no panel.',
+    check: (r, s) => s.food >= 2 * s.fullSun && s.food > 0.05, pass: 'Your basil grew more than twice the no-panel basil.', fail: 'Your basil needs more protection from the heat.' },
+  fan: { set: { weather: 'october', days: '1' }, needs: 'fan', text: 'Sunny day. Keep the fan spinning every hour from noon to 5 pm, and grow at least as much as a plant with no panel.',
+    check: (r, s) => r.hours.filter(x => x.h >= 12 && x.h <= 17).every(x => x.on.fan) && s.food >= s.fullSun, pass: 'The fan ran all afternoon and the plant kept up.', fail: 'The fan stopped in the afternoon, or the plant fell behind.' },
+  tank: { set: { weather: 'october', days: '7' }, needs: 'pump', text: 'Sunny week with the pump and no hand watering. The soil may be dry for 30 hours at most.',
+    check: (r) => r.hours.filter(x => x.dry).length <= 30 && r.hours.filter(x => x.soggy).length < 5, pass: 'The soil stayed just right all week.', fail: 'The soil got too dry. Try slowing down how fast it dries.' }
+};
+
+/* ---------- controls ---------- */
+const segs = [...document.querySelectorAll('.seg[data-key]')];
+segs.forEach(seg => seg.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  const k = seg.dataset.key, v = b.dataset.v;
+  if (seg.dataset.multi) D.loads[v] = !D.loads[v]; else D[k] = v;
+  changed();
+}));
+$('challenge').addEventListener('change', e => {
+  challenge = e.target.value;
+  if (challenge !== 'free') { Object.assign(D, CH[challenge].set); if (CH[challenge].needs) D.loads[CH[challenge].needs] = true }
+  changed();
+});
+
+const cropHints = { lettuce: 'Likes cool weather and some shade.', basil: 'Likes warmth and bright light.', chili: 'Loves sun and handles heat well.' };
+
+function syncControls() {
+  D.water = D.loads.pump ? 'smart' : 'hand';
+  const locked = challenge !== 'free' ? CH[challenge].set : {}, needs = challenge !== 'free' ? CH[challenge].needs : null;
+  segs.forEach(seg => {
+    const k = seg.dataset.key;
+    seg.querySelectorAll('button').forEach(b => {
+      const on = seg.dataset.multi ? !!D.loads[b.dataset.v] : String(D[k]) === b.dataset.v;
+      b.setAttribute('aria-pressed', on);
+      b.disabled = seg.dataset.multi ? b.dataset.v === needs : (k in locked && String(locked[k]) !== b.dataset.v);
+    });
+  });
+  $('cropHint').textContent = cropHints[D.crop];
+  $('waterHint').textContent = D.loads.pump
+    ? 'The pump waters the plant by itself when the soil gets dry. It needs strong sun and a big panel.'
+    : 'Without the pump, you water the plant once each morning.';
+  $('goal').hidden = challenge === 'free';
+  if (challenge !== 'free') $('goal').textContent = CH[challenge].text;
+}
+
+/* ---------- prediction ---------- */
+function bindPred(id, key) {
+  $(id).addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    pred[key] = b.dataset.v;
+    $(id).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  });
+}
+bindPred('predGuess', 'guess'); bindPred('predWhy', 'why');
+function resetPred() {
+  pred = { guess: null, why: null };
+  document.querySelectorAll('#predGuess button, #predWhy button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+  $('predictCard').hidden = false;
+}
+
+/* ---------- scene ---------- */
+const NS = 'http://www.w3.org/2000/svg';
+const GY = 196, CX = 180;
+const panelY = { low: 122, mid: 104, high: 84 };
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e }
+function mix(a, b, t) { const pa = a.match(/\w\w/g).map(x => parseInt(x, 16)), pb = b.match(/\w\w/g).map(x => parseInt(x, 16)); return '#' + pa.map((v, i) => Math.round(v + (pb[i] - v) * t).toString(16).padStart(2, '0')).join('') }
+function panelSegs(d) {
+  const t = rad(d.tilt * 0.6), py = panelY[d.height];
+  const g = d.gap === 'wide' ? 22 : d.gap === 'small' ? 11 : 0;
+  let parts = [];
+  if (d.panels === 'small') parts = [[-32, 32, 'small']];
+  else if (d.panels === 'large') parts = [[-56, 56, 'large']];
+  else if (d.panels === 'both') { const tot = 100 + 56 + g, s = -tot / 2; parts = [[s, s + 100, 'large'], [s + 100 + g, s + tot, 'small']] }
+  return parts.map(([a, b, k]) => ({ k, x1: CX + a * Math.cos(t), y1: py - a * Math.sin(t), x2: CX + b * Math.cos(t), y2: py - b * Math.sin(t) }));
+}
+function drawScene(hr, growthFrac, tankFrac, id = 'scene', d = D) {
+  const s = $(id); s.textContent = '';
+  const w = MODEL.weather[d.weather];
+  const h = hr ? hr.h : (id === 'heroScene' ? 9.5 : 12), sun = sunAt(h, w);
+  const elevShare = Math.min(1, sun.elev / 40);
+  const sky = hr ? (sun.S > 0 ? mix('f7d7a8', 'bfe3f2', elevShare) : '#4a5a78') : '#bfe3f2';
+  el('rect', { x: 0, y: 0, width: 360, height: 230, fill: sky }, s);
+  // sun
+  const sx = 20 + (h - H0) / (H1 - H0) * 320, sy = 186 - (sun.elev / 85) * 168;
+  if (sun.S > 0 || !hr) { el('circle', { cx: sx, cy: sy, r: 20, fill: '#FFE7A3', opacity: .6 }, s); el('circle', { cx: sx, cy: sy, r: 13, fill: '#F2B705' }, s) }
+  // ground
+  el('rect', { x: 0, y: GY, width: 360, height: 34, fill: '#C9A779' }, s);
+  el('rect', { x: 0, y: GY, width: 360, height: 3, fill: '#A8865A' }, s);
+  const segsP = panelSegs(d);
+  // shade on ground and plant
+  if (segsP.length && (sun.S > 0 || !hr)) {
+    segsP.forEach(p => {
+      const proj = (x, y) => { const dx = x - sx, dy = y - sy; if (dy <= 0) return null; return x + dx * (GY - y) / dy };
+      const a = proj(p.x1, p.y1), b = proj(p.x2, p.y2);
+      if (a == null || b == null) return;
+      const xa = Math.max(-20, Math.min(a, b)), xb = Math.min(380, Math.max(a, b));
+      el('polygon', { points: `${p.x1},${p.y1} ${p.x2},${p.y2} ${xb},${GY} ${xa},${GY}`, fill: '#1b2a20', opacity: .10 }, s);
+      el('rect', { x: xa, y: GY, width: Math.max(0, xb - xa), height: 6, fill: '#6b5236', opacity: .45 }, s);
+    });
+  }
+  // tank + tube
+  const pumpOn = hr && hr.on.pump;
+  if (d.loads.pump) {
+    el('rect', { x: 26, y: 150, width: 36, height: 46, rx: 4, fill: '#E9F3FA', stroke: '#5c7a8f', 'stroke-width': 1.5 }, s);
+    const lv = tankFrac == null ? 1 : tankFrac;
+    el('rect', { x: 28, y: 194 - 42 * lv, width: 32, height: 42 * lv, rx: 2, fill: '#3E8FD1', opacity: .8 }, s);
+    el('path', { d: 'M62 160 Q 110 136 162 166', fill: 'none', stroke: '#5c7a8f', 'stroke-width': 2.5 }, s);
+    el('rect', { x: 52, y: 176, width: 14, height: 12, rx: 2, fill: pumpOn ? '#F2B705' : '#9aa7ad' }, s);
+    if (pumpOn) { const g = el('g', {}, s); [0, 1, 2].forEach(i => el('circle', { class: reduce ? '' : 'drop', cx: 166, cy: 172 + i * 4, r: 2.4, fill: '#3E8FD1' }, g)) }
+    el('text', { x: 44, y: 145, 'text-anchor': 'middle', 'font-size': 9, 'font-family': 'Source Sans 3, sans-serif', fill: '#2B2F2C' }, s).textContent = 'tank';
+  }
+  // posts
+  if (segsP.length) {
+    const L = segsP[0], R = segsP[segsP.length - 1];
+    const lx = Math.min(L.x1, L.x2) + 4, rx = Math.max(R.x1, R.x2) - 4;
+    const ly = L.x1 < L.x2 ? L.y1 : L.y2, ry = R.x2 > R.x1 ? R.y2 : R.y1;
+    el('line', { x1: lx, y1: ly, x2: lx, y2: GY, stroke: '#8A7A62', 'stroke-width': 4 }, s);
+    el('line', { x1: rx, y1: ry, x2: rx, y2: GY, stroke: '#8A7A62', 'stroke-width': 4 }, s);
+  }
+  // pot, plant, dome
+  el('polygon', { points: '154,168 206,168 200,196 160,196', fill: '#B8693E' }, s);
+  el('ellipse', { cx: 180, cy: 168, rx: 26, ry: 4, fill: '#5a3a1e' }, s);
+  const gf = Math.max(0.22, Math.min(1, growthFrac || 0.22));
+  const stress = hr && (hr.hot || hr.M < MODEL.wilt + 0.05);
+  const leaf = stress ? '#B9A54A' : '#3E9B4F';
+  const top = 166 - 34 * gf;
+  el('path', { d: `M180 167 L180 ${top}`, stroke: '#3a7a3f', 'stroke-width': 2.5 }, s);
+  const droop = stress ? 6 : 0;
+  for (let i = 0; i < 3; i++) {
+    const y = 164 - (166 - top) * (0.35 + i * 0.3), sz = (7 + 5 * gf) * (1 - i * 0.18);
+    el('ellipse', { cx: 180 - sz * .9, cy: y + droop * (1 - i * .3), rx: sz, ry: sz * .42, fill: leaf, transform: `rotate(${-20 + droop * 3} ${180 - sz * .9} ${y})` }, s);
+    el('ellipse', { cx: 180 + sz * .9, cy: y + droop * (1 - i * .3), rx: sz, ry: sz * .42, fill: leaf, transform: `rotate(${20 - droop * 3} ${180 + sz * .9} ${y})` }, s);
+  }
+  el('path', { d: 'M136 196 A 44 60 0 0 1 224 196', fill: 'rgba(160,215,240,.25)', stroke: '#7fb6d6', 'stroke-width': 1.5 }, s);
+  // panels
+  segsP.forEach(p => {
+    el('line', { x1: p.x1, y1: p.y1, x2: p.x2, y2: p.y2, stroke: '#1B3E66', 'stroke-width': p.k === 'large' ? 7 : 6, 'stroke-linecap': 'round' }, s);
+    el('line', { x1: p.x1, y1: p.y1 - 1.5, x2: p.x2, y2: p.y2 - 1.5, stroke: '#4F7FB0', 'stroke-width': 1.2, 'stroke-dasharray': '7 3' }, s);
+  });
+  if (segsP.length === 2 && d.gap !== 'none') {
+    const a = segsP[0], b = segsP[1];
+    el('text', { x: (a.x2 + b.x1) / 2, y: Math.min(a.y2, b.y1) - 8, 'text-anchor': 'middle', 'font-size': 9, 'font-family': 'Source Sans 3, sans-serif', fill: '#2B2F2C' }, s).textContent = 'gap';
+  }
+  // LED
+  if (d.loads.led) {
+    const on = hr && hr.on.led;
+    if (on) el('circle', { cx: 226, cy: 186, r: 10, fill: '#FFE066', opacity: .6 }, s);
+    el('circle', { cx: 226, cy: 186, r: 5, fill: on ? '#FFD000' : '#d9d4c2', stroke: '#7a6a3a', 'stroke-width': 1 }, s);
+    el('text', { x: 226, y: 210, 'text-anchor': 'middle', 'font-size': 9, 'font-family': 'Source Sans 3, sans-serif', fill: '#2B2F2C' }, s).textContent = 'LED';
+  }
+  // fan
+  if (d.loads.fan) {
+    const on = hr && hr.on.fan;
+    el('rect', { x: 296, y: 172, width: 8, height: 24, fill: '#7d7a72' }, s);
+    el('rect', { x: 286, y: 192, width: 28, height: 5, rx: 2, fill: '#7d7a72' }, s);
+    el('rect', { x: 296, y: 152, width: 22, height: 16, rx: 4, fill: '#B4B2A9', stroke: '#5F5E5A' }, s);
+    const g = el('g', { class: on && !reduce ? 'spin' : '' }, s);
+    const bl = el('g', { class: 'blades' }, g);
+    el('ellipse', { cx: 292, cy: 147, rx: 3, ry: 13, fill: '#378ADD' }, bl);
+    el('ellipse', { cx: 292, cy: 173, rx: 3, ry: 13, fill: '#378ADD' }, bl);
+    el('circle', { cx: 292, cy: 160, r: 4, fill: '#1f5f9e' }, bl);
+    if (on) {
+      el('line', { class: reduce ? '' : 'air', x1: 280, y1: 150, x2: 232, y2: 150, stroke: '#2B2F2C', 'stroke-width': 1.5 }, s);
+      el('line', { class: reduce ? '' : 'air', x1: 280, y1: 168, x2: 230, y2: 168, stroke: '#2B2F2C', 'stroke-width': 1.5 }, s);
+      el('path', { d: 'M236 146 L230 150 L236 154 M234 164 L228 168 L234 172', fill: 'none', stroke: '#2B2F2C', 'stroke-width': 1.5 }, s);
+    }
+  }
+  // labels
+  if (hr && sun.S <= 0) el('text', { x: 180, y: 30, 'text-anchor': 'middle', 'font-size': 12, fill: '#fff', 'font-family': 'Source Sans 3, sans-serif' }, s).textContent = 'Night: the panel rests';
+}
+
+/* ---------- gauges ---------- */
+function setGauges(hr, energySoFar, growthFrac) {
+  const crop = MODEL.crops[D.crop];
+  $('gE').textContent = energySoFar.toFixed(1);
+  if (!hr) { ['gT', 'gM'].forEach(id => $(id).textContent = '–'); $('gTs').textContent = ''; $('gMs').textContent = ''; $('gMm').style.width = '0' }
+  else {
+    $('gT').textContent = Math.round(hr.Tl) + '°F';
+    const st = hr.Tl > crop.stress ? ['too hot', 'var(--bad)'] : hr.Tl > crop.hi ? ['warm', 'var(--warn)'] : ['comfy', 'var(--good)'];
+    $('gTs').textContent = st[0]; $('gTs').style.color = st[1];
+    $('gM').textContent = Math.round(hr.M * 100) + '%';
+    const ms = hr.M < 0.42 ? ['dry', 'var(--warn)'] : hr.M > MODEL.fieldCapacity ? ['soggy', 'var(--bad)'] : ['good', 'var(--good)'];
+    $('gMs').textContent = ms[0]; $('gMs').style.color = ms[1];
+    $('gMm').style.width = Math.round(hr.M * 100) + '%'; $('gMm').style.background = ms[1];
+  }
+  $('gG').textContent = Math.round(growthFrac * 100) + '%';
+  $('gGm').style.width = Math.min(100, growthFrac * 100) + '%';
+  const c = $('chips'); c.textContent = '';
+  const add = (t, on) => { const s = document.createElement('span'); s.className = 'chip' + (on ? ' on' : ''); s.textContent = t; c.appendChild(s) };
+  if (D.loads.fan) add(hr && hr.on.fan ? 'Fan running' : 'Fan off', hr && hr.on.fan);
+  if (D.loads.led) add(hr && hr.on.led ? 'LED on' : 'LED off', hr && hr.on.led);
+  if (D.loads.pump && D.water !== 'hand') add(hr && hr.on.pump ? 'Pump watering' : 'Pump off', hr && hr.on.pump);
+  if (D.water !== 'hand' && hr) add('Tank ' + Math.round(hr.tank / MODEL.tankSize[D.tank] * 100) + '%', false);
+  if (hr && hr.S > 0) add(Math.round(hr.L / hr.S * 100) + '% of sunlight reaches the plant', false);
+}
+
+/* ---------- run ---------- */
+let anim = null, run = null;
+function changed() {
+  store.set('design2', { crop: D.crop, weather: D.weather, days: D.days, panels: D.panels, height: D.height, loads: D.loads });
+  syncControls();
+  stop();
+  $('results').hidden = true; $('ladder').textContent = ''; hintStep = 0;
+  resetPred();
+  drawScene(null, 0.35, 1); setGauges(null, 0, 0);
+  $('clock').textContent = 'Ready'; $('prog').style.width = '0';
+}
+function stop() { if (anim) cancelAnimationFrame(anim); anim = null; $('play').disabled = false; $('skip').hidden = true; $('playLabel').textContent = 'Run the ' + (D.days === '7' ? 'week' : 'day') }
+
+$('play').addEventListener('click', () => {
+  const days = +D.days, r = simulate({ ...D }, D.weather, days), s = score({ ...D }, D.weather, days, r);
+  const ideal = r.growth / Math.max(0.0001, s.food);
+  run = { r, s, days, ideal, pred: { ...pred }, design: { ...D, loads: { ...D.loads } }, challenge };
+  $('predictCard').hidden = true; $('results').hidden = true;
+  $('play').disabled = true; $('skip').hidden = false;
+  if (reduce) return finish();
+  const perHour = days === 1 ? 650 : 120, total = r.hours.length * perHour, t0 = performance.now();
+  const tick = now => {
+    const i = Math.max(0, Math.min(r.hours.length - 1, Math.floor((now - t0) / perHour)));
+    frame(i);
+    if (now - t0 >= total) return finish();
+    anim = requestAnimationFrame(tick);
+  };
+  anim = requestAnimationFrame(tick);
+});
+$('skip').addEventListener('click', () => finish());
+
+function frame(i) {
+  const { r, ideal } = run, hr = r.hours[i];
+  let e = 0; for (let k = 0; k <= i; k++) e += r.hours[k].P;
+  const gf = hr.growth / ideal;
+  drawScene(hr, 0.25 + 0.75 * gf, D.water === 'hand' ? 1 : hr.tank / MODEL.tankSize[D.tank]);
+  setGauges(hr, e, gf);
+  $('clock').textContent = hr.h + ':00 · Day ' + (hr.day + 1);
+  $('prog').style.width = ((i + 1) / r.hours.length * 100) + '%';
+}
+
+function finish() {
+  if (anim) cancelAnimationFrame(anim); anim = null;
+  frame(run.r.hours.length - 2); // end on the last sunny hour
+  $('play').disabled = false; $('skip').hidden = true; $('playLabel').textContent = 'Run it again';
+  showResults();
+}
+
+/* ---------- feedback ---------- */
+let hintStep = 0, lastRule = null;
+const pct = x => Math.round(x * 100);
+function pickRule(r, s, d) {
+  const crop = MODEL.crops[d.crop];
+  const hot = r.hours.filter(x => x.hot).length, dry = r.hours.filter(x => x.dry && x.S > 0).length, soggy = r.hours.filter(x => x.soggy).length;
+  const fanH = r.hours.filter(x => x.on.fan).length / r.days, sunny = r.hours.filter(x => x.S > 300);
+  const light = sunny.reduce((a, x) => a + x.L / x.S, 0) / Math.max(1, sunny.length);
+  const flAvg = sunny.reduce((a, x) => a + x.fl, 0) / Math.max(1, sunny.length);
+  const emptyDay = d.water !== 'hand' ? r.hours.findIndex(x => x.tank <= 0.0001) : -1;
+  const pumpUser = d.water !== 'hand';
+  if (pumpUser && soggy >= 6) return { why: `The soil stayed soggy for ${soggy} hours. Too much water makes roots soggy, and soggy roots grow slowly.`,
+    next: 'How could the pump water only when the soil is dry?', hints: ['Look at the watering choices again.', 'The Smart pump checks the soil before it waters.', 'Try Smart pump with the setting near 45%.'] };
+  if (pumpUser && emptyDay >= 0 && dry >= 4) return { why: `The tank ran dry on day ${r.hours[emptyDay].day + 1} at ${r.hours[emptyDay].h}:00, then the soil dried out.`,
+    next: 'How could the same water last longer?', hints: ['Where does the water go on a hot day?', 'Shade slows drying, so the same water lasts longer.', 'Try both panels with the pump on.'] };
+  if (dry >= 4) return { why: `The soil got too dry for ${dry} sunny hours, mostly in the afternoon. Thirsty plants stop growing.`,
+    next: 'What would slow the soil from drying, or add water during the day?', hints: ['Where does the water go on a hot afternoon?', 'Shade slows drying. The pump can water while the sun shines.', 'Turn on the pump, and use a big panel to power it.'] };
+  if (hot >= 3) return { why: `Leaves got hotter than ${crop.stress} °F for ${hot} hours. ${crop.name} gets stressed above that.`,
+    next: `What could keep the leaves cooler during the hottest hours?`, hints: ['When is the sun strongest? What is above the plant then?', 'More shade and a running fan both cool the leaves.', 'Try a big panel or both panels, with the fan on.'] };
+  if (flAvg < 0.8 && r.shade > 0.25) return { why: `Your ${crop.name.toLowerCase()} got about ${pct(light)}% of the sun under the panels, and it wanted more light to grow fast.`,
+    next: 'How could you give the plant more light and still make energy?', hints: ['Light can sneak in from the sides.', 'A high panel lets more side light in. A smaller panel makes less shade.', 'Try the panel set high, or the small panel.'] };
+  if (d.loads.fan && fanH < 5 && d.panels !== 'none') return { why: `The fan only ran about ${Math.round(fanH)} hours a day. The panel did not make enough power for it most of the day.`,
+    next: 'How could your panel make more power?', hints: ['Bigger panels catch more sunlight.', 'The fan needs more power than a small panel makes in the morning and evening.', 'Try the big panel or both panels.'] };
+  if (d.panels !== 'none' && s.energy < 0.4) return { why: `Your panel made ${pct(s.energy)}% of the energy the best setup can make.`,
+    next: 'Can you make more energy and still keep the plant happy?', hints: ['Which panel catches the most sun?', 'More panel area means more energy, but also more shade.', 'Try both panels set high.'] };
+  if (d.panels === 'none') return { why: 'With no panel, the plant gets all the sun and you make no energy.',
+    next: 'What happens to the plant if you add a panel above it?', hints: ['Shade can help or hurt. It depends on the plant and the heat.', 'Try a small panel first, then compare.', 'Try the big panel set high.'] };
+  return { why: `A good balance: the plant stayed comfortable and the panel made ${pct(s.energy)}% of the best energy.`,
+    next: 'Can you raise one score without dropping the other?', hints: ['Change just one thing, then run again and compare.', 'Try the other panel height, or a different panel size.', 'Compare Big + high with Both + high.'] };
+}
+function showResults() {
+  const { r, s, design: d, pred: p } = run;
+  const crop = MODEL.crops[d.crop];
+  $('results').hidden = false;
+  const total = Math.round((s.food + s.energy) * 100), fs = Math.round(s.fullSun * 100);
+  $('rTotal').textContent = total;
+  $('rRef').textContent = `A plot with no panel scores ${fs}. Beat it by sharing the sun.`;
+  $('rFood').style.width = Math.min(100, pct(s.food)) + '%'; $('rFoodV').textContent = pct(s.food);
+  $('rFoodRef').style.left = Math.min(100, fs) + '%';
+  $('rEn').style.width = Math.min(100, pct(s.energy)) + '%'; $('rEnV').textContent = pct(s.energy);
+  const actual = s.food > s.fullSun + 0.03 ? 'more' : s.food < s.fullSun - 0.03 ? 'less' : 'same';
+  const words = { more: 'more', same: 'about the same', less: 'less' };
+  $('fPred').textContent = p.guess
+    ? `You guessed ${words[p.guess]}${p.why ? ' because ' + p.why : ''}. It grew ${words[actual]}. ${p.guess === actual ? 'Your prediction matched.' : 'Surprise! Look at why below.'}`
+    : 'You skipped the prediction this time.';
+  $('fWhat').textContent = `Your ${crop.name.toLowerCase()} grew ${pct(s.food)}% of a perfect ${run.days === 1 ? 'day' : 'week'}. A full-sun plant grew ${fs}%. Your panel made ${r.energy.toFixed(1)} Wh, which is ${pct(s.energy)}% of the best setup.`;
+  lastRule = pickRule(r, s, d);
+  $('fWhy').textContent = lastRule.why;
+  $('fNext').textContent = lastRule.next;
+  hintStep = 0; $('ladder').textContent = ''; $('hintBtn').disabled = false; $('hintBtn').textContent = 'Need a hint?';
+  const b = $('rBadge'); b.textContent = ''; b.className = '';
+  if (run.challenge !== 'free') {
+    const c = CH[run.challenge], ok = c.check(r, s);
+    b.className = 'badge ' + (ok ? 'pass' : 'fail'); b.textContent = ok ? 'Challenge passed' : 'Not yet';
+    $('fWhat').textContent += ' ' + (ok ? c.pass : c.fail);
+  }
+  const runs = store.get('runs', []);
+  runs.unshift({ when: Date.now(), crop: crop.name, panels: d.panels, height: d.height, tilt: d.tilt, water: d.water, guess: p.guess, actual, score: total, fs });
+  store.set('runs', runs.slice(0, 30));
+  $('results').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'nearest' });
+}
+$('hintBtn').addEventListener('click', () => {
+  if (!lastRule || hintStep >= 3) return;
+  const label = ['Question', 'Hint', 'Example'][hintStep];
+  const p = document.createElement('p'); p.innerHTML = `<b>${label}:</b> `; p.appendChild(document.createTextNode(lastRule.hints[hintStep]));
+  $('ladder').appendChild(p); hintStep++;
+  $('hintBtn').textContent = hintStep < 3 ? 'More help' : 'That is all the help';
+  $('hintBtn').disabled = hintStep >= 3;
+});
+
+/* ---------- Build Lab ---------- */
+const LEVELS = [
+  { goal: 'The panel sits above the plant. Wire the panel to the motor so the fan blows air toward the plant.', parts: ['panel', 'motor'],
+    real: 'Clip the red wire from the large panel to one motor tab and the black wire to the other. Take it into direct sun. If the air blows the wrong way, swap the two clips.' },
+  { goal: 'Wire the panel to the LED so it lights up next to the plant.', parts: ['panel', 'led'],
+    real: 'Clip red to the LED’s longer leg and black to the shorter leg. If it stays dark in full sun, flip the clips. The LED will not break.' },
+  { goal: 'Use the one panel above the plant to run the fan and the LED at the same time.', parts: ['panel', 'motor', 'led'],
+    real: 'Join all the reds together (panel, motor, LED long leg) and all the blacks together. One alligator clip can hold two wires. If your panel says 5 V or more, add a 100–220 Ω resistor to the LED.' },
+  { goal: 'Wire the panel to the water pump so it sends water from the tank through the tube to the plant.', parts: ['panel', 'pump'],
+    real: 'Put the mini pump in a cup of water and run its tube into the pot. Clip red to the pump’s red (+) wire and black to its black (−) wire. A pump needs strong sun, so use the big panel. Keep the panel and clips up high and dry.' }
+];
+const T = { // terminal positions: x, y, label, label offset
+  'p+': [180, 104, '+', 24], 'p-': [212, 104, '−', 24],
+  'mA': [288, 150, 'A', -16], 'mB': [318, 150, 'B', -16],
+  'lL': [62, 226, 'long +', 26], 'lS': [98, 226, 'short −', 26],
+  'w+': [58, 166, 'pump +', -14, '+'], 'w-': [84, 166, 'pump −', -14, '−']
+};
+let lv = 0, wires = [], sel = null, sunOn = false;
+function nets() {
+  const parent = {}; const f = x => parent[x] === undefined || parent[x] === x ? (parent[x] = x) : (parent[x] = f(parent[x]));
+  Object.keys(T).forEach(k => parent[k] = k);
+  wires.forEach(([a, b]) => { parent[f(a)] = f(b) });
+  return f;
+}
+function evalLab() {
+  const f = nets(), pos = f('p+'), neg = f('p-');
+  const out = { short: pos === neg && wires.length > 0, motor: 0, led: 0, ledRev: false };
+  if (out.short) return out;
+  const parts = LEVELS[lv].parts;
+  if (parts.includes('motor')) {
+    if (f('mA') === pos && f('mB') === neg) out.motor = 1;
+    else if (f('mA') === neg && f('mB') === pos) out.motor = -1;
+  }
+  if (parts.includes('led')) {
+    if (f('lL') === pos && f('lS') === neg) out.led = 1;
+    else if (f('lL') === neg && f('lS') === pos) out.ledRev = true;
+  }
+  if (parts.includes('pump')) {
+    if (f('w+') === pos && f('w-') === neg) out.pump = 1;
+    else if (f('w+') === neg && f('w-') === pos) out.pump = -1;
+  }
+  return out;
+}
+function drawLab() {
+  const s = $('lab'); s.textContent = '';
+  const parts = LEVELS[lv].parts, ev = sunOn ? evalLab() : { motor: 0, led: 0 };
+  const txt = (x, y, t, o = {}) => { el('text', Object.assign({ x, y, 'text-anchor': 'middle', 'font-size': 12, 'font-family': 'Source Sans 3, sans-serif', fill: '#2B2F2C' }, o), s).textContent = t };
+  el('rect', { x: 0, y: 0, width: 360, height: 270, rx: 12, fill: sunOn ? '#FFF3CF' : '#E8EEF0' }, s);
+  // sun and rays onto the panel
+  el('circle', { cx: 300, cy: 34, r: 17, fill: sunOn ? '#F2B705' : '#c9cdc4' }, s);
+  txt(300, 66, sunOn ? 'Sun is on' : 'Sun is off', { 'font-size': 11 });
+  if (sunOn) [[90, 66], [150, 62], [205, 60]].forEach(([x, y]) => el('line', { x1: 285, y1: 44, x2: x, y2: y, stroke: '#F2B705', 'stroke-width': 1.5, 'stroke-dasharray': '4 4' }, s));
+  // ground and shade
+  el('rect', { x: 0, y: 236, width: 360, height: 34, fill: '#C9A779' }, s);
+  if (sunOn) el('rect', { x: 60, y: 236, width: 150, height: 5, fill: '#6b5236', opacity: .4 }, s);
+  // frame posts
+  el('line', { x1: 44, y1: 76, x2: 44, y2: 236, stroke: '#8A7A62', 'stroke-width': 5 }, s);
+  el('line', { x1: 216, y1: 66, x2: 216, y2: 236, stroke: '#8A7A62', 'stroke-width': 5 }, s);
+  // panel on top of the frame, tilted toward the sun
+  el('polygon', { points: '34,72 226,58 226,68 34,82', fill: '#1B3E66', stroke: '#0C2A47' }, s);
+  el('path', { d: 'M82 68.5 V78.5 M130 65 V75 M178 61.5 V71.5', stroke: '#4F7FB0', 'stroke-width': 1.2 }, s);
+  txt(70, 50, 'Solar panel', { 'font-weight': 700 });
+  // panel leads down to its terminals
+  el('path', { d: 'M184 70 L180 96', stroke: '#D9362B', 'stroke-width': 3, fill: 'none' }, s);
+  el('path', { d: 'M206 68 L212 96', stroke: '#2B2F2C', 'stroke-width': 3, fill: 'none' }, s);
+  // plant in its pot, under the panel
+  el('path', { d: 'M130 212 V178', stroke: '#3a7a3f', 'stroke-width': 3 }, s);
+  [[121, 190, -20], [139, 186, 20], [124, 200, -25], [136, 198, 25]].forEach(([x, y, r]) => el('ellipse', { cx: x, cy: y, rx: 10, ry: 4.5, fill: '#3E9B4F', transform: `rotate(${r} ${x} ${y})` }, s));
+  el('polygon', { points: '110,212 150,212 146,236 114,236', fill: '#B8693E' }, s);
+  el('ellipse', { cx: 130, cy: 212, rx: 20, ry: 3, fill: '#5a3a1e' }, s);
+  txt(130, 256, 'plant', { 'font-size': 11 });
+  if (parts.includes('motor')) {
+    el('rect', { x: 294, y: 206, width: 16, height: 30, fill: '#7d7a72' }, s);
+    el('rect', { x: 276, y: 166, width: 54, height: 42, rx: 8, fill: '#B4B2A9', stroke: '#5F5E5A' }, s);
+    el('rect', { x: 262, y: 184, width: 14, height: 6, fill: '#5F5E5A' }, s);
+    txt(303, 256, 'Motor + fan', { 'font-weight': 700, 'font-size': 11 });
+    el('line', { x1: 288, y1: 158, x2: 288, y2: 166, stroke: '#888', 'stroke-width': 2 }, s);
+    el('line', { x1: 318, y1: 158, x2: 318, y2: 166, stroke: '#888', 'stroke-width': 2 }, s);
+    const spin = ev.motor !== 0 && !reduce;
+    const g = el('g', { class: spin ? 'spin' + (ev.motor < 0 ? ' rev' : '') : '' }, s);
+    const bl = el('g', { class: 'blades' }, g);
+    el('ellipse', { cx: 258, cy: 171, rx: 4, ry: 15, fill: '#378ADD' }, bl); el('ellipse', { cx: 258, cy: 203, rx: 4, ry: 15, fill: '#378ADD' }, bl);
+    el('circle', { cx: 258, cy: 187, r: 4, fill: '#1f5f9e' }, bl);
+    if (ev.motor !== 0) {
+      const toPlant = ev.motor > 0, y = 222;
+      if (toPlant) {
+        el('line', { x1: 246, y1: y, x2: 162, y2: y, stroke: '#2B2F2C', 'stroke-width': 2 }, s);
+        el('path', { d: `M170 ${y - 6} L162 ${y} L170 ${y + 6}`, fill: 'none', stroke: '#2B2F2C', 'stroke-width': 2 }, s);
+        txt(204, y - 7, 'air → plant', { 'font-size': 11 });
+      } else {
+        el('line', { x1: 170, y1: y, x2: 240, y2: y, stroke: '#2B2F2C', 'stroke-width': 2 }, s);
+        el('path', { d: `M232 ${y - 6} L240 ${y} L232 ${y + 6}`, fill: 'none', stroke: '#2B2F2C', 'stroke-width': 2 }, s);
+        txt(204, y - 7, 'air pulled away', { 'font-size': 11 });
+      }
+    }
+  }
+  if (parts.includes('led')) {
+    const on = ev.led === 1;
+    if (on) el('circle', { cx: 80, cy: 196, r: 20, fill: '#FFE066', opacity: .75 }, s);
+    el('path', { d: 'M70 208 V196 A10 10 0 0 1 90 196 V208 Z', fill: on ? '#FFD000' : '#E2DED0', stroke: '#7a6a3a' }, s);
+    el('line', { x1: 76, y1: 208, x2: 62, y2: 226, stroke: '#888', 'stroke-width': 2 }, s);
+    el('line', { x1: 84, y1: 208, x2: 98, y2: 220, stroke: '#888', 'stroke-width': 2 }, s);
+    txt(80, 176, 'LED', { 'font-weight': 700, 'font-size': 11 });
+  }
+  if (parts.includes('pump')) {
+    const on = ev.pump === 1, weak = ev.pump === -1;
+    // tank with water, pump inside, tube up to the pot
+    el('rect', { x: 52, y: 182, width: 50, height: 54, rx: 4, fill: '#E9F3FA', stroke: '#5c7a8f', 'stroke-width': 1.5 }, s);
+    el('rect', { x: 54, y: 196, width: 46, height: 38, rx: 2, fill: '#3E8FD1', opacity: .75 }, s);
+    el('rect', { x: 66, y: 214, width: 22, height: 16, rx: 4, fill: on ? '#F2B705' : '#9aa7ad', stroke: '#4a5a62' }, s);
+    el('path', { d: 'M58 174 Q 60 206 70 214 M84 174 Q 82 206 80 214', fill: 'none', stroke: '#888', 'stroke-width': 2 }, s);
+    el('path', { d: 'M86 218 Q 96 214 96 196 V176 Q 98 156 114 158 Q 128 160 128 200', fill: 'none', stroke: '#5c7a8f', 'stroke-width': 4, 'stroke-linecap': 'round' }, s);
+    txt(72, 252, 'water tank', { 'font-size': 11, 'font-weight': 700 });
+    if (on || weak) {
+      const g = el('g', {}, s);
+      [0, 1, 2].forEach(i => el('circle', { class: reduce ? '' : 'drop', cx: 128, cy: 202 + i * 3, r: on ? 3 : 1.6, fill: '#3E8FD1' }, g));
+      txt(186, 226, on ? '← water in' : 'only a trickle', { 'font-size': 11 });
+    }
+  }
+  // wires
+  const f = nets(), pos = f('p+'), neg = f('p-');
+  wires.forEach(([a, b], i) => {
+    const [x1, y1] = T[a], [x2, y2] = T[b];
+    const col = f(a) === pos ? '#D9362B' : f(a) === neg ? '#2B2F2C' : '#8a8f88';
+    const my = Math.max(y1, y2) + 26;
+    const d = `M${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`;
+    el('path', { d, fill: 'none', stroke: col, 'stroke-width': 4, 'stroke-linecap': 'round' }, s);
+    const hit = el('path', { d, fill: 'none', stroke: 'transparent', 'stroke-width': 18, class: 'wire', tabindex: 0, role: 'button', 'aria-label': `Remove wire ${a} to ${b}` }, s);
+    const rm = () => { wires.splice(i, 1); sel = null; update() };
+    hit.addEventListener('click', rm);
+    hit.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); rm() } });
+  });
+  // terminals
+  const show = k => k.startsWith('p') || (k.startsWith('m') && parts.includes('motor')) || (k.startsWith('l') && parts.includes('led')) || (k.startsWith('w') && parts.includes('pump'));
+  Object.entries(T).filter(([k]) => show(k)).forEach(([k, [x, y, lab]]) => {
+    const g = el('g', { class: 'term' + (sel === k ? ' sel' : ''), tabindex: 0, role: 'button', 'aria-label': `Terminal ${lab}` }, s);
+    el('circle', { class: 'hit', cx: x, cy: y, r: 18 }, g);
+    el('circle', { class: 'ring', cx: x, cy: y, r: 8, fill: '#C9A04A', stroke: '#6b5520', 'stroke-width': 2 }, g);
+    const dy = T[k][3], ly = y + dy, lx = x;
+    el('text', { x: lx, y: ly, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, 'font-family': 'Source Sans 3, sans-serif', fill: (k === 'p+' || k === 'w+') ? '#B3261E' : '#2B2F2C' }, g).textContent = T[k][4] || lab;
+    const pick = () => {
+      if (!sel) sel = k;
+      else if (sel === k) sel = null;
+      else { if (!wires.some(([a, b]) => (a === sel && b === k) || (a === k && b === sel))) wires.push([sel, k]); sel = null }
+      update();
+    };
+    g.addEventListener('click', pick);
+    g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick() } });
+  });
+}
+function update() {
+  drawLab();
+  const st = $('labStatus'); let msg = '', cls = '', done = false;
+  if (sel) msg = 'Now tap the dot you want to connect to.';
+  else if (!sunOn) msg = wires.length ? 'Turn on the sun to test your wires.' : 'Tap a dot to start a wire.';
+  else {
+    const ev = evalLab(), parts = LEVELS[lv].parts;
+    if (ev.short) { msg = 'Short circuit! The + and − of the panel are joined directly, so the power skips the parts. Remove that wire.'; cls = 'warn' }
+    else if (lv === 0) {
+      if (ev.motor > 0) { msg = 'It works! The air blows toward the plant.'; cls = 'ok'; done = true }
+      else if (ev.motor < 0) { msg = 'The fan spins, but the air blows away from the plant. A motor has no wrong way, so swap the two wires.'; cls = 'warn' }
+      else msg = 'Nothing yet. The motor needs one wire from + and one wire from −.';
+    } else if (lv === 1) {
+      if (ev.led) { msg = 'It glows! Red to the long leg, black to the short leg.'; cls = 'ok'; done = true }
+      else if (ev.ledRev) { msg = 'Still dark. An LED only works one way: + goes to the long leg. Swap the wires.'; cls = 'warn' }
+      else msg = 'Nothing yet. The LED needs one wire from + and one from −.';
+    } else if (lv === 3) {
+      if (ev.pump > 0) { msg = 'Water is flowing! The pump moves water from the tank to the plant while the sun shines.'; cls = 'ok'; done = true }
+      else if (ev.pump < 0) { msg = 'The pump hums but only a trickle comes out. Most mini pumps have a + and a − side. Swap the wires.'; cls = 'warn' }
+      else msg = 'Nothing yet. The pump needs one wire from + and one wire from −.';
+    } else {
+      if (ev.motor && ev.led) { msg = 'Both run from one panel! This is a parallel circuit: each part has its own path to + and −.'; cls = 'ok'; done = true }
+      else if (ev.motor || ev.led) { msg = (ev.motor ? 'The fan runs, but the LED is dark.' : 'The LED glows, but the fan is still.') + ' Give the other part its own + and − path too.'; cls = 'warn' }
+      else if (ev.ledRev) { msg = 'The LED is turned around: + must reach the long leg.'; cls = 'warn' }
+      else if (wires.length >= 3) { msg = 'Looks like a chain (series). In a chain the LED blocks most of the current, so the fan cannot start. Connect each part straight to + and −.'; cls = 'warn' }
+      else msg = 'Connect both parts to the panel.';
+    }
+  }
+  st.textContent = msg; st.className = 'status ' + cls;
+  $('labReal').hidden = !done; $('labRealText').textContent = LEVELS[lv].real;
+}
+$('levels').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  lv = +b.dataset.l; wires = []; sel = null;
+  $('levels').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  $('labGoal').textContent = LEVELS[lv].goal; update();
+});
+$('sunBtn').addEventListener('click', () => { sunOn = !sunOn; $('sunBtn').setAttribute('aria-pressed', sunOn); $('sunBtn').textContent = sunOn ? 'Turn off the sun' : 'Turn on the sun'; update() });
+$('resetBtn').addEventListener('click', () => { wires = []; sel = null; update() });
+
+/* ---------- journal ---------- */
+const STAGES = {
+  s1: { label: 'Session 1 · Launch', name: 'Session 1', sub: 'Launch', kind: 's', starters: ['Today I built…', 'I noticed…', 'I wonder…'] },
+  h1: { label: 'At home 1', name: 'Home 1', sub: 'at home', kind: 'h', starters: ['I set up my kit by…', 'I predict my plant will…', 'My family helped by…'] },
+  s2: { label: 'Session 2 · Share & Advance', name: 'Session 2', sub: 'Share', kind: 's', starters: ['We shared…', 'We decided to change…', 'Our new idea is…'] },
+  h2: { label: 'At home 2', name: 'Home 2', sub: 'at home', kind: 'h', starters: ['My plant looks…', 'The soil felt…', 'Compared with my guess…'] },
+  s3: { label: 'Session 3 · Wrap-up', name: 'Session 3', sub: 'Wrap-up', kind: 's', starters: ['The biggest surprise was…', 'Next time I would…', 'I learned that…'] }
+};
+let jEntries = store.get('journal', []);
+let draft = { id: null, stage: null, photo: null };
+let openId = null;
+
+function showJ(which) {
+  $('jListView').hidden = which !== 'list'; $('jView').hidden = which !== 'view';
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('#v-plan [data-back]').forEach(b => b.addEventListener('click', () => { renderJournal(); showJ('list') }));
+
+// step buttons
+Object.entries(STAGES).forEach(([k, st]) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = st.kind; b.dataset.v = k; b.setAttribute('aria-pressed', 'false');
+  b.append(st.name); const sm = document.createElement('small'); sm.textContent = st.sub; b.appendChild(sm);
+  b.addEventListener('click', () => { draft.stage = k; syncStage(); $('jMsg').textContent = '' });
+  $('jStage').appendChild(b);
+});
+function syncStage() {
+  $('jStage').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === draft.stage));
+  const box = $('jStarters'); box.textContent = '';
+  (draft.stage ? STAGES[draft.stage].starters : ['Today I…', 'I noticed…', 'Next I will…']).forEach(t => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = t;
+    b.addEventListener('click', () => {
+      const ta = $('jStory'); ta.value = (ta.value ? ta.value.replace(/\s*$/, '') + ' ' : '') + t.replace('…', ' ');
+      ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+    });
+    box.appendChild(b);
+  });
+}
+function setPhoto(src) {
+  draft.photo = src || null;
+  $('jPrev').hidden = !src; if (src) $('jPrev').src = src; else $('jPrev').removeAttribute('src');
+  $('jDropText').textContent = src ? 'Tap to change the photo' : 'Tap to add a photo';
+  $('jPhotoClear').hidden = !src;
+}
+function openForm(entry) {
+  draft = { id: entry ? entry.id : null, stage: entry ? entry.stage : (jEntries[0] ? jEntries[0].stage : null), photo: null };
+  $('jFormTitle').textContent = entry ? 'Edit entry' : 'New entry';
+  $('jStory').value = entry ? entry.story : '';
+  setPhoto(entry ? entry.photo : null);
+  $('jMsg').textContent = '';
+  $('jCancel').hidden = !entry; $('jSave').textContent = entry ? 'Save changes' : 'Save';
+  syncStage(); showJ('list');
+  if (entry) $('jForm').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+}
+$('jCancel').addEventListener('click', () => openForm(null));
+
+// shrink photos so many entries fit in the browser's storage
+function shrinkImage(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onerror = () => reject(new Error('read'));
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('decode'));
+      img.onload = () => {
+        const k = Math.min(1, 900 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL('image/jpeg', 0.72));
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+$('jPhoto').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  $('jDropText').textContent = 'Loading photo…';
+  try { setPhoto(await shrinkImage(f)) }
+  catch (err) { setPhoto(null); $('jDropText').textContent = 'That photo could not be opened. Try a JPG or PNG photo.' }
+  e.target.value = '';
+});
+$('jPhotoClear').addEventListener('click', () => setPhoto(null));
+
+function saveAll() { try { localStorage.setItem('samesun:journal', JSON.stringify(jEntries)); return true } catch (err) { return false } }
+$('jForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const story = $('jStory').value.trim();
+  if (!draft.stage) { $('jMsg').textContent = 'Pick a step first.'; $('jStage').querySelector('button').focus(); return }
+  if (!story && !draft.photo) { $('jMsg').textContent = 'Add a photo or a few words first.'; $('jStory').focus(); return }
+  if (draft.id) {
+    jEntries = jEntries.map(x => x.id === draft.id ? { ...x, stage: draft.stage, story, photo: draft.photo, edited: Date.now() } : x);
+  } else {
+    draft.id = Date.now();
+    jEntries = [{ id: draft.id, when: Date.now(), stage: draft.stage, story, photo: draft.photo }, ...jEntries];
+  }
+  const ok = saveAll(), wasEdit = $('jSave').textContent !== 'Save', keepStage = draft.stage;
+  openForm(null); draft.stage = keepStage; syncStage();
+  renderJournal();
+  $('jMsg').textContent = !ok ? 'Saved on this page, but this browser could not keep it after you close the page.' : wasEdit ? 'Changes saved.' : 'Saved! It is now in My entries.';
+});
+
+function fmtDate(t) { return new Date(t).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) }
+function openEntry(id, note) {
+  const x = jEntries.find(y => y.id === id); if (!x) return showJ('list');
+  openId = id; const st = STAGES[x.stage];
+  $('vTag').className = 'stag ' + st.kind; $('vTag').textContent = st.label;
+  $('vWhen').textContent = fmtDate(x.when) + (note ? ' · ' + note : '');
+  $('vImg').hidden = !x.photo; if (x.photo) { $('vImg').src = x.photo; $('vImg').alt = 'My photo from ' + st.label } else $('vImg').removeAttribute('src');
+  $('vStory').textContent = x.story || '';
+  $('vDel').textContent = 'Delete'; $('vDel').dataset.armed = '';
+  showJ('view');
+}
+$('vEdit').addEventListener('click', () => openForm(jEntries.find(y => y.id === openId)));
+$('vDel').addEventListener('click', () => {
+  const b = $('vDel');
+  if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = 'Tap again to delete for good'; return }
+  jEntries = jEntries.filter(y => y.id !== openId); saveAll(); renderJournal(); showJ('list');
+});
+
+function renderJournal() {
+  const list = $('jList'); list.textContent = '';
+  const all = jEntries;
+  if (!all.length) { const e = document.createElement('p'); e.className = 'none'; e.style.margin = '0'; e.textContent = 'No entries yet. Fill in the form to add your first one.'; list.appendChild(e) }
+  Object.entries(STAGES).forEach(([k, st]) => {
+    const items = all.filter(x => x.stage === k).sort((a, b) => a.when - b.when);
+    const sec = document.createElement('section'); sec.className = 'jstep';
+    const h = document.createElement('h3'); const d = document.createElement('span'); d.className = 'dot ' + st.kind;
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = items.length ? `${items.length}` : '';
+    h.append(d, st.label, n); sec.appendChild(h);
+    if (!items.length) { if (!all.length) return; const p = document.createElement('p'); p.className = 'none'; p.textContent = 'Nothing yet'; sec.appendChild(p) }
+    items.forEach(x => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'erow';
+      b.setAttribute('aria-label', `Open entry from ${fmtDate(x.when)}`);
+      let th;
+      if (x.photo) { th = document.createElement('img'); th.src = x.photo; th.alt = '' } else { th = document.createElement('span'); th.textContent = '✎'; th.setAttribute('aria-hidden', 'true') }
+      th.className = 'thumb';
+      const mid = document.createElement('div');
+      const w = document.createElement('div'); w.className = 'when';
+      w.append(fmtDate(x.when));
+      const t = document.createElement('div'); t.className = 'txt'; t.textContent = x.story || 'Photo only';
+      mid.append(w, t);
+      const ch = document.createElement('span'); ch.className = 'chev'; ch.textContent = 'Open'; ch.setAttribute('aria-hidden', 'true');
+      b.append(th, mid, ch);
+      b.addEventListener('click', () => openEntry(x.id));
+      sec.appendChild(b);
+    });
+    list.appendChild(sec);
+  });
+}
+function renderRuns() {
+  const runs = store.get('runs', []), tb = $('runs'); tb.textContent = '';
+  if (!runs.length) { const tr = document.createElement('tr'); const td = document.createElement('td'); td.colSpan = 4; td.className = 'empty'; td.textContent = 'Run a Sun Day test to see it here.'; tr.appendChild(td); tb.appendChild(tr); return }
+  const W = { more: 'More', same: 'Same', less: 'Less' }, P = { none: 'no panel', small: 'small panel', large: 'big panel', both: 'both panels' };
+  runs.slice(0, 10).forEach(x => {
+    const tr = document.createElement('tr');
+    [`${x.crop}, ${P[x.panels] || x.panels}, ${x.height}`, x.guess ? W[x.guess] : '—', W[x.actual], `${x.score} (no panel: ${x.fs})`]
+      .forEach(t => { const td = document.createElement('td'); td.textContent = t; tr.appendChild(td) });
+    tb.appendChild(tr);
+  });
+}
+
+/* ---------- start ---------- */
+$('labGoal').textContent = LEVELS[0].goal;
+changed(); update(); syncStage(); renderJournal(); renderRuns();
+drawScene(null, 0.7, 1, 'heroScene', { ...D, ...FIXED, weather: 'october', panels: 'both', height: 'high', loads: { fan: true, led: true, pump: false } });
+})();
+</script>
