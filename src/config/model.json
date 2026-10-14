@@ -49,7 +49,7 @@
   "bestPanel": { "panels": "both", "tiltFrom": 0, "tiltTo": 45, "tiltStep": 5 },
 
   "challenges": {
-    "heat": { "set": { "weather": "july", "days": 7, "crop": "basil" }, "foodTimesNoPanel": 2, "minFood": 0.05 },
+    "heat": { "set": { "weather": "july", "days": 7, "crop": "basil" }, "needs": "fan", "foodTimesNoPanel": 2, "minFood": 0.05 },
     "fan":  { "set": { "weather": "october", "days": 1 }, "needs": "fan", "fromHour": 12, "toHour": 17 },
     "tank": { "set": { "weather": "october", "days": 7 }, "needs": "pump", "maxDryHours": 30, "maxSoggyHours": 4 }
   }

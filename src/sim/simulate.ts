@@ -85,7 +85,8 @@ export function simulate(d: Design, m: Model = defaultModel): SimResult {
       const on = chooseLoads({ power, moisture, tank, fan: d.fan, pump: d.pump }, m)
 
       const air = airTemp(h, w, m)
-      const leafTemp = air - m.heightCooling[d.height] + m.domeHeat + m.leafHeat * light - (on.fan ? m.fanCooling : 0)
+      // hot air escapes under a higher panel; with no panel, height does nothing
+      const leafTemp = air - (d.panels === 'none' ? 0 : m.heightCooling[d.height]) + m.domeHeat + m.leafHeat * light - (on.fan ? m.fanCooling : 0)
 
       let pumped = 0
       if (on.pump) {

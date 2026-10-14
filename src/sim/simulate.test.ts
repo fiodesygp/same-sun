@@ -35,6 +35,21 @@ describe('shade', () => {
       expect(noon({ ...base, panels, height: 'high' }).plantLight).toBeGreaterThan(noon({ ...base, panels, height: 'low' }).plantLight)
     }
   })
+
+  it('a high panel cools the leaves', () => {
+    const low = noon({ ...base, fan: false }), high = noon({ ...base, height: 'high', fan: false })
+    expect(high.leafTemp).toBeLessThan(low.leafTemp)
+  })
+
+  it('with no panel, height changes nothing: same hours and same Sun Score at low and high', () => {
+    for (const weather of ['october', 'july'] as const) for (const pump of [false, true]) {
+      const low: Design = { ...base, weather, days: 7, panels: 'none', height: 'low', pump }
+      const high: Design = { ...low, height: 'high' }
+      const rl = simulate(low), rh = simulate(high)
+      expect(rh.hours).toEqual(rl.hours)
+      expect(score(high, rh)).toEqual(score(low, rl))
+    }
+  })
 })
 
 describe('fan', () => {
@@ -120,7 +135,7 @@ describe('challenges can be passed', () => {
   it('a challenge sets its weather and days, and turns on what it needs', () => {
     expect(applyChallenge({ ...base, fan: false }, 'fan')).toMatchObject({ weather: 'october', days: 1, fan: true })
     expect(applyChallenge(base, 'tank')).toMatchObject({ days: 7, pump: true })
-    expect(applyChallenge(base, 'heat')).toMatchObject({ weather: 'july', days: 7, crop: 'basil' })
+    expect(applyChallenge({ ...base, fan: false }, 'heat')).toMatchObject({ weather: 'july', days: 7, crop: 'basil', fan: true })
   })
 })
 

@@ -604,7 +604,7 @@ function simulate(d, wKey, days) {
         if (avail >= MODEL.loads[k]) { on[k] = true; avail -= MODEL.loads[k]; }
       }
       const Ta = airTemp(h, w);
-      const Tl = Ta - MODEL.heightCooling[d.height] + MODEL.domeHeat + MODEL.leafHeat * (L / 1000) - (on.fan ? MODEL.fanCooling : 0);
+      const Tl = Ta - (d.panels === 'none' ? 0 : MODEL.heightCooling[d.height]) + MODEL.domeHeat + MODEL.leafHeat * (L / 1000) - (on.fan ? MODEL.fanCooling : 0);
       // water
       let pumped = 0;
       if (on.pump) { pumped = Math.min(MODEL.pumpFlow, tank); tank -= pumped; M += pumped; }
@@ -688,7 +688,7 @@ let challenge = 'free';
 let pred = { guess: null, why: null };
 
 const CH = {
-  heat: { set: { weather: 'july', days: '7', crop: 'basil' }, text: 'Heat wave week with basil. Grow at least twice as much as basil with no panel.',
+  heat: { set: { weather: 'july', days: '7', crop: 'basil' }, needs: 'fan', text: 'Heat wave week with basil. Grow at least twice as much as basil with no panel.',
     check: (r, s) => s.food >= 2 * s.fullSun && s.food > 0.05, pass: 'Your basil grew more than twice the no-panel basil.', fail: 'Your basil needs more protection from the heat.' },
   fan: { set: { weather: 'october', days: '1' }, needs: 'fan', text: 'Sunny day. Keep the fan spinning every hour from noon to 5 pm, and grow at least as much as a plant with no panel.',
     check: (r, s) => r.hours.filter(x => x.h >= 12 && x.h <= 17).every(x => x.on.fan) && s.food >= s.fullSun, pass: 'The fan ran all afternoon and the plant kept up.', fail: 'The fan stopped in the afternoon, or the plant fell behind.' },
