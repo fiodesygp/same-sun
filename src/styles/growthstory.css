@@ -59,6 +59,7 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: v
   .photo-drop img { max-height: 160px }
 }
 @media (min-width: 1024px) and (min-height: 640px), (min-width: 600px) and (orientation: landscape) and (min-height: 640px) {
-  /* if a photo makes the form taller than the screen, it scrolls inside so Save stays reachable */
-  .gs-form { position: sticky; top: calc(var(--header-h, 72px) + 12px); max-height: calc(100svh - var(--header-h, 72px) - 24px); overflow-y: auto; border-radius: var(--radius) }
+  /* pinned only while the whole form fits under the header (GrowthStory.tsx adds .pinned);
+     otherwise the page scrolls normally, so Save is never hidden */
+  .gs-form.pinned { position: sticky; top: calc(var(--header-h, 72px) + 12px) }
 }
