@@ -1,6 +1,9 @@
 # Same Sun
 
-**Play it:** https://fiodesygp.github.io/same-sun/
+**Play it:**
+
+- GitHub Pages: https://fiodesygp.github.io/same-sun/
+- Vercel: _link to be added_
 
 Same Sun is a short design-and-test game for the **miniAgriPV** project (Girl Scouts Beyond Bars × ASU Mary Lou Fulton College for Teaching and Learning Innovation). Players, about 7th grade, build a mini agrivoltaic system: a small solar panel above a plant, so one sunny spot makes energy and grows food.
 
@@ -30,9 +33,23 @@ To try it on a phone on the same Wi-Fi: `npm run dev -- --host`, then open the N
 
 ## How deployment works
 
-Every push to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): it installs dependencies, runs the tests, builds, and publishes `dist/` to GitHub Pages. If the tests or build fail, nothing is published. The workflow can also be started by hand from the Actions tab ("Deploy to GitHub Pages" → Run workflow).
+The same code deploys to two places. Both rebuild on every push to `main`.
 
-The site lives under `/same-sun/`, set as `base` in `vite.config.ts` and as the app manifest's `start_url` and `scope`. `public/404.html` sends any other address back to the app.
+| | GitHub Pages | Vercel |
+|---|---|---|
+| Address | `https://fiodesygp.github.io/same-sun/` | the project's Vercel domain, at `/` |
+| Base path | `/same-sun/` | `/` |
+| Triggered by | [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (or "Run workflow" in the Actions tab) | Vercel's Git integration for this repository |
+| Steps | `npm ci`, `npm test`, `npm run build`, publish `dist/` | `npm ci`, `npm test && npm run build`, publish `dist/` (set in [`vercel.json`](vercel.json)) |
+| Unknown addresses | `404.html` (generated at build time) sends visitors back to the app | a rewrite in `vercel.json` serves `index.html` |
+
+If the tests or build fail, nothing is published on either host.
+
+**Base path.** `vite.config.ts` uses `/` when the `VERCEL` environment variable is set (Vercel sets it during its builds) and `/same-sun/` otherwise. The asset links, the app manifest's `start_url` and `scope`, the service worker and the 404 page all follow that one value. To build the Vercel version locally: `VERCEL=1 npm run build`, then `VERCEL=1 npm run preview` and open `http://localhost:4173/`.
+
+**Updates.** On Vercel, `vercel.json` sends `Cache-Control: no-cache` for `sw.js` and `index.html`, so players get new versions quickly. Hashed files in `assets/` can be cached for a long time.
+
+**No tracking.** Do not turn on Vercel Analytics, Speed Insights or any other tracking; see the privacy note above.
 
 ## Project layout
 

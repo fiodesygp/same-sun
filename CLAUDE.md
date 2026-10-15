@@ -14,7 +14,8 @@
 - Ask before adding any other dependency.
 
 ## Hosting
-- Static site on GitHub Pages at `/same-sun/`.
+- Static site on GitHub Pages at `/same-sun/` and on Vercel at `/`. The base path comes from the `VERCEL` env var in `vite.config.ts`; never hard-code `/same-sun/`.
+- Never enable Vercel Analytics, Speed Insights or any other tracking.
 - No backend, no accounts, no analytics. Nothing leaves the device.
 
 ## Privacy
