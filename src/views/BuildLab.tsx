@@ -1,16 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { t } from '../i18n/t'
 import {
-  ALL, dealPuzzle, evaluate, faultsLeft, FIX, hasPower, labStatus, LEVELS, partStates, power, starCheck, starCount,
-  type Part, type PartState, type Puzzle, type StarCheck, type TermId, type Wire
+  ALL, dealPuzzle, evaluate, faultsLeft, FIX, hasPower, labStatus, LEVELS, partStates, power, starCheck,
+  type Part, type PartState, type Puzzle, type TermId, type Wire
 } from '../lab/circuit'
-import { loadStars, markSolved, saveStars } from '../lib/progress'
-import { Board } from './buildLab/Board'
+import { countStars, loadEarned, markSolved, saveEarned, type Earned } from '../lib/progress'
+import { Board, LANDSCAPE, PORTRAIT } from './buildLab/Board'
 
 const sameWire = (w: Wire, a: TermId, b: TermId) => (w[0] === a && w[1] === b) || (w[0] === b && w[1] === a)
 const CLOUD_MS = 2500
 const LADDER = [0, 1, 2] as const
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+// wide screens (tablet landscape, computer) get the landscape board; same query as the CSS layouts
+const WIDE = '(min-width: 1024px), (min-width: 600px) and (orientation: landscape)'
+function useWide() {
+  const [wide, setWide] = useState(() => window.matchMedia(WIDE).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(WIDE), on = () => setWide(mq.matches)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [])
+  return wide
+}
 type L = 0 | 1 | 2 | 3 | 4 | 5
 
 /** checklist icons: shape and text carry the meaning, not colour */
@@ -46,8 +57,8 @@ export function BuildLab() {
   // this try at the level: sun tests, failed ones, and whether it worked on the very first test
   const [tests, setTests] = useState({ count: 0, failed: 0, firstTry: false })
   const [hints, setHints] = useState(0)
-  const [best, setBest] = useState<Record<number, number>>(loadStars)
-  const [earned, setEarned] = useState<StarCheck | null>(null)
+  const [earned, setEarned] = useState<Record<number, Earned>>(loadEarned)
+  const wide = useWide()
 
   const Lv = LEVELS[level], L = level as L
   const ev = evaluate(wires, level)
@@ -74,16 +85,11 @@ export function BuildLab() {
     prevSun.current = sunOn
   }, [sunOn, status.done])
 
-  // when the level is solved: work out the stars, keep the best on this device
+  // when the level is solved: add the stars it earned to the ones kept on this device
   useEffect(() => {
-    if (!status.done) {
-      setEarned(null)
-      return
-    }
-    const check = starCheck(level, wires, true, tests.firstTry)
-    setEarned(check)
+    if (!status.done) return
     markSolved(level)
-    setBest(saveStars(level, starCount(check)))
+    setEarned(saveEarned(level, starCheck(level, wires, true, tests.firstTry)))
   }, [status.done, level, wires, tests.firstTry])
 
   // the cloud drifts in or out over a couple of seconds, so you can watch the pump, then the fan, stop
@@ -152,14 +158,17 @@ export function BuildLab() {
         <div className="card lab stack">
           <div className="levels seg" role="group" aria-label={t('lab.levelLabel')}>
             {LEVELS.map((_, l) => (
-              <button key={l} type="button" aria-pressed={level === l} onClick={() => start(l)}>
+              <button key={l} type="button" aria-pressed={level === l} onClick={() => start(l)}
+                aria-label={t('lab.levelButton', { label: t(`lab.level.${l as L}`), n: countStars(earned[l]) })}>
                 <span className="lv-name">{t(`lab.level.${l as L}`)}</span>
-                <span className="lv-stars" aria-hidden="true">{stars(best[l] ?? 0)}</span>
-                <span className="sr">, {t('lab.starsOf', { n: best[l] ?? 0 })}</span>
+                <span className="lv-stars" aria-hidden="true">{stars(countStars(earned[l]))}</span>
               </button>
             ))}
           </div>
-          <Board level={level} wires={wires} selected={selected} sunOn={sunOn} power={pw} cloud={cloud} burnt={burnt} burntAt={burntAt}
+          <p className="star-legend">
+            {t('lab.legend.title')} <span aria-hidden="true">★</span> {t('lab.legend.solve')} · <span aria-hidden="true">★</span> {t('lab.legend.wires')} · <span aria-hidden="true">★</span> {t('lab.legend.first')}
+          </p>
+          <Board layout={wide ? LANDSCAPE : PORTRAIT} level={level} wires={wires} selected={selected} sunOn={sunOn} power={pw} cloud={cloud} burnt={burnt} burntAt={burntAt}
             tester={tester} probe={tester && probe ? { term: probe, power: hasPower(probe, wires, level, sunOn) } : null}
             onPick={pick} onConnect={connect} onCancel={() => setSelected(null)}
             onRemove={i => { setWires(wires.filter((_, j) => j !== i)); setSelected(null) }} />
@@ -168,6 +177,12 @@ export function BuildLab() {
               {t(sunOn ? 'lab.sunOff' : 'lab.sunOn')}
             </button>
             <button className="btn ghost" type="button" onClick={() => { setWires([]); setSelected(null) }}>{t('lab.clear')}</button>
+            {level === FIX && (
+              <button type="button" className="toggle compact" aria-pressed={tester} onClick={() => { setTester(!tester); setSelected(null); setProbe(null) }}>
+                <span className="switch" aria-hidden="true"><span className="knob">{tester && <Check />}</span></span>
+                <span className="toggle-label">{t('lab.tester')}</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -176,6 +191,7 @@ export function BuildLab() {
             <div className="eyebrow">{t('lab.goal')}</div>
             <p className="lab-goal">{t(`lab.goal.${L}`)}</p>
             {level === FIX && <p className="faults" aria-live="polite">{t('lab.faultsLeft', { n: left })}</p>}
+            <GoalStars earned={earned[level]} solvedNow={status.done} wires={wires.length} min={Lv.minWires} />
             {states && (
               <>
                 <h2 className="checklist-title">{t('lab.checklist')}</h2>
@@ -210,14 +226,12 @@ export function BuildLab() {
             </div>
           )}
 
+          {level === FIX && tester && (
+            <p className="probe-readout" aria-live="polite">{probe ? t('lab.probe', { term: t(`lab.term.${probe}`), result: t(hasPower(probe, wires, level, sunOn) ? 'lab.powerHere' : 'lab.noPowerHere') }) : t('lab.testerHint')}</p>
+          )}
+
           {level === FIX && (
             <div className="lab-tools">
-              <button type="button" className="toggle" aria-pressed={tester} onClick={() => { setTester(!tester); setSelected(null); setProbe(null) }}>
-                <span className="switch" aria-hidden="true"><span className="knob">{tester && <Check />}</span></span>
-                <span className="toggle-label">{t('lab.tester')}</span>
-                <span className="toggle-state" aria-hidden="true">{t(tester ? 'controls.on' : 'controls.off')}</span>
-              </button>
-              {tester && <p className="hint flat" aria-live="polite">{probe ? t('lab.probe', { term: t(`lab.term.${probe}`), result: t(hasPower(probe, wires, level, sunOn) ? 'lab.powerHere' : 'lab.noPowerHere') }) : t('lab.testerHint')}</p>}
               <button className="btn ghost" type="button" onClick={() => start(FIX, dealPuzzle())}>{t('lab.newPuzzle')}</button>
             </div>
           )}
@@ -228,18 +242,6 @@ export function BuildLab() {
               <span className="toggle-label">{t('lab.cloud')}</span>
               <span className="toggle-state" aria-hidden="true">{t(cloudOn ? 'controls.on' : 'controls.off')}</span>
             </button>
-          )}
-
-          {earned && (
-            <div className="card stars-card">
-              <div className="eyebrow">{t('lab.stars')}</div>
-              <p className="stars-big"><span aria-hidden="true">{stars(starCount(earned))}</span><span className="sr">{t('lab.starsOf', { n: starCount(earned) })}</span></p>
-              <ul className="star-list">
-                <StarLine ok text={t('lab.star.solved')} />
-                <StarLine ok={earned.fewWires} text={earned.fewWires ? t('lab.star.wiresOk', { n: wires.length }) : t('lab.star.wiresMissing', { min: Lv.minWires, n: wires.length })} />
-                <StarLine ok={earned.firstTry} text={t(earned.firstTry ? 'lab.star.firstOk' : 'lab.star.firstMissing')} />
-              </ul>
-            </div>
           )}
 
           {status.done && (
@@ -258,14 +260,19 @@ function Check() {
   return <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
 }
 
-/** one star rule: a filled check when earned, an empty circle and how to get it when not */
-function StarLine({ ok, text }: { ok: boolean; text: string }) {
+/** this level's three stars, each with its rule: filled when earned, outlined when not */
+function GoalStars({ earned, solvedNow, wires, min }: { earned?: Earned; solvedNow: boolean; wires: number; min: number }) {
+  const e = earned ?? { solved: false, fewWires: false, firstTry: false }
+  const wiresText = e.fewWires ? t('lab.goalStar.wires') : solvedNow && wires > min ? t('lab.goalStar.wiresTry', { n: wires, min }) : t('lab.goalStar.wiresMin', { min })
+  const items: [boolean, string][] = [[e.solved, t('lab.goalStar.solved')], [e.fewWires, wiresText], [e.firstTry, t('lab.goalStar.first')]]
   return (
-    <li className={ok ? 'star-line ok' : 'star-line'}>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-        {ok ? <path d="M5 12.5 10 17l9-10" /> : <circle cx="12" cy="12" r="8" />}
-      </svg>
-      <span>{text}</span>
-    </li>
+    <ul className="goal-stars" aria-label={t('lab.goalStars')}>
+      {items.map(([ok, text], i) => (
+        <li key={i} className={ok ? 'ok' : undefined}>
+          <span className="star" aria-hidden="true">{ok ? '★' : '☆'}</span>
+          <span>{text}<span className="sr"> ({t(ok ? 'lab.goalStar.earned' : 'lab.goalStar.notYet')})</span></span>
+        </li>
+      ))}
+    </ul>
   )
 }

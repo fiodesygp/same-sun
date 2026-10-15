@@ -1,8 +1,10 @@
-// The Build Lab wiring board. All six levels share one picture in a 360 x 340 viewBox: the big
-// panel on posts above the plant, the small panel at the top left (levels 3-6), the resistor
-// (levels 3-6), the LED beside the pot, the fan on the right post blowing toward the plant, and the
-// water tank at the bottom left with a tube to the pot. Terminals shown together sit at least 54
-// units apart with 27-unit hit circles: 44 px tap targets on a 360 px phone (board about 296 px wide).
+// The Build Lab wiring board. Two layouts share the same parts, terminals, wires and logic:
+// - portrait (360 x 340) for phones and tablets held upright,
+// - landscape (640 x 320) for wide screens, parts spread left to right: small panel, big panel
+//   above the plant, resistor, LED, fan, water tank.
+// Each part is drawn from one anchor point, and its terminals are fixed offsets from that anchor.
+// Terminals shown together sit at least 54 units apart with 27-unit hit circles, so each is a
+// 44 px tap target at every size the board is shown.
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { t, type Key } from '../../i18n/t'
 import { evaluate, levelTerms, LEVELS, nets, type Power, type TermId, type Wire } from '../../lab/circuit'
@@ -10,20 +12,81 @@ import { evaluate, levelTerms, LEVELS, nets, type Power, type TermId, type Wire 
 const HIT = 27
 const FONT = 'Source Sans 3, sans-serif'
 const INK = '#2B2F2C', RED = '#D9362B', PLUS = '#B3261E', LOOSE = '#8a8f88'
-const GROUND = 306
+type Pt = [number, number]
 
-/** x, y, label, label offset below (+) or above (-) the dot */
-const T: Record<TermId, [number, number, string, number]> = {
-  'p+': [190, 90, '+', 22], 'p-': [244, 90, '−', 22],
-  'q+': [34, 120, '+', 22], 'q-': [88, 120, '−', 22],
-  mA: [279, 136, '+', -14], mB: [333, 136, '−', -14],
-  lL: [130, 292, 'lab.svg.long', 24], lS: [184, 292, 'lab.svg.short', 24],
-  'w+': [30, 236, '+', -14], 'w-': [84, 236, '−', -14],
-  rA: [150, 146, '', 0], rB: [150, 214, '', 0]
+export interface Layout {
+  w: number
+  h: number
+  ground: number
+  sun: Pt
+  sunLabel: Pt
+  /** anchors: big panel and small panel (top-left corner of the panel), plant (pot rim centre),
+   *  resistor (top end), LED (top of the bulb), fan (top-left of the motor box), tank (top-left) */
+  big: Pt
+  small: Pt
+  plant: Pt
+  res: Pt
+  led: Pt
+  fan: Pt
+  tank: Pt
+  /** air arrow from the fan blades, as an offset from the blades' centre */
+  air: { from: Pt; to: Pt; text: Pt }
+  ledLabel: Pt
+  /** resistor label, as an offset from its top end */
+  resLabel: Pt
+  waterText: Pt
+  plantLabel: Pt
+  tankLabel: Pt
+  motorLabel: Pt
+}
+
+export const PORTRAIT: Layout = {
+  w: 360, h: 340, ground: 306, sun: [336, 22], sunLabel: [296, 18],
+  big: [106, 52], small: [8, 80], plant: [222, 282], res: [150, 146], led: [157, 258], fan: [274, 156], tank: [16, 266],
+  air: { from: [-10, 18], to: [-22, 62], text: [12, 78] }, ledLabel: [-31, 4], resLabel: [38, 38], waterText: [268, 296],
+  plantLabel: [222, 331], tankLabel: [44, 331], motorLabel: [306, 331]
+}
+
+export const LANDSCAPE: Layout = {
+  w: 640, h: 320, ground: 286, sun: [612, 24], sunLabel: [552, 20],
+  big: [150, 60], small: [16, 96], plant: [250, 262], res: [400, 96], led: [470, 200], fan: [500, 110], tank: [545, 246],
+  air: { from: [-12, 14], to: [-56, 40], text: [-52, 58] }, ledLabel: [31, 4], resLabel: [44, 60], waterText: [296, 276],
+  plantLabel: [250, 311], tankLabel: [575, 314], motorLabel: [488, 302]
+}
+
+const add = (p: Pt, dx: number, dy: number): Pt => [p[0] + dx, p[1] + dy]
+
+/** terminal positions for a layout */
+export function terminals(L: Layout): Record<TermId, Pt> {
+  return {
+    'p+': add(L.big, 84, 38), 'p-': add(L.big, 138, 38),
+    'q+': add(L.small, 26, 40), 'q-': add(L.small, 80, 40),
+    mA: add(L.fan, 5, -20), mB: add(L.fan, 59, -20),
+    lL: add(L.led, -27, 34), lS: add(L.led, 27, 34),
+    'w+': add(L.tank, 14, -30), 'w-': add(L.tank, 68, -30),
+    rA: L.res, rB: add(L.res, 0, 68)
+  }
+}
+
+/** label text and offset: below (+) or above (-) each dot */
+const LABEL: Record<TermId, [string, number]> = {
+  'p+': ['+', 22], 'p-': ['−', 22], 'q+': ['+', 22], 'q-': ['−', 22], mA: ['+', -14], mB: ['−', -14],
+  lL: ['lab.svg.long', 24], lS: ['lab.svg.short', 24], 'w+': ['+', -14], 'w-': ['−', -14], rA: ['', 0], rB: ['', 0]
 }
 const isPlus = (k: TermId) => k === 'p+' || k === 'q+' || k === 'mA' || k === 'lL' || k === 'w+'
 
+/** tube from the pump up out of the tank, down to the ground, along it and into the pot */
+function tubePath(tank: Pt, pot: Pt, ground: number) {
+  const dir = pot[0] > tank[0] ? 1 : -1
+  const px = tank[0] + 29, top = tank[1]
+  const wall = dir > 0 ? tank[0] + 78 : tank[0] - 22
+  const gy = ground - 4
+  return `M${px} ${top + 20} V${top + 10} Q${px} ${top - 4} ${px + dir * 15} ${top - 4} Q${wall} ${top - 4} ${wall} ${top + 14} ` +
+    `V${gy - 4} Q${wall} ${gy} ${wall + dir * 8} ${gy} H${pot[0] - dir * 26} Q${pot[0] - dir * 18} ${gy} ${pot[0] - dir * 16} ${gy - 8} L${pot[0] - dir * 10} ${pot[1] + 4}`
+}
+
 type Props = {
+  layout: Layout
   level: number
   wires: Wire[]
   selected: TermId | null
@@ -45,15 +108,18 @@ type Props = {
 }
 
 export function Board(props: Props) {
-  const { level, wires, selected, sunOn, power: pw, cloud, burnt, burntAt, tester, probe, onPick, onConnect, onRemove, onCancel } = props
+  const { layout: Y, level, wires, selected, sunOn, power: pw, cloud, burnt, burntAt, tester, probe, onPick, onConnect, onRemove, onCancel } = props
+  const T = terminals(Y)
   const svgRef = useRef<SVGSVGElement>(null)
   const [drag, setDrag] = useState<{ from: TermId; x: number; y: number; moved: boolean } | null>(null)
   const justDragged = useRef(false)
-  const L = LEVELS[level], terms = levelTerms(level)
+  const Lv = LEVELS[level], terms = levelTerms(level)
   const ev = sunOn ? evaluate(wires, level) : null
   const f = nets(wires)
-  const posNets = new Set(L.panels.map(p => f(p === 'big' ? 'p+' : 'q+'))), negNets = new Set(L.panels.map(p => f(p === 'big' ? 'p-' : 'q-')))
-  const two = L.panels.length === 2
+  const posNets = new Set(Lv.panels.map(p => f(p === 'big' ? 'p+' : 'q+'))), negNets = new Set(Lv.panels.map(p => f(p === 'big' ? 'p-' : 'q-')))
+  const two = Lv.panels.length === 2
+  const G = Y.ground, [bx, by] = Y.big, [sx, sy] = Y.small, [px, py] = Y.plant, [rx, ry] = Y.res, [lx, ly] = Y.led, [fx, fy] = Y.fan, [tx, ty] = Y.tank
+  const blades: Pt = [fx - 18, fy + 18]
 
   const txt = (x: number, y: number, s: string, o: { size?: number; bold?: boolean; fill?: string } = {}) => (
     <text x={x} y={y} textAnchor="middle" fontSize={o.size ?? 12} fontWeight={o.bold ? 700 : undefined} fontFamily={FONT} fill={o.fill ?? INK}>{s}</text>
@@ -106,128 +172,131 @@ export function Board(props: Props) {
   const pumpDir = ev && pw.pump !== 'off' && !ev.chain.includes('pump') ? ev.conn.pump.dir : 0
   const pumpFull = pumpDir > 0 && pw.pump === 'full'
   const sunFill = sunOn ? (cloud > 0.5 ? '#c9b25a' : '#F2B705') : '#c9cdc4'
+  const [sunX, sunY] = Y.sun
+  const pumpDropX = px + (tx > px ? 10 : -10)
+  const airFrom = add(blades, ...Y.air.from), airTo = add(blades, ...Y.air.to), airText = add(blades, ...Y.air.text)
+  // arrow head at the end of a line from a to b
+  const head = (a: Pt, b: Pt) => {
+    const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), l = 8
+    const p = (d: number): Pt => [b[0] - l * Math.cos(ang + d), b[1] - l * Math.sin(ang + d)]
+    return `M${p(0.5).join(' ')} L${b.join(' ')} L${p(-0.5).join(' ')}`
+  }
 
   return (
-    <svg ref={svgRef} viewBox="0 0 360 340" role="group" aria-label={t('lab.boardLabel')}
+    <svg ref={svgRef} viewBox={`0 0 ${Y.w} ${Y.h}`} role="group" aria-label={t('lab.boardLabel')}
       onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={() => setDrag(null)}>
-      <rect x={0} y={0} width={360} height={340} rx={12} fill={sunOn ? '#FFF3CF' : '#E8EEF0'} />
-      <circle cx={336} cy={22} r={13} fill={sunFill} />
+      <rect x={0} y={0} width={Y.w} height={Y.h} rx={12} fill={sunOn ? '#FFF3CF' : '#E8EEF0'} />
+      <circle cx={sunX} cy={sunY} r={13} fill={sunFill} />
       {cloud > 0 && (
-        <g opacity={Math.min(1, cloud * 1.2)} transform={`translate(${60 * (1 - cloud)} 0)`} aria-hidden="true">
+        <g opacity={Math.min(1, cloud * 1.2)} transform={`translate(${sunX - 336 + 60 * (1 - cloud)} ${sunY - 22})`} aria-hidden="true">
           <path d="M312 36 a12 12 0 0 1 7-21 a15 15 0 0 1 28-3 a11 11 0 0 1 9 20 z" fill="#9aa4a8" stroke="#6f7a7e" strokeWidth={1.5} />
         </g>
       )}
-      {txt(296, 18, t(sunOn ? 'lab.svg.sunIsOn' : 'lab.svg.sunIsOff'), { size: 11 })}
-      {sunOn && [[170, 49], [230, 45], [290, 41], ...(two ? [[60, 76]] : [])].map(([x, y]) => (
-        <line key={x} x1={324} y1={28} x2={x} y2={y} stroke="#F2B705" strokeWidth={1.5} strokeDasharray="4 4" opacity={1 - 0.75 * cloud} />
+      {txt(Y.sunLabel[0], Y.sunLabel[1], t(sunOn ? 'lab.svg.sunIsOn' : 'lab.svg.sunIsOff'), { size: 11 })}
+      {sunOn && [add(Y.big, 64, -3), add(Y.big, 124, -7), add(Y.big, 184, -11), ...(two ? [add(Y.small, 52, -4)] : [])].map(([x, y]) => (
+        <line key={x} x1={sunX - 12} y1={sunY + 6} x2={x} y2={y} stroke="#F2B705" strokeWidth={1.5} strokeDasharray="4 4" opacity={1 - 0.75 * cloud} />
       ))}
 
-      <rect x={0} y={GROUND} width={360} height={34} fill="#C9A779" />
-      {sunOn && <rect x={120} y={GROUND} width={180} height={5} fill="#6b5236" opacity={0.4} />}
+      <rect x={0} y={G} width={Y.w} height={Y.h - G} fill="#C9A779" />
+      {sunOn && <rect x={bx + 14} y={G} width={180} height={5} fill="#6b5236" opacity={0.4} />}
 
       {/* big panel on two posts, above the plant */}
-      <line x1={112} y1={61} x2={112} y2={GROUND} stroke="#8A7A62" strokeWidth={5} />
-      <line x1={300} y1={48} x2={300} y2={GROUND} stroke="#8A7A62" strokeWidth={5} />
-      <polygon points="106,52 312,38 312,48 106,62" fill="#1B3E66" stroke="#0C2A47" />
-      <path d="M154 48.7 V58.7 M206 45.2 V55.2 M258 41.7 V51.7" stroke="#4F7FB0" strokeWidth={1.2} />
-      {txt(150, 34, t(two ? 'lab.svg.bigPanel' : 'lab.svg.panel'), { bold: true })}
-      <path d="M196 56 L190 82" stroke={RED} strokeWidth={3} fill="none" />
-      <path d="M240 53 L244 82" stroke={INK} strokeWidth={3} fill="none" />
+      <line x1={bx + 6} y1={by + 9} x2={bx + 6} y2={G} stroke="#8A7A62" strokeWidth={5} />
+      <line x1={bx + 194} y1={by - 4} x2={bx + 194} y2={G} stroke="#8A7A62" strokeWidth={5} />
+      <polygon points={`${bx},${by} ${bx + 206},${by - 14} ${bx + 206},${by - 4} ${bx},${by + 10}`} fill="#1B3E66" stroke="#0C2A47" />
+      <path d={`M${bx + 48} ${by - 3.3} v10 M${bx + 100} ${by - 6.8} v10 M${bx + 152} ${by - 10.3} v10`} stroke="#4F7FB0" strokeWidth={1.2} />
+      {txt(bx + 44, by - 18, t(two ? 'lab.svg.bigPanel' : 'lab.svg.panel'), { bold: true })}
+      <path d={`M${bx + 90} ${by + 4} L${T['p+'][0]} ${T['p+'][1] - 8}`} stroke={RED} strokeWidth={3} fill="none" />
+      <path d={`M${bx + 134} ${by + 1} L${T['p-'][0]} ${T['p-'][1] - 8}`} stroke={INK} strokeWidth={3} fill="none" />
 
       {two && (
         <g>
-          <line x1={14} y1={88} x2={14} y2={GROUND} stroke="#8A7A62" strokeWidth={4} />
-          <polygon points="8,80 96,72 96,81 8,89" fill="#1B3E66" stroke="#0C2A47" />
-          <path d="M52 76 V85" stroke="#4F7FB0" strokeWidth={1.2} />
-          {txt(52, 62, t('lab.svg.smallPanel'), { bold: true, size: 11 })}
-          <path d="M30 87 L34 112" stroke={RED} strokeWidth={3} fill="none" />
-          <path d="M84 82 L88 112" stroke={INK} strokeWidth={3} fill="none" />
+          <line x1={sx + 6} y1={sy + 8} x2={sx + 6} y2={G} stroke="#8A7A62" strokeWidth={4} />
+          <polygon points={`${sx},${sy} ${sx + 88},${sy - 8} ${sx + 88},${sy + 1} ${sx},${sy + 9}`} fill="#1B3E66" stroke="#0C2A47" />
+          <path d={`M${sx + 44} ${sy - 4} v9`} stroke="#4F7FB0" strokeWidth={1.2} />
+          {txt(sx + 44, sy - 18, t('lab.svg.smallPanel'), { bold: true, size: 11 })}
+          <path d={`M${sx + 22} ${sy + 7} L${T['q+'][0]} ${T['q+'][1] - 8}`} stroke={RED} strokeWidth={3} fill="none" />
+          <path d={`M${sx + 76} ${sy + 2} L${T['q-'][0]} ${T['q-'][1] - 8}`} stroke={INK} strokeWidth={3} fill="none" />
         </g>
       )}
 
       {/* plant in its pot, under the big panel */}
-      <path d="M222 282 V248" stroke="#3a7a3f" strokeWidth={3} />
-      {[[213, 260, -20], [231, 256, 20], [216, 270, -25], [228, 268, 25]].map(([x, y, r]) => (
-        <ellipse key={`${x}${y}`} cx={x} cy={y} rx={10} ry={4.5} fill="#3E9B4F" transform={`rotate(${r} ${x} ${y})`} />
+      <path d={`M${px} ${py} V${py - 34}`} stroke="#3a7a3f" strokeWidth={3} />
+      {[[-9, -22, -20], [9, -26, 20], [-6, -12, -25], [6, -14, 25]].map(([dx, dy, r]) => (
+        <ellipse key={`${dx}${dy}`} cx={px + dx} cy={py + dy} rx={10} ry={4.5} fill="#3E9B4F" transform={`rotate(${r} ${px + dx} ${py + dy})`} />
       ))}
-      <polygon points="202,282 242,282 238,306 206,306" fill="#B8693E" />
-      <ellipse cx={222} cy={282} rx={20} ry={3} fill="#5a3a1e" />
-      {txt(222, 331, t('lab.svg.plant'), { size: 11 })}
+      <polygon points={`${px - 20},${py} ${px + 20},${py} ${px + 16},${py + 24} ${px - 16},${py + 24}`} fill="#B8693E" />
+      <ellipse cx={px} cy={py} rx={20} ry={3} fill="#5a3a1e" />
+      {txt(Y.plantLabel[0], Y.plantLabel[1], t('lab.svg.plant'), { size: 11 })}
 
-      {L.resistor && (
+      {Lv.resistor && (
         <g>
-          <path d="M150 154 V160 M150 200 V206" stroke="#888" strokeWidth={2} />
-          <rect x={144} y={160} width={12} height={40} rx={4} fill="#d8c39a" stroke="#7a6a3a" />
-          <rect x={144} y={168} width={12} height={3} fill="#7a4a1e" />
-          <rect x={144} y={176} width={12} height={3} fill="#2B2F2C" />
-          <rect x={144} y={184} width={12} height={3} fill="#B3261E" />
-          {txt(188, 184, t('lab.svg.resistor'), { size: 11 })}
+          <path d={`M${rx} ${ry + 8} V${ry + 14} M${rx} ${ry + 54} V${ry + 60}`} stroke="#888" strokeWidth={2} />
+          <rect x={rx - 6} y={ry + 14} width={12} height={40} rx={4} fill="#d8c39a" stroke="#7a6a3a" />
+          <rect x={rx - 6} y={ry + 22} width={12} height={3} fill="#7a4a1e" />
+          <rect x={rx - 6} y={ry + 30} width={12} height={3} fill="#2B2F2C" />
+          <rect x={rx - 6} y={ry + 38} width={12} height={3} fill="#B3261E" />
+          {txt(rx + Y.resLabel[0], ry + Y.resLabel[1], t('lab.svg.resistor'), { size: 11 })}
         </g>
       )}
 
-      {L.parts.includes('led') && (
+      {Lv.parts.includes('led') && (
         <g>
-          {ledOn && <circle cx={157} cy={258} r={20} fill="#FFE066" opacity={0.75} />}
-          {burnt && <circle key={burntAt} className="flash" cx={157} cy={258} r={24} fill="#fff7c2" opacity={0} />}
-          <path d="M147 270 V258 A10 10 0 0 1 167 258 V270 Z" fill={burnt ? '#5b5650' : ledOn ? '#FFD000' : '#E2DED0'} stroke="#7a6a3a" />
+          {ledOn && <circle cx={lx} cy={ly} r={20} fill="#FFE066" opacity={0.75} />}
+          {burnt && <circle key={burntAt} className="flash" cx={lx} cy={ly} r={24} fill="#fff7c2" opacity={0} />}
+          <path d={`M${lx - 10} ${ly + 12} V${ly} A10 10 0 0 1 ${lx + 10} ${ly} V${ly + 12} Z`} fill={burnt ? '#5b5650' : ledOn ? '#FFD000' : '#E2DED0'} stroke="#7a6a3a" />
           {burnt && (
             <g aria-hidden="true">
-              <ellipse cx={157} cy={260} rx={6} ry={4} fill="#1d1a17" opacity={0.75} />
-              <path d="M152 246 q3 -5 0 -9 M160 246 q3 -5 0 -9" fill="none" stroke="#6f6a64" strokeWidth={1.5} strokeLinecap="round" />
+              <ellipse cx={lx} cy={ly + 2} rx={6} ry={4} fill="#1d1a17" opacity={0.75} />
+              <path d={`M${lx - 5} ${ly - 12} q3 -5 0 -9 M${lx + 3} ${ly - 12} q3 -5 0 -9`} fill="none" stroke="#6f6a64" strokeWidth={1.5} strokeLinecap="round" />
             </g>
           )}
-          <line x1={153} y1={270} x2={130} y2={292} stroke="#888" strokeWidth={2} />
-          <line x1={161} y1={270} x2={184} y2={292} stroke="#888" strokeWidth={2} />
-          {txt(126, 262, t('lab.svg.led'), { bold: true, size: 11 })}
+          <line x1={lx - 4} y1={ly + 12} x2={T.lL[0]} y2={T.lL[1]} stroke="#888" strokeWidth={2} />
+          <line x1={lx + 4} y1={ly + 12} x2={T.lS[0]} y2={T.lS[1]} stroke="#888" strokeWidth={2} />
+          {txt(lx + Y.ledLabel[0], ly + Y.ledLabel[1], t('lab.svg.led'), { bold: true, size: 11 })}
         </g>
       )}
 
-      {L.parts.includes('pump') && (
+      {Lv.parts.includes('pump') && (
         <g>
-          <rect x={16} y={266} width={56} height={40} rx={4} fill="#E9F3FA" stroke="#5c7a8f" strokeWidth={1.5} />
-          <rect x={18} y={276} width={52} height={28} rx={2} fill="#3E8FD1" opacity={0.75} />
-          <rect x={34} y={286} width={22} height={14} rx={4} fill={pumpFull ? '#F2B705' : '#9aa7ad'} stroke="#4a5a62" />
-          <path d="M30 244 Q 30 270 38 286 M84 244 Q 82 270 52 286" fill="none" stroke="#888" strokeWidth={2} />
-          {/* tube: up out of the tank, down to the ground, along it and into the pot */}
-          <path d="M45 286 V276 Q45 262 60 262 Q 92 262 94 280 V298 Q 94 302 102 302 H196 Q 204 302 206 294 L 212 286" fill="none" stroke="#5c7a8f" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
-          {txt(44, 331, t('lab.svg.tank'), { size: 11, bold: true })}
+          <rect x={tx} y={ty} width={56} height={40} rx={4} fill="#E9F3FA" stroke="#5c7a8f" strokeWidth={1.5} />
+          <rect x={tx + 2} y={ty + 10} width={52} height={28} rx={2} fill="#3E8FD1" opacity={0.75} />
+          <rect x={tx + 18} y={ty + 20} width={22} height={14} rx={4} fill={pumpFull ? '#F2B705' : '#9aa7ad'} stroke="#4a5a62" />
+          <path d={`M${T['w+'][0]} ${T['w+'][1] + 8} Q ${T['w+'][0]} ${ty + 4} ${tx + 22} ${ty + 20} M${T['w-'][0]} ${T['w-'][1] + 8} Q ${T['w-'][0] - 2} ${ty + 4} ${tx + 36} ${ty + 20}`} fill="none" stroke="#888" strokeWidth={2} />
+          <path d={tubePath(Y.tank, Y.plant, G)} fill="none" stroke="#5c7a8f" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
+          {txt(Y.tankLabel[0], Y.tankLabel[1], t('lab.svg.tank'), { size: 11, bold: true })}
           {pumpDir !== 0 && (
             <g>
-              {[0, 1, 2].map(i => <circle key={i} className="drop" cx={212} cy={290 + i * 3} r={pumpFull ? 3 : 1.6} fill="#3E8FD1" />)}
-              {txt(268, 296, t(pumpFull ? 'lab.svg.waterIn' : 'lab.svg.trickle'), { size: 11 })}
+              {[0, 1, 2].map(i => <circle key={i} className="drop" cx={pumpDropX} cy={py + 8 + i * 3} r={pumpFull ? 3 : 1.6} fill="#3E8FD1" />)}
+              {txt(Y.waterText[0], Y.waterText[1], t(pumpFull ? 'lab.svg.waterIn' : 'lab.svg.trickle'), { size: 11 })}
             </g>
           )}
         </g>
       )}
 
-      {L.parts.includes('motor') && (
+      {Lv.parts.includes('motor') && (
         <g>
-          <rect x={274} y={156} width={66} height={36} rx={8} fill="#B4B2A9" stroke="#5F5E5A" />
-          <rect x={260} y={171} width={14} height={6} fill="#5F5E5A" />
-          {txt(306, 331, t('lab.svg.motor'), { bold: true, size: 11 })}
-          <line x1={279} y1={144} x2={279} y2={156} stroke="#888" strokeWidth={2} />
-          <line x1={333} y1={144} x2={333} y2={156} stroke="#888" strokeWidth={2} />
+          <rect x={fx + 26} y={fy + 36} width={14} height={G - fy - 36} fill="#7d7a72" />
+          <rect x={fx + 14} y={G - 4} width={38} height={4} rx={2} fill="#7d7a72" />
+          <rect x={fx} y={fy} width={66} height={36} rx={8} fill="#B4B2A9" stroke="#5F5E5A" />
+          <rect x={fx - 14} y={fy + 15} width={14} height={6} fill="#5F5E5A" />
+          {txt(Y.motorLabel[0], Y.motorLabel[1], t('lab.svg.motor'), { bold: true, size: 11 })}
+          <line x1={T.mA[0]} y1={T.mA[1] + 8} x2={T.mA[0]} y2={fy} stroke="#888" strokeWidth={2} />
+          <line x1={T.mB[0]} y1={T.mB[1] + 8} x2={T.mB[0]} y2={fy} stroke="#888" strokeWidth={2} />
           {/* the fan spins slower when there is less power for it */}
           <g className={motorDir ? (motorDir < 0 ? 'spin rev' : 'spin') : undefined}
             style={motorDir ? ({ '--spin': `${0.5 / Math.max(0.2, pw.motor)}s` } as React.CSSProperties) : undefined}>
             <g className="blades">
-              <ellipse cx={256} cy={160} rx={4} ry={14} fill="#378ADD" />
-              <ellipse cx={256} cy={188} rx={4} ry={14} fill="#378ADD" />
-              <circle cx={256} cy={174} r={4} fill="#1f5f9e" />
+              <ellipse cx={blades[0]} cy={blades[1] - 14} rx={4} ry={14} fill="#378ADD" />
+              <ellipse cx={blades[0]} cy={blades[1] + 14} rx={4} ry={14} fill="#378ADD" />
+              <circle cx={blades[0]} cy={blades[1]} r={4} fill="#1f5f9e" />
             </g>
           </g>
-          {motorDir > 0 && (
+          {motorDir !== 0 && (
             <g>
-              <line x1={246} y1={192} x2={234} y2={236} stroke={INK} strokeWidth={2} />
-              <path d="M230 228 L234 236 L240 229" fill="none" stroke={INK} strokeWidth={2} />
-              {txt(268, 252, t('lab.svg.airToPlant'), { size: 11 })}
-            </g>
-          )}
-          {motorDir < 0 && (
-            <g>
-              <line x1={234} y1={236} x2={246} y2={192} stroke={INK} strokeWidth={2} />
-              <path d="M240 199 L246 192 L250 200" fill="none" stroke={INK} strokeWidth={2} />
-              {txt(268, 252, t('lab.svg.airAway'), { size: 11 })}
+              <line x1={airFrom[0]} y1={airFrom[1]} x2={airTo[0]} y2={airTo[1]} stroke={INK} strokeWidth={2} />
+              <path d={motorDir > 0 ? head(airFrom, airTo) : head(airTo, airFrom)} fill="none" stroke={INK} strokeWidth={2} />
+              {txt(airText[0], airText[1], t(motorDir > 0 ? 'lab.svg.airToPlant' : 'lab.svg.airAway'), { size: 11 })}
             </g>
           )}
         </g>
@@ -237,7 +306,7 @@ export function Board(props: Props) {
         const [x1, y1] = T[a], [x2, y2] = T[b]
         const net = posNets.has(f(a)) ? '+' : negNets.has(f(a)) ? '−' : null
         const col = net === '+' ? RED : net === '−' ? INK : LOOSE
-        const my = Math.min(330, Math.max(y1, y2) + 26)
+        const my = Math.min(Y.h - 10, Math.max(y1, y2) + 26)
         const d = `M${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`
         const mx = (x1 + x2) / 2, mY = (y1 + 6 * my + y2) / 8 // midpoint of the curve
         const remove = () => onRemove(i)
@@ -262,7 +331,7 @@ export function Board(props: Props) {
       )}
 
       {terms.map(k => {
-        const [x, y, label, dy] = T[k]
+        const [x, y] = T[k], [label, dy] = LABEL[k]
         const text = label.startsWith('lab.') ? t(label as Key) : label
         return (
           <g key={k} className={selected === k ? 'term sel' : tester ? 'term probe' : 'term'} tabIndex={0} role="button"
@@ -278,7 +347,7 @@ export function Board(props: Props) {
       {/* tester reading, next to the dot that was tested */}
       {tester && probe && (() => {
         const [x, y] = T[probe.term], label = t(probe.power ? 'lab.powerHere' : 'lab.noPowerHere')
-        const w = label.length * 6.4 + 16, cx = Math.min(356 - w / 2, Math.max(4 + w / 2, x)), cy = y < 60 ? y + 34 : y - 34
+        const w = label.length * 6.4 + 16, cx = Math.min(Y.w - 4 - w / 2, Math.max(4 + w / 2, x)), cy = y < 60 ? y + 34 : y - 34
         return (
           <g pointerEvents="none" aria-hidden="true">
             <rect x={cx - w / 2} y={cy - 12} width={w} height={22} rx={11} fill={probe.power ? '#1A7547' : '#2B2F2C'} />
