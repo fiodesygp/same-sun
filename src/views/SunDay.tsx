@@ -121,9 +121,10 @@ export function SunDay() {
         <h1 className="page-title">{t('sunDay.title')}</h1>
         <p className="lede">{t('sunDay.lede')}</p>
       </div>
-      {/* one flat list in phone order (scene, gauges, controls, prediction, results) so the
-          keyboard order matches what you see; on wide screens CSS moves the controls to a right column */}
+      {/* in phone order (scene and gauges, controls, prediction, results) so the keyboard order
+          matches what you see; sunday.css rearranges it for tablet and computer */}
       <div className="sunday">
+        <div className="stage">
           <div className="card scene-wrap">
             <Scene
               design={design} hour={hr} growth={hr ? 0.25 + 0.75 * growth : 0.35}
@@ -143,6 +144,7 @@ export function SunDay() {
           <p className="sr" role="status">
             {phase === 'playing' ? t('sunDay.statusRunning', { span }) : phase === 'done' && run ? t('sunDay.statusDone', { total: Math.round((run.s.food + run.s.energy) * 100) }) : ''}
           </p>
+        </div>
           <Controls design={design} challenge={challenge} onDesign={d => change(d)} onChallenge={c => change(design, c)} />
           {phase === 'ready' && <Prediction pred={pred} onChange={setPred} />}
           {phase === 'done' && run && <Results key={run.id} ref={resultsRef} run={run} />}

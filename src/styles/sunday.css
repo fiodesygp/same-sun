@@ -1,20 +1,19 @@
-/* phones: one column in DOM order (scene, gauges, chips, controls, prediction, results).
-   Wide screens: controls fill the right column; the last 1fr row absorbs their extra height so the
-   left column stays packed at the top. */
-.sunday { display: grid; gap: 16px; align-items: start }
-.sunday > * { min-width: 0 }
-@media (min-width: 861px) {
-  .sunday { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); grid-template-rows: repeat(5, auto) 1fr }
-  .sunday > * { grid-column: 1 }
-  .sunday > #controls { grid-column: 2; grid-row: 1 / -1 }
-}
+/* Phone: one column in DOM order: stage (scene, gauges 2 x 2, chips), controls, prediction, results.
+   Tablet portrait: stage full width with 4 gauges in a row; controls beside prediction and results.
+   Wide: stage sticky on the left with prediction and results under it; controls scroll on the right.
+   In both two-column layouts the last 1fr row absorbs the controls' extra height, so the other column
+   stays packed at the top. */
+.sunday { display: grid; gap: var(--gap); align-items: start }
+.sunday > *, .stage > * { min-width: 0 }
+.stage { display: grid; gap: var(--gap) }
+
+
 .playbar { display: flex; gap: 10px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); flex-wrap: wrap }
 .clock { font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; margin-left: auto; color: var(--muted) }
 .progress { flex-basis: 100%; height: 6px; background: var(--line); border-radius: 99px; overflow: hidden }
 .progress i { display: block; height: 100%; width: 0; background: var(--sun) }
 
-.gauges { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px }
-@media (max-width: 520px) { .gauges { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.gauges { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px }
 .g { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; min-width: 0 }
 .g span { display: block; font-size: 12px; color: var(--muted); font-weight: 600 }
 .g b { font-family: var(--display); font-size: 22px; font-variant-numeric: tabular-nums }
@@ -55,3 +54,25 @@
 .ladder { font-size: 15px; display: grid; gap: 6px; margin-top: 10px }
 .ladder p { margin: 0; padding: 8px 12px; background: var(--bg); border-radius: 10px }
 #results .row { margin-top: 10px }
+
+@media (min-width: 600px) and (max-width: 1023px) and (orientation: portrait) {
+  .sunday { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto 1fr }
+  .stage { grid-column: 1 / -1; grid-row: 1 }
+  .sunday > #controls { grid-column: 1; grid-row: 2 / -1 }
+  .sunday > #predictCard, .sunday > #results { grid-column: 2; grid-row: 2 }
+  .gauges { grid-template-columns: repeat(4, minmax(0, 1fr)) }
+}
+
+@media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
+  /* the left column is as wide as the scene can be while staying under 45% of the screen height,
+     and never more than 58% of the row (a definite width: minmax(0, x) beside 1fr would collapse to 0) */
+  .sunday { grid-template-columns: min(calc(45svh * 360 / 230), 58%) minmax(0, 1fr); grid-template-rows: auto auto 1fr }
+  .stage { grid-column: 1; grid-row: 1 }
+  .sunday > #controls { grid-column: 2; grid-row: 1 / -1 }
+  .sunday > #predictCard, .sunday > #results { grid-column: 1; grid-row: 2 }
+  .gauges { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) }
+}
+/* keep the scene and gauges in view while the controls scroll, when the screen is tall enough */
+@media (min-width: 1024px) and (min-height: 640px), (min-width: 600px) and (orientation: landscape) and (min-height: 640px) {
+  .stage { position: sticky; top: calc(var(--header-h, 72px) + 8px); z-index: 2; background: var(--bg); padding-bottom: 8px }
+}

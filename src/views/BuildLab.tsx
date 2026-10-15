@@ -35,7 +35,7 @@ export function BuildLab() {
         <h1 className="page-title">{t('buildLab.title')}</h1>
         <p className="lede">{t('buildLab.lede')}</p>
       </div>
-      <div className="cols">
+      <div className="cols lab-cols">
         <div className="card lab stack">
           <div className="levels seg" role="group" aria-label={t('lab.levelLabel')}>
             {LEVELS.map((_, l) => (

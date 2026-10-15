@@ -92,7 +92,7 @@ export function GrowthStory({ active }: { active: boolean }) {
         <EntryView key={open.id} entry={open} onBack={() => show(null)} onEdit={() => edit(open)} onDelete={() => remove(open.id)} />
       ) : (
         <div className="cols jcols">
-          <div ref={formRef}>
+          <div ref={formRef} className="gs-form">
             <EntryForm key={form.key} editing={editing} defaultStage={entries[0]?.stage ?? null} initialMsg={form.msg} onSave={save}
               onCancelEdit={() => { setEditing(null); setForm({ key: form.key + 1 }) }} />
           </div>

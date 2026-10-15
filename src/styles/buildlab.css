@@ -19,3 +19,15 @@
 .real { border: 1px solid var(--green); background: var(--green-soft); border-radius: 12px; padding: 12px }
 .real p, .lab-goal { margin: 6px 0 0 }
 .lab-goal { font-size: 17px }
+
+/* Wide: board on the left, sized so the whole board card fits the screen height (the svg is 4:3;
+   about 360 px goes to the header, page title, level buttons and the buttons under the board).
+   Goal, messages and Try it for real sit on the right. Phone and tablet portrait: one column. */
+@media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
+  .lab-cols {
+    grid-template-columns: min(max(300px, calc((100svh - var(--header-h, 72px) - 360px) * 4 / 3 + 2 * var(--card-pad))), 66%) minmax(0, 1fr)
+  }
+}
+@media (min-width: 600px) and (max-width: 1023px) and (orientation: portrait) {
+  .lab-cols .lab { max-width: calc((100svh - var(--header-h, 72px) - 360px) * 4 / 3 + 2 * var(--card-pad)); width: 100%; justify-self: center }
+}

@@ -26,6 +26,7 @@
 - For 7th graders: few controls, short sentences.
 - Big tap targets (at least 44 px). No hover-only interactions.
 - Mobile first: design for a 360 px wide phone in portrait, then scale up.
+- Three layouts (media queries listed at the top of `src/styles/app.css`): phone under 600 px (tabs in a bottom bar); tablet portrait 600–1023 px; wide = tablet landscape or 1024 px and up (content max 1200 px). Keep the Sun Day scene under 45% of the screen height.
 
 ## Accessibility
 - WCAG 2.2 AA contrast.
