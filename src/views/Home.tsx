@@ -80,6 +80,7 @@ export function Home({ onGo }: Props) {
           </button>
         </div>
       </div>
+      <p className="foot">{t('home.estimates')}</p>
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import model from '../config/model.json'
 import { Scene } from '../components/Scene'
 import { t } from '../i18n/t'
@@ -46,6 +46,9 @@ export function SunDay() {
   const [finished, setFinished] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
   const skipRef = useRef<HTMLButtonElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  // before the first run the gauges show this design at sunrise (the first simulated hour)
+  const sunrise = useMemo(() => simulate(design).hours[0], [design])
 
   // any change starts over: new prediction, no results
   function change(next: Design, nextChallenge = challenge) {
@@ -59,16 +62,22 @@ export function SunDay() {
     setFinished(false)
   }
 
-  function play() {
-    const r = simulate(design), s = score(design, r)
-    setRun({ r, s, design, pred, challenge, ideal: idealGrowth(design), id: Date.now() })
+  function play(skipPrediction = false) {
+    const r = simulate(design), s = score(design, r), p = skipPrediction ? NO_PRED : pred
+    if (skipPrediction) setPred(NO_PRED)
+    setRun({ r, s, design, pred: p, challenge, ideal: idealGrowth(design), id: Date.now() })
     setFrame(0)
     setPhase(reducedMotion() ? 'done' : 'playing')
   }
 
-  // the Run button is disabled while playing, so give keyboard focus to Skip instead of losing it
+  // when a run starts: bring the scene into view (Run may have been pressed in step 4, far below
+  // it on a phone), and give keyboard focus to Skip because the Run buttons are now disabled
   useEffect(() => {
-    if (phase === 'playing') skipRef.current?.focus()
+    if (phase !== 'playing') return
+    const stage = stageRef.current, header = document.querySelector('header')?.getBoundingClientRect().bottom ?? 0
+    const r = stage?.getBoundingClientRect()
+    if (stage && r && (r.top < header || r.bottom > window.innerHeight)) stage.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    skipRef.current?.focus({ preventScroll: true })
   }, [phase])
 
   useEffect(() => {
@@ -96,7 +105,7 @@ export function SunDay() {
     })
     // move focus to the results so keyboard and screen-reader users land on them
     resultsRef.current?.focus({ preventScroll: true })
-    resultsRef.current?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' })
+    resultsRef.current?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' })
   }, [phase, run])
 
   // the hour on screen: the current frame while playing, the last sunny hour when done
@@ -106,6 +115,9 @@ export function SunDay() {
   if (run) for (let k = 0; k <= i; k++) energy += run.r.hours[k].power
   const growth = hr && run ? hr.totalGrowth / run.ideal : 0
   const span = t(design.days === 1 ? 'sunDay.spanDay' : 'sunDay.spanWeek')
+  const runLabel = t(finished ? 'sunDay.runAgain' : design.days === 1 ? 'sunDay.runDay' : 'sunDay.runWeek')
+  const skipLabel = t(finished ? 'predict.skipAgain' : design.days === 1 ? 'predict.skipDay' : 'predict.skipWeek')
+  const playing = phase === 'playing'
   const loads = design.fan && design.pump ? 'both' : design.fan ? 'fan' : design.pump ? 'pump' : 'none'
   const sceneLabel = t('sunDay.sceneLabel', {
     crop: t(`crops.${design.crop}`).toLowerCase(),
@@ -121,34 +133,37 @@ export function SunDay() {
         <h1 className="page-title">{t('sunDay.title')}</h1>
         <p className="lede">{t('sunDay.lede')}</p>
       </div>
-      {/* in phone order (scene and gauges, controls, prediction, results) so the keyboard order
-          matches what you see; sunday.css rearranges it for tablet and computer */}
+      {/* phone order: scene and gauges, steps 1 to 4, then results. On wide screens the stage is a
+          sticky left column beside the steps; results sit below both columns, outside .sunday, so
+          the sticky stage stops before them and nothing scrolls underneath it */}
       <div className="sunday">
-        <div className="stage">
+        <div className="stage" ref={stageRef}>
           <div className="card scene-wrap">
             <Scene
               design={design} hour={hr} growth={hr ? 0.25 + 0.75 * growth : 0.35}
               tank={hr && design.pump ? hr.tank / model.tankSize.large : 1} label={sceneLabel}
             />
             <div className="playbar">
-              <button className="btn" type="button" disabled={phase === 'playing'} onClick={play}>
+              <button className="btn" type="button" disabled={playing} onClick={() => play()}>
                 <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1 L13 7 L2 13 Z" fill="currentColor" /></svg>
-                <span>{t(finished ? 'sunDay.runAgain' : design.days === 1 ? 'sunDay.runDay' : 'sunDay.runWeek')}</span>
+                <span>{runLabel}</span>
               </button>
-              {phase === 'playing' && <button className="btn ghost" type="button" ref={skipRef} onClick={() => setPhase('done')}>{t('sunDay.skip')}</button>}
-              <span className="clock">{hr ? t('sunDay.clock', { hour: hr.h, day: hr.day + 1 }) : t('sunDay.ready')}</span>
-              <div className="progress" aria-hidden="true"><i style={{ width: run ? `${((i + 1) / run.r.hours.length) * 100}%` : 0 }} /></div>
+              {playing && <button className="btn ghost" type="button" ref={skipRef} onClick={() => setPhase('done')}>{t('sunDay.skip')}</button>}
+              <span className="clock">{t('sunDay.clock', hr ? { hour: hr.h, day: hr.day + 1 } : { hour: model.hours.start, day: 1 })}</span>
+              {run && <div className="progress" aria-hidden="true"><i style={{ width: `${((i + 1) / run.r.hours.length) * 100}%` }} /></div>}
             </div>
           </div>
-          <Gauges design={design} hour={hr} energy={energy} growth={growth} />
+          <Gauges design={design} hour={hr ?? sunrise} energy={energy} growth={growth} live={!!hr} />
           <p className="sr" role="status">
             {phase === 'playing' ? t('sunDay.statusRunning', { span }) : phase === 'done' && run ? t('sunDay.statusDone', { total: Math.round((run.s.food + run.s.energy) * 100) }) : ''}
           </p>
         </div>
-          <Controls design={design} challenge={challenge} onDesign={d => change(d)} onChallenge={c => change(design, c)} />
-          {phase === 'ready' && <Prediction pred={pred} onChange={setPred} />}
-          {phase === 'done' && run && <Results key={run.id} ref={resultsRef} run={run} />}
+        <Controls design={design} challenge={challenge} onDesign={d => change(d)} onChallenge={c => change(design, c)}>
+          <Prediction pred={pred} onChange={setPred} runLabel={runLabel} skipLabel={skipLabel}
+            onRun={() => play()} onSkip={() => play(true)} running={playing} />
+        </Controls>
       </div>
+      {phase === 'done' && run && <Results key={run.id} ref={resultsRef} run={run} />}
     </>
   )
 }

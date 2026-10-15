@@ -17,6 +17,10 @@ It works on phones, tablets and computers, in English and Spanish, and offline a
 
 Players are minors, so the game has no accounts, no backend, no analytics and no tracking. Growth Story entries and photos are stored only in the browser on the device (IndexedDB); the last Sun Day design, test runs and language choice are stored in localStorage. Nothing is uploaded or shared. Clearing the browser's site data removes it all.
 
+## For adults: the numbers are estimates
+
+The simulation is built for learning, not for engineering. Its numbers (sunlight, panel power, leaf temperature, soil water, growth) are estimates chosen to behave sensibly, not measurements. They all live in one file, [`src/config/model.json`](src/config/model.json), so the team can tune them once the real kit has been measured. The game says this to players in one line at the bottom of the Home page.
+
 ## Run it locally
 
 Needs Node.js 20.19 or newer (the current LTS is fine).

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import model from '../../config/model.json'
 import { Seg } from '../../components/Seg'
 import { t } from '../../i18n/t'
@@ -16,9 +17,11 @@ type Props = {
   challenge: ChallengeId | null
   onDesign: (d: Design) => void
   onChallenge: (c: ChallengeId | null) => void
+  /** step 4, the prediction */
+  children?: ReactNode
 }
 
-export function Controls({ design: d, challenge, onDesign, onChallenge }: Props) {
+export function Controls({ design: d, challenge, onDesign, onChallenge, children }: Props) {
   const rules = challenge ? model.challenges[challenge] : null
   const locked = (rules?.set ?? {}) as Partial<Design>
   const needs = rules && 'needs' in rules ? rules.needs : null
@@ -72,15 +75,24 @@ export function Controls({ design: d, challenge, onDesign, onChallenge }: Props)
         <h3>{t('controls.group3')}</h3>
         <fieldset>
           <legend>{t('controls.turnOn')}</legend>
-          <Seg
-            options={(['fan', 'pump'] as const).map(v => ({ v, label: t(`controls.${v}`), disabled: needs === v }))}
-            isOn={v => d[v]}
-            onPick={v => onDesign({ ...d, [v]: !d[v] })}
-          />
+          {/* two independent on/off switches, not a choice between them */}
+          <div className="toggles">
+            {(['fan', 'pump'] as const).map(v => (
+              <button key={v} type="button" className="toggle" aria-pressed={d[v]} disabled={needs === v} onClick={() => onDesign({ ...d, [v]: !d[v] })}>
+                <span className="switch" aria-hidden="true">
+                  <span className="knob">
+                    {d[v] && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                  </span>
+                </span>
+                <span className="toggle-label">{t(`controls.${v}`)}</span>
+                <span className="toggle-state" aria-hidden="true">{t(d[v] ? 'controls.on' : 'controls.off')}</span>
+              </button>
+            ))}
+          </div>
           <p className="hint">{t(d.pump ? 'controls.waterPump' : 'controls.waterHand')}</p>
         </fieldset>
       </div>
-      <p className="foot">{t('controls.foot')}</p>
+      {children}
     </div>
   )
 }

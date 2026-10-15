@@ -35,6 +35,7 @@ export const Results = forwardRef<HTMLDivElement, { run: Run }>(function Results
 
   return (
     <div className="card" id="results" ref={ref} tabIndex={-1}>
+      <div className="res-score">
       <div className="eyebrow">{t('results.eyebrow')}</div>
       <div className="total">
         <b>{total}</b><span>{t('results.outOf')}</span>
@@ -57,6 +58,8 @@ export const Results = forwardRef<HTMLDivElement, { run: Run }>(function Results
         </div>
       </div>
       <p className="hint">{t('results.note')}</p>
+      </div>
+      <div className="res-feedback">
       <div className="fb">
         <div><span className="k">{t('results.yourPrediction')}</span><span>{predText}</span></div>
         <div><span className="k">{t('results.whatHappened')}</span><span>{what}</span></div>
@@ -74,6 +77,7 @@ export const Results = forwardRef<HTMLDivElement, { run: Run }>(function Results
         <button className="btn ghost" type="button" disabled={hints >= LADDER.length} onClick={() => setHints(hints + 1)}>
           {t(hints === 0 ? 'results.hint' : hints < LADDER.length ? 'results.moreHelp' : 'results.allHelp')}
         </button>
+      </div>
       </div>
     </div>
   )
