@@ -4,7 +4,7 @@ import { Scene } from '../components/Scene'
 import type { TabId } from '../components/Header'
 import { t } from '../i18n/t'
 import { growthStoryStore } from '../lib/growthStory'
-import { loadSolved } from '../lib/progress'
+import { loadSolved, totalStars } from '../lib/progress'
 import { bestScore } from '../lib/runs'
 
 const HERO_DESIGN = { panels: 'both', height: 'high', weather: 'october', fan: true, pump: true } as const
@@ -12,7 +12,7 @@ const HERO_DESIGN = { panels: 'both', height: 'high', weather: 'october', fan: t
 const DAY_MS = 40000, FRAME_MS = 80, SUNRISE = 6.4, SUNSET = 18.6
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-type Progress = { best: number | null; solved: number; stories: number }
+type Progress = { best: number | null; solved: number; stars: number; stories: number }
 
 const ICON_PROPS = { width: 28, height: 28, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true } as const
 const ICONS = {
@@ -27,7 +27,7 @@ type Props = { onGo: (tab: TabId) => void; active: boolean }
 
 export function Home({ onGo, active }: Props) {
   const [hour, setHour] = useState(10)
-  const [progress, setProgress] = useState<Progress>({ best: null, solved: 0, stories: 0 })
+  const [progress, setProgress] = useState<Progress>({ best: null, solved: 0, stars: 0, stories: 0 })
 
   // the sun moves along its arc while Home is open (still with reduced motion)
   useEffect(() => {
@@ -48,7 +48,7 @@ export function Home({ onGo, active }: Props) {
   // progress read from this device each time Home opens
   useEffect(() => {
     if (!active) return
-    setProgress(p => ({ ...p, best: bestScore(), solved: loadSolved().length }))
+    setProgress(p => ({ ...p, best: bestScore(), solved: loadSolved().length, stars: totalStars() }))
     growthStoryStore.all().then(xs => setProgress(p => ({ ...p, stories: xs.length })), () => setProgress(p => ({ ...p, stories: 0 })))
   }, [active])
 
@@ -56,7 +56,7 @@ export function Home({ onGo, active }: Props) {
     { tab: 'sunDay', icon: ICONS.sun, title: t('tabs.sunDay'), goal: t('home.m.sunDay.goal'),
       progress: progress.best === null ? t('home.m.sunDay.none') : t('home.m.sunDay.progress', { score: progress.best }) },
     { tab: 'buildLab', icon: ICONS.bolt, title: t('tabs.buildLab'), goal: t('home.m.buildLab.goal'),
-      progress: t('home.m.buildLab.progress', { n: progress.solved }) },
+      progress: t('home.m.buildLab.progress', { n: progress.solved, s: progress.stars }) },
     { tab: 'growthStory', icon: ICONS.sprout, title: t('growthStory.eyebrow'), goal: t('home.m.growthStory.goal'),
       progress: progress.stories ? t('home.m.growthStory.progress', { n: progress.stories }) : t('home.m.growthStory.none') }
   ] as const

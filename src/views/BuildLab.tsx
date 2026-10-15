@@ -1,24 +1,34 @@
 import { useEffect, useRef, useState } from 'react'
 import { t } from '../i18n/t'
-import { ALL, labStatus, LEVELS, panelWatts, partStates, shareLoads, type Part, type PartState, type TermId, type Wire } from '../lab/circuit'
-import { markSolved } from '../lib/progress'
+import {
+  ALL, dealPuzzle, evaluate, faultsLeft, FIX, hasPower, labStatus, LEVELS, partStates, power, starCheck, starCount,
+  type Part, type PartState, type Puzzle, type StarCheck, type TermId, type Wire
+} from '../lab/circuit'
+import { loadStars, markSolved, saveStars } from '../lib/progress'
 import { Board } from './buildLab/Board'
 
 const sameWire = (w: Wire, a: TermId, b: TermId) => (w[0] === a && w[1] === b) || (w[0] === b && w[1] === a)
 const CLOUD_MS = 2500
+const LADDER = [0, 1, 2] as const
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+type L = 0 | 1 | 2 | 3 | 4 | 5
 
 /** checklist icons: shape and text carry the meaning, not colour */
 const ICON: Record<PartState, React.ReactNode> = {
   working: <path d="M5 12.5 10 17l9-10" />,
   slow: <path d="M12 7v5l3 3M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" />,
+  trickle: <path d="M12 4c3 4 5 7 5 10a5 5 0 0 1-10 0c0-3 2-6 5-10z" />,
   noPower: <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM9 9v6M15 9v6" />,
   backwards: <path d="M7 7h11l-3-3M17 17H6l3 3" />,
   notConnected: <path d="M6 6l12 12M18 6 6 18" />,
   chain: <path d="M9 15l6-6M8 11l-2 2a3 3 0 0 0 4 4l2-2M16 13l2-2a3 3 0 0 0-4-4l-2 2" />,
   short: <path d="M13 3 6 13h5l-1 8 7-10h-5z" />,
+  joined: <path d="M8 12h8M4 8v8M20 8v8" />,
+  tooMuch: <path d="M12 3 2 20h20L12 3zM12 10v4M12 17v.5" />,
+  burnt: <path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3-1-3 0-6 1-8z" />,
   waiting: <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5" />
 }
+const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(3 - n)
 
 export function BuildLab() {
   const [level, setLevel] = useState(0)
@@ -28,11 +38,53 @@ export function BuildLab() {
   const [cloudOn, setCloudOn] = useState(false)
   const [cloud, setCloud] = useState(0) // 0 = clear, 1 = full cloud; animates toward cloudOn
   const cloudRef = useRef(0)
+  const [burnt, setBurnt] = useState(false)
+  const [burntAt, setBurntAt] = useState(0)
+  const [tester, setTester] = useState(false)
+  const [probe, setProbe] = useState<TermId | null>(null)
+  const [puzzle, setPuzzle] = useState<Puzzle | null>(null)
+  // this try at the level: sun tests, failed ones, and whether it worked on the very first test
+  const [tests, setTests] = useState({ count: 0, failed: 0, firstTry: false })
+  const [hints, setHints] = useState(0)
+  const [best, setBest] = useState<Record<number, number>>(loadStars)
+  const [earned, setEarned] = useState<StarCheck | null>(null)
 
-  const loads = shareLoads(panelWatts(cloud))
-  const status = labStatus(level, wires, selected !== null, sunOn, cloud > 0)
-  const solved = level === ALL && status.done
-  const states = level === ALL ? partStates(level, wires, sunOn, loads) : null
+  const Lv = LEVELS[level], L = level as L
+  const ev = evaluate(wires, level)
+  const pw = power(ev, level, cloud, burnt)
+  const status = labStatus(level, wires, selected !== null, sunOn, { cloudy: cloud > 0, burnt })
+  const states = level >= 2 ? partStates(level, wires, sunOn, cloud, burnt) : null
+  const left = level === FIX && puzzle ? faultsLeft(puzzle, wires, burnt) : 0
+  const solvedAll = level === ALL && status.done
+
+  // the LED burns out the moment the sun reaches it with too much power
+  useEffect(() => {
+    if (sunOn && ev.tooMuch && !burnt) {
+      setBurnt(true)
+      setBurntAt(Date.now())
+    }
+  }, [sunOn, ev.tooMuch, burnt])
+
+  // count each time the sun is turned on: the first test decides the third star; two misses show a hint
+  const prevSun = useRef(false)
+  useEffect(() => {
+    if (sunOn && !prevSun.current) {
+      setTests(x => ({ count: x.count + 1, failed: x.failed + (status.done ? 0 : 1), firstTry: x.firstTry || (x.count === 0 && status.done) }))
+    }
+    prevSun.current = sunOn
+  }, [sunOn, status.done])
+
+  // when the level is solved: work out the stars, keep the best on this device
+  useEffect(() => {
+    if (!status.done) {
+      setEarned(null)
+      return
+    }
+    const check = starCheck(level, wires, true, tests.firstTry)
+    setEarned(check)
+    markSolved(level)
+    setBest(saveStars(level, starCount(check)))
+  }, [status.done, level, wires, tests.firstTry])
 
   // the cloud drifts in or out over a couple of seconds, so you can watch the pump, then the fan, stop
   useEffect(() => {
@@ -54,34 +106,40 @@ export function BuildLab() {
     return () => cancelAnimationFrame(id)
   }, [cloudOn])
 
-  // remember solved levels on this device for the Home missions
-  useEffect(() => {
-    if (status.done) markSolved(level)
-  }, [status.done, level])
-
   // the cloud only belongs to a solved level 5
   useEffect(() => {
-    if (!solved && cloudOn) setCloudOn(false)
-  }, [solved, cloudOn])
+    if (!solvedAll && cloudOn) setCloudOn(false)
+  }, [solvedAll, cloudOn])
+
+  /** start a level fresh: the sun off, so the first-test star is fair */
+  function start(l: number, pz: Puzzle | null = puzzle) {
+    let p = pz
+    if (l === FIX && !p) p = dealPuzzle()
+    setPuzzle(p)
+    setLevel(l)
+    setWires(l === FIX && p ? p.wires : [])
+    setSelected(null)
+    setSunOn(false)
+    setCloudOn(false)
+    setBurnt(false)
+    setTester(false)
+    setProbe(null)
+    setTests({ count: 0, failed: 0, firstTry: false })
+    setHints(0)
+  }
 
   function connect(a: TermId, b: TermId) {
     if (!wires.some(w => sameWire(w, a, b))) setWires([...wires, [a, b]])
     setSelected(null)
   }
-  // tap one dot, then another: the second tap makes the wire; tapping the same dot again cancels
+  // tap one dot, then another: the second tap makes the wire; tapping the same dot again cancels.
+  // With the Tester on, a tap tests the dot instead.
   function pick(k: TermId) {
+    if (tester) return setProbe(k)
     if (!selected) setSelected(k)
     else if (selected === k) setSelected(null)
     else connect(selected, k)
   }
-  function chooseLevel(l: number) {
-    setLevel(l)
-    setWires([])
-    setSelected(null)
-    setCloudOn(false)
-  }
-
-  const L = level as 0 | 1 | 2 | 3 | 4
 
   return (
     <>
@@ -94,12 +152,15 @@ export function BuildLab() {
         <div className="card lab stack">
           <div className="levels seg" role="group" aria-label={t('lab.levelLabel')}>
             {LEVELS.map((_, l) => (
-              <button key={l} type="button" aria-pressed={level === l} onClick={() => chooseLevel(l)}>
-                {t(`lab.level.${l as 0 | 1 | 2 | 3 | 4}`)}
+              <button key={l} type="button" aria-pressed={level === l} onClick={() => start(l)}>
+                <span className="lv-name">{t(`lab.level.${l as L}`)}</span>
+                <span className="lv-stars" aria-hidden="true">{stars(best[l] ?? 0)}</span>
+                <span className="sr">, {t('lab.starsOf', { n: best[l] ?? 0 })}</span>
               </button>
             ))}
           </div>
-          <Board level={level} wires={wires} selected={selected} sunOn={sunOn} loads={loads} cloud={cloud}
+          <Board level={level} wires={wires} selected={selected} sunOn={sunOn} power={pw} cloud={cloud} burnt={burnt} burntAt={burntAt}
+            tester={tester} probe={tester && probe ? { term: probe, power: hasPower(probe, wires, level, sunOn) } : null}
             onPick={pick} onConnect={connect} onCancel={() => setSelected(null)}
             onRemove={i => { setWires(wires.filter((_, j) => j !== i)); setSelected(null) }} />
           <div className="row wrap">
@@ -109,10 +170,12 @@ export function BuildLab() {
             <button className="btn ghost" type="button" onClick={() => { setWires([]); setSelected(null) }}>{t('lab.clear')}</button>
           </div>
         </div>
+
         <div className="stack">
           <div className="card">
             <div className="eyebrow">{t('lab.goal')}</div>
             <p className="lab-goal">{t(`lab.goal.${L}`)}</p>
+            {level === FIX && <p className="faults" aria-live="polite">{t('lab.faultsLeft', { n: left })}</p>}
             {states && (
               <>
                 <h2 className="checklist-title">{t('lab.checklist')}</h2>
@@ -127,18 +190,58 @@ export function BuildLab() {
               </>
             )}
           </div>
+
           <div className={`status ${status.tone}`} aria-live="polite">{t(`lab.status.${status.id}`)}</div>
-          {solved && (
+
+          {burnt && Lv.parts.includes('led') && (
+            <button className="btn" type="button" onClick={() => setBurnt(false)}>{t('lab.replaceLed')}</button>
+          )}
+
+          {!status.done && tests.failed >= 2 && (
+            <div className="lab-hints">
+              {hints > 0 && (
+                <div className="ladder" aria-live="polite">
+                  {LADDER.slice(0, hints).map(i => <p key={i}><b>{t(`results.ladder.${i}`)}:</b> {t(`lab.hint.${L}.${i}`)}</p>)}
+                </div>
+              )}
+              <button className="btn ghost" type="button" disabled={hints >= LADDER.length} onClick={() => setHints(hints + 1)}>
+                {t(hints === 0 ? 'results.hint' : hints < LADDER.length ? 'results.moreHelp' : 'results.allHelp')}
+              </button>
+            </div>
+          )}
+
+          {level === FIX && (
+            <div className="lab-tools">
+              <button type="button" className="toggle" aria-pressed={tester} onClick={() => { setTester(!tester); setSelected(null); setProbe(null) }}>
+                <span className="switch" aria-hidden="true"><span className="knob">{tester && <Check />}</span></span>
+                <span className="toggle-label">{t('lab.tester')}</span>
+                <span className="toggle-state" aria-hidden="true">{t(tester ? 'controls.on' : 'controls.off')}</span>
+              </button>
+              {tester && <p className="hint flat" aria-live="polite">{probe ? t('lab.probe', { term: t(`lab.term.${probe}`), result: t(hasPower(probe, wires, level, sunOn) ? 'lab.powerHere' : 'lab.noPowerHere') }) : t('lab.testerHint')}</p>}
+              <button className="btn ghost" type="button" onClick={() => start(FIX, dealPuzzle())}>{t('lab.newPuzzle')}</button>
+            </div>
+          )}
+
+          {solvedAll && (
             <button type="button" className="toggle" aria-pressed={cloudOn} onClick={() => setCloudOn(!cloudOn)}>
-              <span className="switch" aria-hidden="true">
-                <span className="knob">
-                  {cloudOn && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-                </span>
-              </span>
+              <span className="switch" aria-hidden="true"><span className="knob">{cloudOn && <Check />}</span></span>
               <span className="toggle-label">{t('lab.cloud')}</span>
               <span className="toggle-state" aria-hidden="true">{t(cloudOn ? 'controls.on' : 'controls.off')}</span>
             </button>
           )}
+
+          {earned && (
+            <div className="card stars-card">
+              <div className="eyebrow">{t('lab.stars')}</div>
+              <p className="stars-big"><span aria-hidden="true">{stars(starCount(earned))}</span><span className="sr">{t('lab.starsOf', { n: starCount(earned) })}</span></p>
+              <ul className="star-list">
+                <StarLine ok text={t('lab.star.solved')} />
+                <StarLine ok={earned.fewWires} text={earned.fewWires ? t('lab.star.wiresOk', { n: wires.length }) : t('lab.star.wiresMissing', { min: Lv.minWires, n: wires.length })} />
+                <StarLine ok={earned.firstTry} text={t(earned.firstTry ? 'lab.star.firstOk' : 'lab.star.firstMissing')} />
+              </ul>
+            </div>
+          )}
+
           {status.done && (
             <div className="real">
               <div className="eyebrow">{t('lab.real')}</div>
@@ -148,5 +251,21 @@ export function BuildLab() {
         </div>
       </div>
     </>
+  )
+}
+
+function Check() {
+  return <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+}
+
+/** one star rule: a filled check when earned, an empty circle and how to get it when not */
+function StarLine({ ok, text }: { ok: boolean; text: string }) {
+  return (
+    <li className={ok ? 'star-line ok' : 'star-line'}>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+        {ok ? <path d="M5 12.5 10 17l9-10" /> : <circle cx="12" cy="12" r="8" />}
+      </svg>
+      <span>{text}</span>
+    </li>
   )
 }

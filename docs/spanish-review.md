@@ -43,6 +43,14 @@ Questions for these three:
 | On / Off (switches) | Encendido / Apagado | — |
 | Add a cloud | Agregar una nube | — |
 | At sunrise | Al amanecer | — |
+| big panel / small panel | panel grande / panel pequeño | — |
+| resistor | resistencia | Same word as the session guides? |
+| Fix it (level 6) | Arréglalo | Natural as a level name? |
+| fault | falla | Or "error", "problema"? |
+| Tester (tool) | Probador | Is there a better word kids would know? |
+| Replace LED | Cambiar el LED | — |
+| stars | estrellas | — |
+| New puzzle | Nuevo reto | — |
 | °F | °F | Fine for a US audience? |
 
 The partner names in the credits (Girl Scouts Beyond Bars, ASU Mary Lou Fulton College for Teaching and Learning Innovation) are left in English. Is there an official Spanish form?

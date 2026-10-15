@@ -14,14 +14,15 @@
 .status { font-weight: 600; padding: 10px 12px; border-radius: 10px; background: var(--bg) }
 .status.ok { background: var(--green-soft) }
 .status.warn { background: var(--sun-soft) }
-/* five levels: one row when the board card is wide enough to keep them readable, else 3 + 2 */
+/* six levels: 3 + 3 on phones, one row of six when the board card is wide enough */
 .lab { container-type: inline-size }
-.seg.levels { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px }
-.seg.levels button { grid-column: span 2; padding: 8px 4px; min-width: 0; white-space: nowrap; font-size: 15px }
-.seg.levels button:nth-child(n + 4) { grid-column: span 3 }
-@container (min-width: 430px) {
-  .seg.levels { grid-template-columns: repeat(5, minmax(0, 1fr)) }
-  .seg.levels button, .seg.levels button:nth-child(n + 4) { grid-column: auto }
+.seg.levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px }
+.seg.levels button { display: grid; justify-items: center; gap: 0; padding: 6px 4px; min-width: 0; font-size: 15px; line-height: 1.2 }
+.lv-name { white-space: nowrap }
+.lv-stars { font-size: 13px; letter-spacing: 1px; color: var(--warn) }
+@container (min-width: 520px) {
+  .seg.levels { grid-template-columns: repeat(6, minmax(0, 1fr)) }
+  .seg.levels button { font-size: 14px; padding-inline: 2px }
 }
 /* level 5 checklist: an icon and words for each part */
 .checklist-title { font-size: 15px; margin: 14px 0 6px }
@@ -36,14 +37,29 @@
 .real p, .lab-goal { margin: 6px 0 0 }
 .lab-goal { font-size: 17px }
 
-/* Wide: board on the left, sized so the whole board card fits the screen height (the svg is 6:5;
+/* Wide: board on the left, sized so the whole board card fits the screen height (the svg is 360 x 340;
    about 360 px goes to the header, page title, level buttons and the buttons under the board).
    Goal, messages and Try it for real sit on the right. Phone and tablet portrait: one column. */
 @media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
   .lab-cols {
-    grid-template-columns: min(max(300px, calc((100svh - var(--header-h, 72px) - 360px) * 360 / 300 + 2 * var(--card-pad))), 66%) minmax(0, 1fr)
+    grid-template-columns: min(max(300px, calc((100svh - var(--header-h, 72px) - 410px) * 360 / 340 + 2 * var(--card-pad))), 66%) minmax(0, 1fr)
   }
 }
 @media (min-width: 600px) and (max-width: 1023px) and (orientation: portrait) {
-  .lab-cols .lab { max-width: calc((100svh - var(--header-h, 72px) - 360px) * 360 / 300 + 2 * var(--card-pad)); width: 100%; justify-self: center }
+  .lab-cols .lab { max-width: calc((100svh - var(--header-h, 72px) - 410px) * 360 / 340 + 2 * var(--card-pad)); width: 100%; justify-self: center }
 }
+
+/* LED burn-out flash (once; none with reduced motion) */
+@keyframes flash { 0% { opacity: 0 } 15% { opacity: 1 } 100% { opacity: 0 } }
+.flash { animation: flash .7s ease-out 1 }
+@media (prefers-reduced-motion: reduce) { .flash { animation: none } }
+.term.probe { cursor: help }
+.faults { margin: 8px 0 0; font-weight: 700; font-size: 17px }
+.lab-tools, .lab-hints { display: grid; gap: 10px }
+.stars-big { margin: 4px 0 8px; font-size: 26px; letter-spacing: 2px; color: var(--warn) }
+.star-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px }
+.star-line { display: flex; gap: 8px; align-items: flex-start; color: var(--muted); font-weight: 600 }
+.star-line svg { flex: none; margin-top: 2px }
+.star-line.ok { color: var(--good) }
+.star-line span { color: var(--ink) }
+.part.trickle, .part.tooMuch, .part.burnt, .part.joined { color: var(--warn) }

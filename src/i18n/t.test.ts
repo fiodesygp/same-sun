@@ -31,7 +31,7 @@ describe('t() slots', () => {
 describe('Spanish', () => {
   // brand names, units and labels that are the same in both languages
   const SAME = new Set(['app.name', 'lang.en', 'lang.es', 'growthStory.runsDesignValue', 'lab.level.1', 'lab.svg.led', 'scene.led',
-    'lab.term.p+', 'lab.term.p-', 'lab.term.mA', 'lab.term.mB', 'scene.panelAt', 'gauges.wh', 'gauges.degF'])
+    'lab.term.mA', 'lab.term.mB', 'lab.probe', 'scene.panelAt', 'gauges.wh', 'gauges.degF'])
   const slots = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort()
 
   it('uses the same {slots} as English', () => {

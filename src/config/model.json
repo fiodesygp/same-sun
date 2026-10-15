@@ -45,7 +45,7 @@
     "chili":   { "sat": 820, "hi": 90, "stress": 100, "water": 0.8 }
   },
 
-  "lab": { "panel": "big", "cloudShare": 0.1 },
+  "lab": { "panelWatts": { "small": 0.6, "big": 1.8 }, "cloudShare": 0.1, "trickleWatts": 0.2 },
 
   "fixed": { "tilt": 30, "gap": "small", "priority": "fan", "trigger": 0.45, "tank": "large" },
   "bestPanel": { "panels": "both", "tiltFrom": 0, "tiltTo": 45, "tiltStep": 5 },

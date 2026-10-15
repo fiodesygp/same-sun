@@ -37,3 +37,21 @@ describe('Home mission progress', () => {
     expect(loadSolved()).toEqual([])
   })
 })
+
+describe('Build Lab stars', () => {
+  beforeEach(() => mem.clear())
+
+  it('keeps the best stars per level and adds them up', async () => {
+    const { loadStars, saveStars, totalStars } = await import('./progress')
+    expect(loadStars()).toEqual({})
+    saveStars(0, 2); saveStars(0, 1); saveStars(2, 3)
+    expect(loadStars()).toEqual({ 0: 2, 2: 3 })
+    saveStars(0, 3)
+    expect(totalStars()).toBe(6)
+  })
+  it('ignores broken saved stars', async () => {
+    const { loadStars } = await import('./progress')
+    mem.set('samesun:buildLabStars', '{"0": 7, "x": 2, "1": 2}')
+    expect(loadStars()).toEqual({ 1: 2 })
+  })
+})
