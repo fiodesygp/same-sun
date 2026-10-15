@@ -25,8 +25,18 @@ export interface SavedRun {
 const KEY = 'sunDayRuns'
 const KEEP = 30
 
+const BEST = 'sunDayBest'
+
 export const loadRuns = () => load<SavedRun[]>(KEY, [])
 
 export function saveRun(run: SavedRun) {
   save(KEY, [run, ...loadRuns()].slice(0, KEEP))
+  // only the last runs are kept, so remember the best score separately
+  save(BEST, Math.max(run.score, load<number>(BEST, 0)))
+}
+
+/** Best Sun Score ever played on this device, or null if no run yet. */
+export function bestScore(): number | null {
+  const runs = loadRuns(), best = load<number>(BEST, 0)
+  return runs.length || best ? Math.max(best, ...runs.map(r => r.score)) : null
 }

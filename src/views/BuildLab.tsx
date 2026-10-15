@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { t } from '../i18n/t'
 import { ALL, labStatus, LEVELS, panelWatts, partStates, shareLoads, type Part, type PartState, type TermId, type Wire } from '../lab/circuit'
+import { markSolved } from '../lib/progress'
 import { Board } from './buildLab/Board'
 
 const sameWire = (w: Wire, a: TermId, b: TermId) => (w[0] === a && w[1] === b) || (w[0] === b && w[1] === a)
@@ -52,6 +53,11 @@ export function BuildLab() {
     id = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(id)
   }, [cloudOn])
+
+  // remember solved levels on this device for the Home missions
+  useEffect(() => {
+    if (status.done) markSolved(level)
+  }, [status.done, level])
 
   // the cloud only belongs to a solved level 5
   useEffect(() => {

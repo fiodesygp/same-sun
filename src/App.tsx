@@ -28,7 +28,7 @@ export function App() {
   }
 
   const views: Record<TabId, React.ReactNode> = {
-    home: <Home onGo={select} />,
+    home: <Home onGo={select} active={tab === 'home'} />,
     sunDay: <SunDay />,
     buildLab: <BuildLab />,
     growthStory: <GrowthStory active={tab === 'growthStory'} />

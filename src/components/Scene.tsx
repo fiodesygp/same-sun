@@ -46,9 +46,12 @@ type Props = {
   idleHour?: number
   led?: boolean
   label: string
+  className?: string
+  /** draw the panels' shadows (off in the Home sky band, where long shadows would end at the picture's edge) */
+  shadows?: boolean
 }
 
-export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, led = false, label }: Props) {
+export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, led = false, label, className = 'scene', shadows: showShadows = true }: Props) {
   const w = model.weather[d.weather]
   const h = hr ? hr.h : idleHour
   const sun = sunAt(h, w)
@@ -59,7 +62,7 @@ export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, le
   const segs = panelSegs(d)
 
   // shadow of each panel, cast from the sun onto the ground
-  const shadows = sunUp
+  const shadows = sunUp && showShadows
     ? segs.flatMap((p, i) => {
         const proj = (x: number, y: number) => {
           const dx = x - sx, dy = y - sy
@@ -93,16 +96,17 @@ export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, le
   const L = segs[0], R = segs[segs.length - 1]
 
   return (
-    <svg className="scene" viewBox="0 0 360 230" role="img" aria-label={label}>
-      <rect x={0} y={0} width={360} height={230} fill={sky} />
+    <svg className={className} viewBox="0 0 360 230" role="img" aria-label={label}>
+      {/* sky and ground run far past the edges: the Home band shows them full width; elsewhere the svg clips them */}
+      <rect x={-2000} y={0} width={4360} height={230} fill={sky} />
       {sunUp && (
         <>
           <circle cx={sx} cy={sy} r={20} fill="#FFE7A3" opacity={0.6} />
           <circle cx={sx} cy={sy} r={13} fill="#F2B705" />
         </>
       )}
-      <rect x={0} y={GY} width={360} height={34} fill="#C9A779" />
-      <rect x={0} y={GY} width={360} height={3} fill="#A8865A" />
+      <rect x={-2000} y={GY} width={4360} height={34} fill="#C9A779" />
+      <rect x={-2000} y={GY} width={4360} height={3} fill="#A8865A" />
       {shadows}
 
       {d.pump && (
