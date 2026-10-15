@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import model from '../config/model.json'
 import {
   BASE_WIRES, dealPuzzle, evaluate, FAULTS, faultsLeft, FIX, hasPower, labStatus, levelTerms, LEVELS, makePuzzle, nets, panelWatts,
-  partStates, shareLoads, starCheck, starCount, type FaultId, type Wire
+  partStates, shareLoads, type FaultId, type Wire
 } from './circuit'
 
 const FAN = 0, LED = 1, BOTH = 2, PUMP = 3, ALL5 = 4
@@ -159,20 +159,9 @@ describe('level 5 · All and the cloud', () => {
   })
 })
 
-describe('stars', () => {
-  it('1 star for solving, 2 for no more wires than the minimum, 3 for working on the first sun test', () => {
-    const min = LEVELS[BOTH].minWires
-    const four: Wire[] = [['q+', 'lL'], ['q-', 'lS'], ['p+', 'mA'], ['p-', 'mB']]
-    const five: Wire[] = [['p+', 'mA'], ['p-', 'mB'], ['p+', 'rA'], ['rB', 'lL'], ['lS', 'p-']]
-    expect(four).toHaveLength(min)
-    expect(starCount(starCheck(BOTH, four, true, true))).toBe(3)
-    expect(starCount(starCheck(BOTH, four, true, false))).toBe(2)
-    expect(starCount(starCheck(BOTH, five, true, true))).toBe(2)
-    expect(starCount(starCheck(BOTH, five, true, false))).toBe(1)
-    expect(starCount(starCheck(BOTH, four, false, true))).toBe(0)
-  })
-  it('every level can be solved with exactly its minimum number of wires', () => {
-    const best: Wire[][] = [
+describe('every level can be solved', () => {
+  it('with a known wiring', () => {
+    const solutions: Wire[][] = [
       [['p+', 'mA'], ['p-', 'mB']],
       [['p+', 'lL'], ['p-', 'lS']],
       [['q+', 'lL'], ['q-', 'lS'], ['p+', 'mA'], ['p-', 'mB']],
@@ -180,10 +169,8 @@ describe('stars', () => {
       [['p+', 'mA'], ['p-', 'mB'], ['p+', 'w+'], ['p-', 'w-'], ['q+', 'lL'], ['q-', 'lS']],
       BASE_WIRES
     ]
-    best.forEach((w, l) => {
-      expect(w, `level ${l + 1}`).toHaveLength(LEVELS[l].minWires)
-      expect(status(l, w).done, `level ${l + 1}`).toBe(true)
-    })
+    expect(solutions).toHaveLength(LEVELS.length)
+    solutions.forEach((w, l) => expect(status(l, w).done, `level ${l + 1}`).toBe(true))
   })
 })
 

@@ -38,22 +38,15 @@ describe('Home mission progress', () => {
   })
 })
 
-describe('Build Lab stars', () => {
+describe('old star data', () => {
   beforeEach(() => mem.clear())
 
-  it('remembers which stars each level earned, and never takes one away', async () => {
-    const { loadEarned, saveEarned, loadStars, totalStars } = await import('./progress')
-    expect(loadEarned()).toEqual({})
-    saveEarned(0, { solved: true, fewWires: true, firstTry: false })
-    saveEarned(0, { solved: true, fewWires: false, firstTry: true })
-    saveEarned(2, { solved: true, fewWires: false, firstTry: false })
-    expect(loadEarned()[0]).toEqual({ solved: true, fewWires: true, firstTry: true })
-    expect(loadStars()).toEqual({ 0: 3, 2: 1 })
-    expect(totalStars()).toBe(4)
-  })
-  it('reads older saves that kept only a count', async () => {
-    const { loadEarned } = await import('./progress')
-    mem.set('samesun:buildLabStars', '{"0": 2, "1": 3, "x": 2, "4": 9}')
-    expect(loadEarned()).toEqual({ 0: { solved: true, fewWires: true, firstTry: false }, 1: { solved: true, fewWires: true, firstTry: true } })
+  it('is removed, and solved levels are kept', async () => {
+    const { forgetStars, loadSolved, markSolved } = await import('./progress')
+    mem.set('samesun:buildLabStars', '{"0": 3}')
+    markSolved(0)
+    forgetStars()
+    expect(mem.has('samesun:buildLabStars')).toBe(false)
+    expect(loadSolved()).toEqual([0])
   })
 })

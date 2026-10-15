@@ -1,5 +1,5 @@
 /* touch-action must sit on the svg itself: browsers ignore it on shapes inside, and a drag would scroll the page instead */
-.lab svg { width: 100%; height: auto; display: block; touch-action: none; user-select: none; -webkit-user-select: none }
+.lab > svg { width: 100%; height: auto; display: block; touch-action: none; user-select: none; -webkit-user-select: none }
 .term { cursor: pointer }
 .term circle.hit { fill: transparent }
 .term.sel circle.ring { stroke: var(--sun); stroke-width: 4 }
@@ -17,9 +17,9 @@
 /* six levels: 3 + 3 on phones, one row of six when the board card is wide enough */
 .lab { container-type: inline-size }
 .seg.levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px }
-.seg.levels button { display: grid; justify-items: center; gap: 0; padding: 6px 4px; min-width: 0; font-size: 15px; line-height: 1.2 }
+.seg.levels button { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 6px 4px; min-width: 0; font-size: 15px; line-height: 1.2 }
+.lv-check { flex: none; color: var(--good) }
 .lv-name { white-space: nowrap }
-.lv-stars { font-size: 13px; letter-spacing: 1px; color: var(--warn) }
 @container (min-width: 520px) {
   .seg.levels { grid-template-columns: repeat(6, minmax(0, 1fr)) }
   .seg.levels button { font-size: 14px; padding-inline: 2px }
@@ -39,11 +39,11 @@
 
 /* Wide: the landscape board (640 x 320) takes about two thirds of the row; goal, messages and
    Try it for real take the rest. The board column is also capped so the whole board card fits the
-   screen height: about 415 px goes to the header, page title, level buttons, star legend and the
+   screen height: about 360 px goes to the header, page title, level buttons and the
    buttons under the board. Phone and tablet portrait: one column with the portrait board. */
 @media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
   .lab-cols {
-    grid-template-columns: min(66%, max(420px, calc((100svh - var(--header-h, 72px) - 415px) * 2 + 2 * var(--card-pad)))) minmax(0, 1fr)
+    grid-template-columns: min(66%, max(420px, calc((100svh - var(--header-h, 72px) - 360px) * 2 + 2 * var(--card-pad)))) minmax(0, 1fr)
   }
 }
 @media (min-width: 600px) and (max-width: 1023px) and (orientation: portrait) {
@@ -59,13 +59,6 @@
 .lab-tools, .lab-hints { display: grid; gap: 10px }
 .part.trickle, .part.tooMuch, .part.burnt, .part.joined { color: var(--warn) }
 
-/* star legend under the level buttons, and this level's stars in the goal card */
-.star-legend { margin: -4px 0 0; font-size: 13px; color: var(--muted) }
-.star-legend span, .goal-stars .star { color: var(--warn) }
-.goal-stars { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px }
-.goal-stars li { display: inline-flex; align-items: baseline; gap: 6px; color: var(--muted); font-weight: 600 }
-.goal-stars li.ok { color: var(--ink) }
-.goal-stars .star { font-size: 18px; line-height: 1 }
 /* compact switch in the row under the board */
 .toggle.compact { width: auto; min-height: 48px; padding-inline: 10px 14px }
 .probe-readout { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--surface); border: 1px dashed var(--field); font-weight: 600 }

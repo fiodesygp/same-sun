@@ -48,7 +48,6 @@ Questions for these three:
 | fault | falla | Or "error", "problema"? |
 | Tester (tool) | Probador | Is there a better word kids would know? |
 | Replace LED | Cambiar el LED | — |
-| stars | estrellas | — |
 | New puzzle | Nuevo reto | — |
 | °F | °F | Fine for a US audience? |
 

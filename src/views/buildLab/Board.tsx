@@ -50,7 +50,7 @@ export const PORTRAIT: Layout = {
 export const LANDSCAPE: Layout = {
   w: 640, h: 320, ground: 286, sun: [612, 24], sunLabel: [552, 20],
   big: [150, 60], small: [16, 96], plant: [250, 262], res: [400, 96], led: [470, 200], fan: [500, 110], tank: [545, 246],
-  air: { from: [-12, 14], to: [-56, 40], text: [-52, 58] }, ledLabel: [31, 4], resLabel: [44, 60], waterText: [296, 276],
+  air: { from: [-6, 20], to: [-14, 48], text: [-44, 62] }, ledLabel: [31, 4], resLabel: [44, 60], waterText: [296, 276],
   plantLabel: [250, 311], tankLabel: [575, 314], motorLabel: [488, 302]
 }
 

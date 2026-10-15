@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { t } from '../i18n/t'
 import {
-  ALL, dealPuzzle, evaluate, faultsLeft, FIX, hasPower, labStatus, LEVELS, partStates, power, starCheck,
+  ALL, dealPuzzle, evaluate, faultsLeft, FIX, hasPower, labStatus, LEVELS, partStates, power,
   type Part, type PartState, type Puzzle, type TermId, type Wire
 } from '../lab/circuit'
-import { countStars, loadEarned, markSolved, saveEarned, type Earned } from '../lib/progress'
+import { forgetStars, loadSolved, markSolved } from '../lib/progress'
 import { Board, LANDSCAPE, PORTRAIT } from './buildLab/Board'
 
 const sameWire = (w: Wire, a: TermId, b: TermId) => (w[0] === a && w[1] === b) || (w[0] === b && w[1] === a)
@@ -39,7 +39,6 @@ const ICON: Record<PartState, React.ReactNode> = {
   burnt: <path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3-1-3 0-6 1-8z" />,
   waiting: <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7v5" />
 }
-const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(3 - n)
 
 export function BuildLab() {
   const [level, setLevel] = useState(0)
@@ -54,10 +53,10 @@ export function BuildLab() {
   const [tester, setTester] = useState(false)
   const [probe, setProbe] = useState<TermId | null>(null)
   const [puzzle, setPuzzle] = useState<Puzzle | null>(null)
-  // this try at the level: sun tests, failed ones, and whether it worked on the very first test
-  const [tests, setTests] = useState({ count: 0, failed: 0, firstTry: false })
+  // sun tests at this level that did not solve it (two of them show the hint button)
+  const [failed, setFailed] = useState(0)
   const [hints, setHints] = useState(0)
-  const [earned, setEarned] = useState<Record<number, Earned>>(loadEarned)
+  const [solved, setSolved] = useState<number[]>(loadSolved)
   const wide = useWide()
 
   const Lv = LEVELS[level], L = level as L
@@ -76,21 +75,20 @@ export function BuildLab() {
     }
   }, [sunOn, ev.tooMuch, burnt])
 
-  // count each time the sun is turned on: the first test decides the third star; two misses show a hint
+  // count sun tests that do not solve the level: two of them show a hint
   const prevSun = useRef(false)
   useEffect(() => {
-    if (sunOn && !prevSun.current) {
-      setTests(x => ({ count: x.count + 1, failed: x.failed + (status.done ? 0 : 1), firstTry: x.firstTry || (x.count === 0 && status.done) }))
-    }
+    if (sunOn && !prevSun.current && !status.done) setFailed(n => n + 1)
     prevSun.current = sunOn
   }, [sunOn, status.done])
 
-  // when the level is solved: add the stars it earned to the ones kept on this device
+  // remember solved levels on this device (a check mark on the level button, and the Home missions)
   useEffect(() => {
-    if (!status.done) return
-    markSolved(level)
-    setEarned(saveEarned(level, starCheck(level, wires, true, tests.firstTry)))
-  }, [status.done, level, wires, tests.firstTry])
+    if (status.done) setSolved(markSolved(level))
+  }, [status.done, level])
+
+  // older versions saved stars; the game no longer has them
+  useEffect(() => forgetStars(), [])
 
   // the cloud drifts in or out over a couple of seconds, so you can watch the pump, then the fan, stop
   useEffect(() => {
@@ -117,7 +115,7 @@ export function BuildLab() {
     if (!solvedAll && cloudOn) setCloudOn(false)
   }, [solvedAll, cloudOn])
 
-  /** start a level fresh: the sun off, so the first-test star is fair */
+  /** start a level fresh, with the sun off */
   function start(l: number, pz: Puzzle | null = puzzle) {
     let p = pz
     if (l === FIX && !p) p = dealPuzzle()
@@ -130,7 +128,7 @@ export function BuildLab() {
     setBurnt(false)
     setTester(false)
     setProbe(null)
-    setTests({ count: 0, failed: 0, firstTry: false })
+    setFailed(0)
     setHints(0)
   }
 
@@ -159,15 +157,12 @@ export function BuildLab() {
           <div className="levels seg" role="group" aria-label={t('lab.levelLabel')}>
             {LEVELS.map((_, l) => (
               <button key={l} type="button" aria-pressed={level === l} onClick={() => start(l)}
-                aria-label={t('lab.levelButton', { label: t(`lab.level.${l as L}`), n: countStars(earned[l]) })}>
+                aria-label={solved.includes(l) ? t('lab.levelSolved', { label: t(`lab.level.${l as L}`) }) : undefined}>
                 <span className="lv-name">{t(`lab.level.${l as L}`)}</span>
-                <span className="lv-stars" aria-hidden="true">{stars(countStars(earned[l]))}</span>
+                {solved.includes(l) && <svg className="lv-check" width="14" height="14" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4 4.8 9 10 3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
               </button>
             ))}
           </div>
-          <p className="star-legend">
-            {t('lab.legend.title')} <span aria-hidden="true">★</span> {t('lab.legend.solve')} · <span aria-hidden="true">★</span> {t('lab.legend.wires')} · <span aria-hidden="true">★</span> {t('lab.legend.first')}
-          </p>
           <Board layout={wide ? LANDSCAPE : PORTRAIT} level={level} wires={wires} selected={selected} sunOn={sunOn} power={pw} cloud={cloud} burnt={burnt} burntAt={burntAt}
             tester={tester} probe={tester && probe ? { term: probe, power: hasPower(probe, wires, level, sunOn) } : null}
             onPick={pick} onConnect={connect} onCancel={() => setSelected(null)}
@@ -191,7 +186,6 @@ export function BuildLab() {
             <div className="eyebrow">{t('lab.goal')}</div>
             <p className="lab-goal">{t(`lab.goal.${L}`)}</p>
             {level === FIX && <p className="faults" aria-live="polite">{t('lab.faultsLeft', { n: left })}</p>}
-            <GoalStars earned={earned[level]} solvedNow={status.done} wires={wires.length} min={Lv.minWires} />
             {states && (
               <>
                 <h2 className="checklist-title">{t('lab.checklist')}</h2>
@@ -213,7 +207,7 @@ export function BuildLab() {
             <button className="btn" type="button" onClick={() => setBurnt(false)}>{t('lab.replaceLed')}</button>
           )}
 
-          {!status.done && tests.failed >= 2 && (
+          {!status.done && failed >= 2 && (
             <div className="lab-hints">
               {hints > 0 && (
                 <div className="ladder" aria-live="polite">
@@ -258,21 +252,4 @@ export function BuildLab() {
 
 function Check() {
   return <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-}
-
-/** this level's three stars, each with its rule: filled when earned, outlined when not */
-function GoalStars({ earned, solvedNow, wires, min }: { earned?: Earned; solvedNow: boolean; wires: number; min: number }) {
-  const e = earned ?? { solved: false, fewWires: false, firstTry: false }
-  const wiresText = e.fewWires ? t('lab.goalStar.wires') : solvedNow && wires > min ? t('lab.goalStar.wiresTry', { n: wires, min }) : t('lab.goalStar.wiresMin', { min })
-  const items: [boolean, string][] = [[e.solved, t('lab.goalStar.solved')], [e.fewWires, wiresText], [e.firstTry, t('lab.goalStar.first')]]
-  return (
-    <ul className="goal-stars" aria-label={t('lab.goalStars')}>
-      {items.map(([ok, text], i) => (
-        <li key={i} className={ok ? 'ok' : undefined}>
-          <span className="star" aria-hidden="true">{ok ? '★' : '☆'}</span>
-          <span>{text}<span className="sr"> ({t(ok ? 'lab.goalStar.earned' : 'lab.goalStar.notYet')})</span></span>
-        </li>
-      ))}
-    </ul>
-  )
 }

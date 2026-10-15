@@ -22,17 +22,15 @@ export interface Level {
   resistor: boolean
   /** level 6: starts pre-wired with faults */
   fix: boolean
-  /** fewest wires that solve it (for the second star) */
-  minWires: number
 }
 const BIG: Panel[] = ['big'], BOTH: Panel[] = ['big', 'small']
 export const LEVELS: Level[] = [
-  { parts: ['motor'], panels: BIG, resistor: false, fix: false, minWires: 2 },
-  { parts: ['led'], panels: BIG, resistor: false, fix: false, minWires: 2 },
-  { parts: ['motor', 'led'], panels: BOTH, resistor: true, fix: false, minWires: 4 },
-  { parts: ['pump'], panels: BOTH, resistor: true, fix: false, minWires: 2 },
-  { parts: ['motor', 'led', 'pump'], panels: BOTH, resistor: true, fix: false, minWires: 6 },
-  { parts: ['motor', 'led', 'pump'], panels: BOTH, resistor: true, fix: true, minWires: 7 }
+  { parts: ['motor'], panels: BIG, resistor: false, fix: false },
+  { parts: ['led'], panels: BIG, resistor: false, fix: false },
+  { parts: ['motor', 'led'], panels: BOTH, resistor: true, fix: false },
+  { parts: ['pump'], panels: BOTH, resistor: true, fix: false },
+  { parts: ['motor', 'led', 'pump'], panels: BOTH, resistor: true, fix: false },
+  { parts: ['motor', 'led', 'pump'], panels: BOTH, resistor: true, fix: true }
 ]
 export const ALL = 4 // level 5 · All
 export const FIX = 5 // level 6 · Fix it
@@ -263,20 +261,6 @@ export function labStatus(level: number, wires: Wire[], selected: boolean, sunOn
   if (states.includes('slow') || states.includes('trickle')) return s('weak', 'warn')
   if (states.includes('working')) return s('allSome', 'warn')
   return s((['bothNothing', 'pumpNothing', 'allNothing', 'allNothing'] as const)[level - 2])
-}
-
-// ---------- stars ----------
-
-export interface StarCheck {
-  solved: boolean
-  /** wires used is no more than the level's minimum */
-  fewWires: boolean
-  /** it worked the first time the sun was turned on */
-  firstTry: boolean
-}
-export const starCount = (c: StarCheck) => (c.solved ? 1 + (c.fewWires ? 1 : 0) + (c.firstTry ? 1 : 0) : 0)
-export function starCheck(level: number, wires: Wire[], solved: boolean, solvedOnFirstSun: boolean): StarCheck {
-  return { solved, fewWires: solved && wires.length <= LEVELS[level].minWires, firstTry: solved && solvedOnFirstSun }
 }
 
 // ---------- tester ----------
