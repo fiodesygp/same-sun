@@ -32,7 +32,7 @@ Questions for these three:
 | alligator clip | pinza de cocodrilo | Or "caimán" in this region? |
 | (motor) tab | pestaña del motor | — |
 | leg (LED, long/short) | pata larga / pata corta | — |
-| resistor | resistencia | — |
+| resistor | resistencia | Same word as the session guides? |
 | mini pump, tank, tube, pot | minibomba, tanque, tubo, maceta | — |
 | seedling | plantita | Or "plántula"? |
 | chili pepper / bush bean | chile / frijol | Regional: "chile" or "ají", "frijol" or "poroto"? |
@@ -44,7 +44,6 @@ Questions for these three:
 | Add a cloud | Agregar una nube | — |
 | At sunrise | Al amanecer | — |
 | big panel / small panel | panel grande / panel pequeño | — |
-| resistor | resistencia | Same word as the session guides? |
 | Fix it (level 6) | Arréglalo | Natural as a level name? |
 | fault | falla | Or "error", "problema"? |
 | Tester (tool) | Probador | Is there a better word kids would know? |
