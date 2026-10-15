@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { t } from '../../i18n/t'
 import { stageKind, type GrowthStoryEntry } from '../../lib/growthStory'
 import { fmtDate } from './EntryList'
@@ -8,6 +8,9 @@ type Props = { entry: GrowthStoryEntry; onBack: () => void; onEdit: () => void; 
 export function EntryView({ entry: x, onBack, onEdit, onDelete }: Props) {
   const [armed, setArmed] = useState(false)
   const [failed, setFailed] = useState(false)
+  const backRef = useRef<HTMLButtonElement>(null)
+  // the list this replaced is gone, so start keyboard focus at Back
+  useEffect(() => backRef.current?.focus(), [])
   const step = t(`stage.${x.stage}.label`)
 
   // delete needs a second tap
@@ -18,7 +21,7 @@ export function EntryView({ entry: x, onBack, onEdit, onDelete }: Props) {
 
   return (
     <article className="card jview">
-      <button className="back" type="button" onClick={onBack}>{t('growthStory.back')}</button>
+      <button className="back" type="button" ref={backRef} onClick={onBack}>{t('growthStory.back')}</button>
       <div className="meta">
         <span className={`stag ${stageKind(x.stage)}`}>{step}</span>
         <span className="when">{fmtDate(x.when)}</span>

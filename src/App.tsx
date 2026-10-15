@@ -1,12 +1,24 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Header, TABS, type TabId } from './components/Header'
+import { setLang, type Lang } from './i18n/t'
+import { load, save } from './lib/storage'
 import { BuildLab } from './views/BuildLab'
 import { GrowthStory } from './views/GrowthStory'
 import { Home } from './views/Home'
 import { SunDay } from './views/SunDay'
 
+const savedLang = (): Lang => (load<string>('lang', 'en') === 'es' ? 'es' : 'en')
+
 export function App() {
   const [tab, setTab] = useState<TabId>('home')
+  const [lang, setLangState] = useState<Lang>(savedLang)
+  // t() reads the language when each view renders, so set it before rendering the tree
+  setLang(lang)
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+    save('lang', lang)
+  }, [lang])
 
   function select(id: TabId) {
     setTab(id)
@@ -25,7 +37,7 @@ export function App() {
   // every view stays mounted (hidden when inactive) so a tab keeps its state when you switch away
   return (
     <>
-      <Header tab={tab} onSelect={select} />
+      <Header tab={tab} onSelect={select} lang={lang} onLang={setLangState} />
       <main>
         {TABS.map(({ id }) => (
           <section key={id} className={`view ${id}`} id={`v-${id}`} role="tabpanel" aria-labelledby={`t-${id}`} hidden={tab !== id}>

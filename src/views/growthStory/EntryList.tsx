@@ -1,7 +1,7 @@
-import { t } from '../../i18n/t'
+import { getLang, t } from '../../i18n/t'
 import { STAGES, stageKind, type GrowthStoryEntry } from '../../lib/growthStory'
 
-export const fmtDate = (ms: number) => new Date(ms).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+export const fmtDate = (ms: number) => new Date(ms).toLocaleDateString(getLang(), { weekday: 'short', month: 'short', day: 'numeric' })
 
 export function EntryList({ entries, onOpen }: { entries: GrowthStoryEntry[]; onOpen: (id: number) => void }) {
   if (!entries.length) return <p className="none flat">{t('growthStory.noEntries')}</p>

@@ -45,6 +45,7 @@ export function SunDay() {
   const [frame, setFrame] = useState(0)
   const [finished, setFinished] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const skipRef = useRef<HTMLButtonElement>(null)
 
   // any change starts over: new prediction, no results
   function change(next: Design, nextChallenge = challenge) {
@@ -64,6 +65,11 @@ export function SunDay() {
     setFrame(0)
     setPhase(reducedMotion() ? 'done' : 'playing')
   }
+
+  // the Run button is disabled while playing, so give keyboard focus to Skip instead of losing it
+  useEffect(() => {
+    if (phase === 'playing') skipRef.current?.focus()
+  }, [phase])
 
   useEffect(() => {
     if (phase !== 'playing' || !run) return
@@ -88,6 +94,8 @@ export function SunDay() {
       actual: compareToFullSun(s), score: Math.round((s.food + s.energy) * 100), fullSun: Math.round(s.fullSun * 100),
       food: Math.round(s.food * 100), energy: Math.round(s.energy * 100)
     })
+    // move focus to the results so keyboard and screen-reader users land on them
+    resultsRef.current?.focus({ preventScroll: true })
     resultsRef.current?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' })
   }, [phase, run])
 
@@ -98,6 +106,13 @@ export function SunDay() {
   if (run) for (let k = 0; k <= i; k++) energy += run.r.hours[k].power
   const growth = hr && run ? hr.totalGrowth / run.ideal : 0
   const span = t(design.days === 1 ? 'sunDay.spanDay' : 'sunDay.spanWeek')
+  const loads = design.fan && design.pump ? 'both' : design.fan ? 'fan' : design.pump ? 'pump' : 'none'
+  const sceneLabel = t('sunDay.sceneLabel', {
+    crop: t(`crops.${design.crop}`).toLowerCase(),
+    panel: design.panels === 'none' ? t('growthStory.panel.none')
+      : t('scene.panelAt', { panel: t(`growthStory.panel.${design.panels}`), height: t(`height.${design.height}`).toLowerCase() }),
+    loads: t(`scene.loads.${loads}`)
+  })
 
   return (
     <>
@@ -106,31 +121,31 @@ export function SunDay() {
         <h1 className="page-title">{t('sunDay.title')}</h1>
         <p className="lede">{t('sunDay.lede')}</p>
       </div>
-      <div className="cols sunday">
-        <div className="stack">
+      {/* one flat list in phone order (scene, gauges, controls, prediction, results) so the
+          keyboard order matches what you see; on wide screens CSS moves the controls to a right column */}
+      <div className="sunday">
           <div className="card scene-wrap">
             <Scene
               design={design} hour={hr} growth={hr ? 0.25 + 0.75 * growth : 0.35}
-              tank={hr && design.pump ? hr.tank / model.tankSize.large : 1} label={t('sunDay.sceneLabel')}
+              tank={hr && design.pump ? hr.tank / model.tankSize.large : 1} label={sceneLabel}
             />
             <div className="playbar">
               <button className="btn" type="button" disabled={phase === 'playing'} onClick={play}>
                 <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1 L13 7 L2 13 Z" fill="currentColor" /></svg>
                 <span>{t(finished ? 'sunDay.runAgain' : design.days === 1 ? 'sunDay.runDay' : 'sunDay.runWeek')}</span>
               </button>
-              {phase === 'playing' && <button className="btn ghost" type="button" onClick={() => setPhase('done')}>{t('sunDay.skip')}</button>}
+              {phase === 'playing' && <button className="btn ghost" type="button" ref={skipRef} onClick={() => setPhase('done')}>{t('sunDay.skip')}</button>}
               <span className="clock">{hr ? t('sunDay.clock', { hour: hr.h, day: hr.day + 1 }) : t('sunDay.ready')}</span>
               <div className="progress" aria-hidden="true"><i style={{ width: run ? `${((i + 1) / run.r.hours.length) * 100}%` : 0 }} /></div>
             </div>
           </div>
           <Gauges design={design} hour={hr} energy={energy} growth={growth} />
           <p className="sr" role="status">
-            {phase === 'playing' ? t('sunDay.statusRunning', { span }) : phase === 'done' ? t('sunDay.statusDone') : ''}
+            {phase === 'playing' ? t('sunDay.statusRunning', { span }) : phase === 'done' && run ? t('sunDay.statusDone', { total: Math.round((run.s.food + run.s.energy) * 100) }) : ''}
           </p>
+          <Controls design={design} challenge={challenge} onDesign={d => change(d)} onChallenge={c => change(design, c)} />
           {phase === 'ready' && <Prediction pred={pred} onChange={setPred} />}
           {phase === 'done' && run && <Results key={run.id} ref={resultsRef} run={run} />}
-        </div>
-        <Controls design={design} challenge={challenge} onDesign={d => change(d)} onChallenge={c => change(design, c)} />
       </div>
     </>
   )

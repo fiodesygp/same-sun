@@ -45,7 +45,7 @@ export function BuildLab() {
             ))}
           </div>
           <Board level={level} wires={wires} selected={selected} sunOn={sunOn}
-            onPick={pick} onConnect={connect} onRemove={i => { setWires(wires.filter((_, j) => j !== i)); setSelected(null) }} />
+            onPick={pick} onConnect={connect} onCancel={() => setSelected(null)} onRemove={i => { setWires(wires.filter((_, j) => j !== i)); setSelected(null) }} />
           <div className="row wrap">
             <button className="btn" type="button" aria-pressed={sunOn} onClick={() => setSunOn(!sunOn)}>
               {t(sunOn ? 'lab.sunOff' : 'lab.sunOn')}

@@ -12,6 +12,8 @@ export function setLang(next: Lang) {
   lang = next
 }
 
+export const getLang = () => lang
+
 /** Look up UI text for the current language, falling back to English. Fills {name} slots from vars. */
 export function t(key: Key, vars?: Vars): string {
   const s = strings[lang][key] ?? en[key]

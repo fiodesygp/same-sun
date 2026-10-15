@@ -17,6 +17,8 @@ export function GrowthStory({ active }: { active: boolean }) {
   const [form, setForm] = useState<{ key: number; msg?: Key }>({ key: 0 })
   const [runs, setRuns] = useState<SavedRun[]>([])
   const formRef = useRef<HTMLDivElement>(null)
+  const listHeadingRef = useRef<HTMLHeadingElement>(null)
+  const focusList = useRef(false)
 
   useEffect(() => {
     growthStoryStore.all().then(xs => setEntries(newestFirst(xs)), () => setLoadFailed(true))
@@ -28,8 +30,15 @@ export function GrowthStory({ active }: { active: boolean }) {
 
   function show(id: number | null) {
     setOpenId(id)
+    focusList.current = id === null
     window.scrollTo(0, 0)
   }
+  // back from an entry: land on My entries instead of losing focus
+  useEffect(() => {
+    if (openId !== null || !focusList.current) return
+    focusList.current = false
+    listHeadingRef.current?.focus({ preventScroll: true })
+  }, [openId])
 
   async function save(d: Draft) {
     const now = Date.now()
@@ -88,7 +97,7 @@ export function GrowthStory({ active }: { active: boolean }) {
               onCancelEdit={() => { setEditing(null); setForm({ key: form.key + 1 }) }} />
           </div>
           <div className="stack">
-            <h2 className="h2 flat">{t('growthStory.myEntries')}</h2>
+            <h2 className="h2 flat" ref={listHeadingRef} tabIndex={-1}>{t('growthStory.myEntries')}</h2>
             {loadFailed && <p className="notice" role="status">{t('growthStory.errLoad')}</p>}
             <EntryList entries={entries} onOpen={show} />
             <RunsTable runs={runs} />

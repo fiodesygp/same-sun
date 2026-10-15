@@ -4,9 +4,12 @@
 .term circle.hit { fill: transparent }
 .term.sel circle.ring { stroke: var(--sun); stroke-width: 4 }
 .term:focus, .wire:focus { outline: none }
-.term:focus-visible circle.ring { stroke: var(--sun); stroke-width: 5 }
+/* focus = dark ring; selected = yellow ring (the board colours stay light in dark mode) */
+.term:focus-visible circle.ring { stroke: #17241D; stroke-width: 5 }
+.term.sel:focus-visible circle.ring { stroke: #17241D; stroke-width: 5; outline: none }
+.term:focus-visible circle.hit { fill: rgba(242, 183, 5, .35) }
 .wire { cursor: pointer }
-.wire:focus-visible { stroke: rgba(242, 183, 5, .45) }
+.wire:focus-visible { stroke: rgba(23, 36, 29, .3); box-shadow: none }
 .spin.rev .blades { animation-direction: reverse }
 .status { font-weight: 600; padding: 10px 12px; border-radius: 10px; background: var(--bg) }
 .status.ok { background: var(--green-soft) }

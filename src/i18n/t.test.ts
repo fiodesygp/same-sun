@@ -27,3 +27,17 @@ describe('t() slots', () => {
     expect(t('sunDay.clock', { hour: 9 })).toBe('9:00 · Day {day}')
   })
 })
+
+describe('Spanish', () => {
+  // brand names, units and labels that are the same in both languages
+  const SAME = new Set(['app.name', 'lang.en', 'lang.es', 'growthStory.runsDesignValue', 'lab.level.1', 'lab.svg.led', 'scene.led',
+    'lab.term.p+', 'lab.term.p-', 'lab.term.mA', 'lab.term.mB', 'home.eyebrow', 'scene.panelAt', 'gauges.wh', 'gauges.degF'])
+  const slots = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort()
+
+  it('uses the same {slots} as English', () => {
+    for (const [k, v] of Object.entries(en)) expect(slots(es[k as keyof typeof es]), k).toEqual(slots(v))
+  })
+  it('is translated, apart from names and units', () => {
+    for (const [k, v] of Object.entries(en)) if (!SAME.has(k)) expect(es[k as keyof typeof es], k).not.toBe(v)
+  })
+})

@@ -30,6 +30,11 @@ export function EntryForm({ editing, defaultStage, initialMsg, onSave, onCancelE
   const stepsRef = useRef<HTMLDivElement>(null)
   const caretToEnd = useRef(false)
 
+  // when an entry is loaded for editing, put the cursor in its text
+  useEffect(() => {
+    if (editing) storyRef.current?.focus()
+  }, [editing])
+
   // entries load after the form opens; start on the newest entry's step if none is picked yet
   useEffect(() => {
     if (!stage && defaultStage) setStage(defaultStage)

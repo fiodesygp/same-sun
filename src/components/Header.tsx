@@ -1,5 +1,5 @@
-import { useRef, type KeyboardEvent } from 'react'
-import { t, type Key } from '../i18n/t'
+import { useEffect, useRef, type KeyboardEvent } from 'react'
+import { t, type Key, type Lang } from '../i18n/t'
 import { Logo } from './Logo'
 
 export const TABS = [
@@ -11,10 +11,24 @@ export const TABS = [
 
 export type TabId = (typeof TABS)[number]['id']
 
-type Props = { tab: TabId; onSelect: (id: TabId) => void }
+type Props = { tab: TabId; onSelect: (id: TabId) => void; lang: Lang; onLang: (l: Lang) => void }
 
-export function Header({ tab, onSelect }: Props) {
+const LANGS: Lang[] = ['en', 'es']
+
+export function Header({ tab, onSelect, lang, onLang }: Props) {
   const refs = useRef<(HTMLButtonElement | null)[]>([])
+  const barRef = useRef<HTMLElement>(null)
+
+  // share the header height with CSS (scroll-padding-top) so focused items never hide under it
+  useEffect(() => {
+    const bar = barRef.current
+    if (!bar) return
+    const set = () => document.documentElement.style.setProperty('--header-h', `${bar.offsetHeight}px`)
+    set()
+    const ro = new ResizeObserver(set)
+    ro.observe(bar)
+    return () => ro.disconnect()
+  }, [])
 
   // arrow keys, Home and End move between tabs (WAI-ARIA tabs pattern)
   function onKeyDown(e: KeyboardEvent, i: number) {
@@ -27,7 +41,7 @@ export function Header({ tab, onSelect }: Props) {
   }
 
   return (
-    <header className="bar">
+    <header className="bar" ref={barRef}>
       <div className="bar-in">
         <div className="brand">
           <Logo />
@@ -55,6 +69,13 @@ export function Header({ tab, onSelect }: Props) {
             </button>
           ))}
         </nav>
+        <div className="lang" role="group" aria-label={t('lang.label')}>
+          {LANGS.map(l => (
+            <button key={l} type="button" lang={l} aria-pressed={lang === l} onClick={() => onLang(l)}>
+              {l.toUpperCase()}<span className="sr"> {t(`lang.${l}`)}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </header>
   )

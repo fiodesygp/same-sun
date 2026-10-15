@@ -5,7 +5,7 @@ const SHOW = 10
 
 export function RunsTable({ runs }: { runs: SavedRun[] }) {
   return (
-    <details className="card">
+    <details className="card" aria-label={t('growthStory.runsTitle')}>
       <summary><b>{t('growthStory.runsTitle')}</b></summary>
       <div className="tablewrap">
         <table>

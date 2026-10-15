@@ -28,7 +28,7 @@ export const Results = forwardRef<HTMLDivElement, { run: Run }>(function Results
       ' ' + t(pred.guess === actual ? 'results.matched' : 'results.surprise')
     : t('results.skipped')
   let what = t('results.what', {
-    crop: crop.toLowerCase(), food: pct(s.food), span: t(d.days === 1 ? 'sunDay.spanDay' : 'sunDay.spanWeek'),
+    crop: crop.toLowerCase(), food: pct(s.food), perfect: t(d.days === 1 ? 'results.perfectDay' : 'results.perfectWeek'),
     fs, wh: r.energy.toFixed(1), energy: pct(s.energy)
   })
   if (challenge) what += ' ' + t(`challenge.${challenge}.${passed ? 'pass' : 'fail'}`)

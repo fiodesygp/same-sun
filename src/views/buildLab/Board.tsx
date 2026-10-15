@@ -26,9 +26,10 @@ type Props = {
   onPick: (k: TermId) => void
   onConnect: (a: TermId, b: TermId) => void
   onRemove: (i: number) => void
+  onCancel: () => void
 }
 
-export function Board({ level, wires, selected, sunOn, onPick, onConnect, onRemove }: Props) {
+export function Board({ level, wires, selected, sunOn, onPick, onConnect, onRemove, onCancel }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
   const [drag, setDrag] = useState<{ from: TermId; x: number; y: number; moved: boolean } | null>(null)
   const justDragged = useRef(false)
@@ -76,11 +77,12 @@ export function Board({ level, wires, selected, sunOn, onPick, onConnect, onRemo
     }
     onPick(k)
   }
+  // Enter or Space acts like a tap; Escape drops a half-made wire
   const onKey = (fn: () => void) => (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       fn()
-    }
+    } else if (e.key === 'Escape') onCancel()
   }
 
   const motorOn = ev?.motor ?? 0, ledOn = !!ev?.led, pump = ev?.pump ?? 0
@@ -189,7 +191,7 @@ export function Board({ level, wires, selected, sunOn, onPick, onConnect, onRemo
                 <text x={mx} y={mY + 4} textAnchor="middle" fontSize={11} fontWeight={700} fontFamily={FONT} fill={net === '+' ? PLUS : INK}>{net}</text>
               </g>
             )}
-            <path className="wire" d={d} fill="none" stroke="transparent" strokeWidth={44} tabIndex={0} role="button"
+            <path className="wire" d={d} fill="none" stroke="transparent" strokeWidth={54} tabIndex={0} role="button"
               aria-label={t('lab.removeWire', { a: t(`lab.term.${a}`), b: t(`lab.term.${b}`) })}
               onClick={remove} onKeyDown={onKey(remove)} />
           </g>
