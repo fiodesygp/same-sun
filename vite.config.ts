@@ -28,7 +28,9 @@ export default defineConfig({
       },
       workbox: {
         // cache every built file so the game works offline after the first visit
-        globPatterns: ['**/*.{html,js,css,woff2,svg,png,txt}']
+        globPatterns: ['**/*.{html,js,css,woff2,svg,png,txt}'],
+        // 404.html only redirects to the app on GitHub Pages; no need to keep it offline
+        globIgnores: ['**/404.html']
       }
     })
   ],

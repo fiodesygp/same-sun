@@ -5,3 +5,7 @@ dev-dist
 *.local
 *.tsbuildinfo
 screenshots/
+coverage/
+*.log
+.vscode/
+.claude/
