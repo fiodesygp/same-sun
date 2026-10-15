@@ -77,6 +77,10 @@ export function Home({ onGo, active }: Props) {
               <div className="mission-label">{t('home.missionLabel')}</div>
               <p>{t('home.mission')}</p>
             </div>
+            <div className="big-question">
+              <div className="big-question-label">{t('home.bigQuestionLabel')}</div>
+              <p>{t('home.bigQuestion')}</p>
+            </div>
             <div className="row wrap">
               <button className="btn play" type="button" onClick={() => onGo('sunDay')}>
                 <svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1 L13 7 L2 13 Z" fill="currentColor" /></svg>

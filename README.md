@@ -7,6 +7,8 @@
 
 Same Sun is a short design-and-test game for the **miniAgriPV** project (Girl Scouts Beyond Bars × ASU Mary Lou Fulton College for Teaching and Learning Innovation). Players, about 7th grade, build a mini agrivoltaic system: a small solar panel above a plant, so one sunny spot makes energy and grows food.
 
+**Our big question:** *In a desert where land, water, and shade are hard to come by, how can you use STEM to build a micro-lab that shows your family how one sunny space can grow food and power other things at once?*
+
 - **Sun Day:** pick a plant, panel and day, predict, then watch a sunny Arizona day and see the Sun Score with feedback.
 - **Build Lab:** wire the panel to a fan, an LED, both, or a water pump.
 - **Growth Story Card:** add a photo and a few words at each step of the real project.

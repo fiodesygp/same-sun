@@ -4,7 +4,7 @@ Oct 14, 2026 · @Fiodesy Putri
 
 ## Overview
 
-**Same Sun** is a short design-and-test game where players build a virtual mini agrivoltaic plot, run sunny Arizona days, and balance plant health against solar energy. It turns the project's driving question into play: *How can one sunny space grow food and make energy at the same time?*
+**Same Sun** is a short design-and-test game where players build a virtual mini agrivoltaic plot, run sunny Arizona days, and balance plant health against solar energy. It turns the project's driving question into play: *In a desert where land, water, and shade are hard to come by, how can you use STEM to build a micro-lab that shows your family how one sunny space can grow food and power other things at once?*
 
 - **Where it lives:** a new "Game" page on the miniAgriPV site, playable on a phone or laptop browser.
 - **Who plays:** Girl Scouts in the Girl Scouts Beyond Bars × ASU Mary Lou Fulton College program, alone at home or with a family member.
