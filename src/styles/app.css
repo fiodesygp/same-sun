@@ -99,6 +99,21 @@ legend { font-size: 14px; font-weight: 700; margin-bottom: 6px; padding: 0 }
 .seg button:disabled { opacity: .4; cursor: not-allowed }
 select { font: inherit; width: 100%; padding: 10px; border-radius: 10px; border: 1.5px solid var(--field); background: var(--surface); color: var(--ink); min-height: 44px }
 
+/* on/off switch buttons (Sun Day fan and pump, Build Lab cloud) */
+.toggle { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 8px 12px; text-align: left;
+  border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); cursor: pointer; font-weight: 600 }
+.toggle[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft); box-shadow: inset 0 0 0 1px var(--green) }
+.toggle:disabled { cursor: not-allowed; opacity: .6 }
+.switch { flex: none; position: relative; width: 44px; height: 26px; border-radius: 999px; background: var(--field) }
+.knob { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; color: var(--green);
+  display: grid; place-items: center; transition: transform .15s }
+.toggle[aria-pressed="true"] .switch { background: var(--green) }
+.toggle[aria-pressed="true"] .knob { transform: translateX(18px) }
+.toggle-label { flex: 1 }
+.toggle-state { font-size: 14px; font-weight: 700; color: var(--muted); min-width: 4ch; text-align: right }
+.toggle[aria-pressed="true"] .toggle-state { color: var(--ink) }
+@media (prefers-reduced-motion: reduce) { .knob { transition: none } }
+
 /* touch screens: bigger tap areas */
 @media (pointer: coarse) {
   .btn, .seg button, .lang button, select, .linkbtn, .back, .starters button { min-height: 48px }
@@ -111,7 +126,7 @@ select { font: inherit; width: 100%; padding: 10px; border-radius: 10px; border:
 .scene { display: block; width: 100%; height: auto; background: var(--sky-day) }
 @keyframes spin { to { transform: rotate(360deg) } }
 .blades { transform-box: fill-box; transform-origin: center }
-.spin .blades { animation: spin .5s linear infinite }
+.spin .blades { animation: spin var(--spin, .5s) linear infinite }
 @keyframes drip { 0% { opacity: 0; transform: translateY(-6px) } 30% { opacity: 1 } 100% { opacity: 0; transform: translateY(10px) } }
 .drop { animation: drip 1s ease-in infinite }
 .drop:nth-child(2) { animation-delay: .33s } .drop:nth-child(3) { animation-delay: .66s }

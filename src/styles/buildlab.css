@@ -14,20 +14,36 @@
 .status { font-weight: 600; padding: 10px 12px; border-radius: 10px; background: var(--bg) }
 .status.ok { background: var(--green-soft) }
 .status.warn { background: var(--sun-soft) }
-.levels { flex-wrap: nowrap }
-.seg.levels button { flex: 1 1 0; padding: 8px 4px; min-width: 0; white-space: nowrap; font-size: 15px }
+/* five levels: one row when the board card is wide enough to keep them readable, else 3 + 2 */
+.lab { container-type: inline-size }
+.seg.levels { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px }
+.seg.levels button { grid-column: span 2; padding: 8px 4px; min-width: 0; white-space: nowrap; font-size: 15px }
+.seg.levels button:nth-child(n + 4) { grid-column: span 3 }
+@container (min-width: 430px) {
+  .seg.levels { grid-template-columns: repeat(5, minmax(0, 1fr)) }
+  .seg.levels button, .seg.levels button:nth-child(n + 4) { grid-column: auto }
+}
+/* level 5 checklist: an icon and words for each part */
+.checklist-title { font-size: 15px; margin: 14px 0 6px }
+.checklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px }
+.part { display: flex; align-items: flex-start; gap: 8px; font-weight: 600 }
+.part svg { flex: none; margin-top: 2px }
+.part.working { color: var(--good) }
+.part.backwards, .part.chain, .part.short, .part.slow, .part.noPower { color: var(--warn) }
+.part.notConnected, .part.waiting { color: var(--muted) }
+.part span { color: var(--ink) }
 .real { border: 1px solid var(--green); background: var(--green-soft); border-radius: 12px; padding: 12px }
 .real p, .lab-goal { margin: 6px 0 0 }
 .lab-goal { font-size: 17px }
 
-/* Wide: board on the left, sized so the whole board card fits the screen height (the svg is 4:3;
+/* Wide: board on the left, sized so the whole board card fits the screen height (the svg is 6:5;
    about 360 px goes to the header, page title, level buttons and the buttons under the board).
    Goal, messages and Try it for real sit on the right. Phone and tablet portrait: one column. */
 @media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
   .lab-cols {
-    grid-template-columns: min(max(300px, calc((100svh - var(--header-h, 72px) - 360px) * 4 / 3 + 2 * var(--card-pad))), 66%) minmax(0, 1fr)
+    grid-template-columns: min(max(300px, calc((100svh - var(--header-h, 72px) - 360px) * 360 / 300 + 2 * var(--card-pad))), 66%) minmax(0, 1fr)
   }
 }
 @media (min-width: 600px) and (max-width: 1023px) and (orientation: portrait) {
-  .lab-cols .lab { max-width: calc((100svh - var(--header-h, 72px) - 360px) * 4 / 3 + 2 * var(--card-pad)); width: 100%; justify-self: center }
+  .lab-cols .lab { max-width: calc((100svh - var(--header-h, 72px) - 360px) * 360 / 300 + 2 * var(--card-pad)); width: 100%; justify-self: center }
 }

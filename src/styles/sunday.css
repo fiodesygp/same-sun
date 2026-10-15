@@ -37,21 +37,8 @@
 .skip-pred { justify-self: center }
 .gauge-note { margin: -6px 0 0; font-size: 13px; color: var(--muted) }
 
-/* step 3: two independent on/off switches */
+/* step 3: two independent on/off switches (.toggle styles live in app.css) */
 .toggles { display: grid; gap: 6px }
-.toggle { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 8px 12px; text-align: left;
-  border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); cursor: pointer; font-weight: 600 }
-.toggle[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft); box-shadow: inset 0 0 0 1px var(--green) }
-.toggle:disabled { cursor: not-allowed; opacity: .6 }
-.switch { flex: none; position: relative; width: 44px; height: 26px; border-radius: 999px; background: var(--field) }
-.knob { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; color: var(--green);
-  display: grid; place-items: center; transition: transform .15s }
-.toggle[aria-pressed="true"] .switch { background: var(--green) }
-.toggle[aria-pressed="true"] .knob { transform: translateX(18px) }
-.toggle-label { flex: 1 }
-.toggle-state { font-size: 14px; font-weight: 700; color: var(--muted); min-width: 4ch; text-align: right }
-.toggle[aria-pressed="true"] .toggle-state { color: var(--ink) }
-@media (prefers-reduced-motion: reduce) { .knob { transition: none } }
 
 #results:focus { outline: none; box-shadow: none }
 .score { display: grid; gap: 10px; margin-top: 10px }

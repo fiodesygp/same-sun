@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { evaluate, labStatus, levelTerms, nets, type Wire } from './circuit'
+import model from '../config/model.json'
+import { evaluate, labStatus, levelTerms, nets, panelWatts, partStates, shareLoads, type Wire } from './circuit'
 
 const FAN = 0, LED = 1, BOTH = 2, PUMP = 3
 
@@ -106,5 +107,87 @@ describe('levelTerms', () => {
     expect(levelTerms(FAN)).toEqual(['p+', 'p-', 'mA', 'mB'])
     expect(levelTerms(BOTH)).toEqual(['p+', 'p-', 'mA', 'mB', 'lL', 'lS'])
     expect(levelTerms(PUMP)).toEqual(['p+', 'p-', 'w+', 'w-'])
+  })
+})
+
+describe('level 5 · All', () => {
+  const ALL5 = 4
+  // fan, LED and pump each wired straight to the panel
+  const fan: Wire[] = [['p+', 'mA'], ['p-', 'mB']]
+  const led: Wire[] = [['p+', 'lL'], ['p-', 'lS']]
+  const pump: Wire[] = [['p+', 'w+'], ['p-', 'w-']]
+  const full = shareLoads(panelWatts(0))
+  const states = (w: Wire[]) => partStates(ALL5, w, true, full)
+
+  it('shows all eight terminals', () => {
+    expect(levelTerms(ALL5)).toEqual(['p+', 'p-', 'mA', 'mB', 'lL', 'lS', 'w+', 'w-'])
+  })
+  it('is solved when all three parts have their own + and - path', () => {
+    expect(labStatus(ALL5, [...fan, ...led, ...pump], false, true)).toEqual({ id: 'allOk', tone: 'ok', done: true })
+    expect(states([...fan, ...led, ...pump])).toEqual({ motor: 'working', led: 'working', pump: 'working' })
+    // joining the reds and blacks through other parts' terminals is still parallel
+    expect(labStatus(ALL5, [['p+', 'mA'], ['mA', 'lL'], ['lL', 'w+'], ['p-', 'mB'], ['mB', 'lS'], ['lS', 'w-']], false, true).id).toBe('allOk')
+  })
+  it('names each part that is wired backwards', () => {
+    const rev = { motor: [['p+', 'mB'], ['p-', 'mA']], led: [['p+', 'lS'], ['p-', 'lL']], pump: [['p+', 'w-'], ['p-', 'w+']] } as const
+    for (const part of ['motor', 'led', 'pump'] as const) {
+      const w = [...(part === 'motor' ? rev.motor : fan), ...(part === 'led' ? rev.led : led), ...(part === 'pump' ? rev.pump : pump)] as Wire[]
+      expect(labStatus(ALL5, w, false, true)).toMatchObject({ id: 'allBackwards', tone: 'warn', done: false })
+      expect(states(w)[part]).toBe('backwards')
+      for (const other of (['motor', 'led', 'pump'] as const).filter(p => p !== part)) expect(states(w)[other]).toBe('working')
+    }
+  })
+  it('names a part that is not connected', () => {
+    expect(labStatus(ALL5, [...fan, ...led], false, true).id).toBe('allSome')
+    expect(states([...fan, ...led])).toEqual({ motor: 'working', led: 'working', pump: 'notConnected' })
+    expect(states([['p+', 'w+'], ...fan, ...led]).pump).toBe('notConnected') // only one wire
+  })
+  it('spots a chain of all three parts, or of two', () => {
+    const chain3: Wire[] = [['p+', 'mA'], ['mB', 'lL'], ['lS', 'w+'], ['w-', 'p-']]
+    expect(labStatus(ALL5, chain3, false, true)).toMatchObject({ id: 'allSeries', tone: 'warn' })
+    expect(states(chain3)).toEqual({ motor: 'chain', led: 'chain', pump: 'chain' })
+    const chain2: Wire[] = [['p+', 'w+'], ['w-', 'mA'], ['mB', 'p-'], ...led]
+    expect(labStatus(ALL5, chain2, false, true).id).toBe('allSeries')
+    expect(states(chain2)).toEqual({ motor: 'chain', led: 'working', pump: 'chain' })
+  })
+  it('a short circuit stops everything', () => {
+    const w: Wire[] = [...fan, ...led, ...pump, ['p+', 'p-']]
+    expect(labStatus(ALL5, w, false, true)).toMatchObject({ id: 'short', tone: 'warn' })
+    expect(states(w)).toEqual({ motor: 'short', led: 'short', pump: 'short' })
+  })
+  it('waits for the sun', () => {
+    expect(partStates(ALL5, [...fan, ...led, ...pump], false, full)).toEqual({ motor: 'waiting', led: 'waiting', pump: 'waiting' })
+  })
+  it('shows the cloud message once solved', () => {
+    expect(labStatus(ALL5, [...fan, ...led, ...pump], false, true, true)).toEqual({ id: 'cloud', tone: '', done: true })
+    expect(labStatus(ALL5, [...fan, ...led], false, true, true).id).toBe('allSome')
+  })
+})
+
+describe('shared power under a cloud', () => {
+  it('runs everything in full sun', () => {
+    expect(shareLoads(panelWatts(0))).toEqual({ led: true, fan: 1, pump: true })
+  })
+  it('as power drops: the pump stops first, then the fan slows and stops, and the LED last', () => {
+    const offAt: Record<string, number> = {}
+    let slowedAt = -1
+    for (let w = panelWatts(0); w >= 0; w -= 0.01) {
+      const l = shareLoads(w)
+      if (!l.pump) offAt.pump ??= w
+      if (l.fan < 1 && l.fan > 0 && slowedAt < 0) slowedAt = w
+      if (l.fan === 0) offAt.fan ??= w
+      if (!l.led) offAt.led ??= w
+    }
+    expect(offAt.pump).toBeGreaterThan(offAt.fan)
+    expect(slowedAt).toBeGreaterThan(offAt.fan)
+    expect(offAt.fan).toBeGreaterThan(offAt.led)
+  })
+  it('under a full cloud only the LED keeps glowing', () => {
+    expect(shareLoads(panelWatts(1))).toEqual({ led: true, fan: 0, pump: false })
+  })
+  it('uses the load thresholds from model.json', () => {
+    expect(shareLoads(model.loads.led + model.loads.fan - 0.001)).toEqual({ led: true, fan: 0, pump: false })
+    expect(shareLoads(model.loads.led + model.loads.fan + model.loads.pump)).toMatchObject({ led: true, pump: true })
+    expect(shareLoads(model.loads.led + model.loads.fan + model.loads.pump - 0.001).pump).toBe(false)
   })
 })
