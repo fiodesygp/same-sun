@@ -19,7 +19,7 @@ export function App() {
     home: <Home onGo={select} />,
     sunDay: <SunDay />,
     buildLab: <BuildLab />,
-    growthStory: <GrowthStory />
+    growthStory: <GrowthStory active={tab === 'growthStory'} />
   }
 
   // every view stays mounted (hidden when inactive) so a tab keeps its state when you switch away
