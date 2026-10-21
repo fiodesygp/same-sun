@@ -5,6 +5,7 @@ import { load, save } from './lib/storage'
 import { BuildLab } from './views/BuildLab'
 import { GrowthStory } from './views/GrowthStory'
 import { Home } from './views/Home'
+import { Learn } from './views/Learn'
 import { SunDay } from './views/SunDay'
 
 const savedLang = (): Lang => (load<string>('lang', 'en') === 'es' ? 'es' : 'en')
@@ -31,7 +32,8 @@ export function App() {
     home: <Home onGo={select} active={tab === 'home'} />,
     sunDay: <SunDay />,
     buildLab: <BuildLab />,
-    growthStory: <GrowthStory active={tab === 'growthStory'} />
+    growthStory: <GrowthStory active={tab === 'growthStory'} />,
+    learn: <Learn active={tab === 'learn'} onSketch={() => select('growthStory')} />
   }
 
   // every view stays mounted (hidden when inactive) so a tab keeps its state when you switch away

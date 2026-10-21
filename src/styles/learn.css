@@ -1,0 +1,44 @@
+/* ---------- deck colours: a chip with text, plus a coloured band ---------- */
+.deck-red { --deck: var(--deck-red); --deck-ink: #fff }
+.deck-orange { --deck: var(--deck-orange); --deck-ink: #17241D }
+.deck-yellow { --deck: var(--deck-yellow); --deck-ink: #17241D }
+.deck-green { --deck: var(--deck-green); --deck-ink: #fff }
+.deck-blue { --deck: var(--deck-blue); --deck-ink: #fff }
+.deck-purple { --deck: var(--deck-purple); --deck-ink: #fff }
+.deck-magenta { --deck: var(--deck-magenta); --deck-ink: #fff }
+.deck-bonus { --deck: var(--deck-bonus); --deck-ink: #fff }
+.deck-chip { display: inline-grid; place-items: center; min-width: 32px; height: 32px; padding: 0 10px; border-radius: 999px;
+  background: var(--deck); color: var(--deck-ink); font-weight: 800; font-family: var(--display); text-transform: capitalize }
+
+/* ---------- Learn page ---------- */
+.learn-progress { display: grid; gap: 10px }
+.learn-progress-row b { font-family: var(--display); font-size: 20px }
+.learn-bar { height: 12px; border-radius: 99px; background: var(--line); overflow: hidden }
+.learn-bar i { display: block; height: 100%; background: var(--green) }
+.learn-checklist summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; cursor: pointer }
+.learn-checklist ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px }
+.learn-checklist li { color: var(--muted); font-weight: 600 }
+.learn-checklist li.ok { color: var(--ink) }
+.learn-checklist li span[aria-hidden] { color: var(--good); font-weight: 800 }
+.learn-grid { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)) }
+.learn-card { text-align: left; display: grid; gap: 8px; align-content: start; cursor: pointer; font: inherit; color: inherit; border-top: 8px solid var(--deck) }
+@media (hover: hover) { .learn-card:hover { border-color: var(--deck) } }
+.learn-card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px }
+.learn-card-title { font-family: var(--display); font-weight: 700; font-size: 18px; line-height: 1.25 }
+.learn-card-goal { color: var(--muted); font-size: 15px }
+.done-tag { font-weight: 700; color: var(--good); font-size: 14px }
+
+/* ---------- a mission ---------- */
+.mission-view { display: grid; gap: var(--gap) }
+.mission-head { display: grid; gap: 6px; justify-items: start; border-left: 8px solid var(--deck); padding-left: 14px }
+.card-chip { margin: 0; color: var(--muted); font-weight: 600 }
+.mission-goal p { margin: 6px 0 0; font-size: 1.1em; font-weight: 600 }
+.support-cards { display: grid; gap: var(--gap) }
+.support { background: var(--sun-soft); border-color: var(--sun) }
+.support p { margin: 6px 0 0 }
+.try-steps { margin: 8px 0 0; padding-left: 1.4em; display: grid; gap: 6px }
+.mission-finish { display: grid; gap: 8px; justify-items: start }
+.done-note { margin: 0; font-weight: 700; color: var(--good) }
+@media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
+  .support-cards { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) }
+}

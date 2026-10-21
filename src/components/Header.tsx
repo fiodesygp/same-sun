@@ -6,7 +6,8 @@ export const TABS = [
   { id: 'home', label: 'tabs.home' },
   { id: 'sunDay', label: 'tabs.sunDay' },
   { id: 'buildLab', label: 'tabs.buildLab' },
-  { id: 'growthStory', label: 'tabs.growthStory' }
+  { id: 'growthStory', label: 'tabs.growthStory' },
+  { id: 'learn', label: 'tabs.learn' }
 ] as const satisfies readonly { id: string; label: Key }[]
 
 export type TabId = (typeof TABS)[number]['id']
@@ -21,7 +22,8 @@ const ICONS: Record<TabId, React.ReactNode> = {
   home: <svg {...ICON_PROPS}><path d="M3 11 12 4l9 7" /><path d="M5 10v10h14V10" /><path d="M10 20v-6h4v6" /></svg>,
   sunDay: <svg {...ICON_PROPS}><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>,
   buildLab: <svg {...ICON_PROPS}><path d="M13 2 4 14h7l-1 8 9-12h-7z" /></svg>,
-  growthStory: <svg {...ICON_PROPS}><path d="M12 21V11" /><path d="M12 13c-5 0-7-3-7-7 4 0 7 2 7 7z" /><path d="M12 11c0-4 2-6 6-6 0 4-2 6-6 6z" /></svg>
+  growthStory: <svg {...ICON_PROPS}><path d="M12 21V11" /><path d="M12 13c-5 0-7-3-7-7 4 0 7 2 7 7z" /><path d="M12 11c0-4 2-6 6-6 0 4-2 6-6 6z" /></svg>,
+  learn: <svg {...ICON_PROPS}><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v15H5.5A1.5 1.5 0 0 0 4 19.5z" /><path d="M4 19.5A1.5 1.5 0 0 0 5.5 21H20v-3" /><path d="M8 7h8M8 11h6" /></svg>
 }
 
 export function Header({ tab, onSelect, lang, onLang }: Props) {
@@ -82,7 +84,12 @@ export function Header({ tab, onSelect, lang, onLang }: Props) {
               onKeyDown={e => onKeyDown(e, i)}
             >
               <span className="tab-icon" aria-hidden="true">{ICONS[x.id]}</span>
-              <span className="tab-label">{t(x.label)}</span>
+              {x.id === 'growthStory' ? (
+                // phones show the short label so the five tabs fit without wrapping
+                <span className="tab-label"><span className="label-full">{t(x.label)}</span><span className="label-short">{t('tabs.growthStoryShort')}</span></span>
+              ) : (
+                <span className="tab-label">{t(x.label)}</span>
+              )}
             </button>
           ))}
         </nav>

@@ -8,6 +8,7 @@ import './styles/home.css'
 import './styles/sunday.css'
 import './styles/buildlab.css'
 import './styles/growthstory.css'
+import './styles/learn.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
