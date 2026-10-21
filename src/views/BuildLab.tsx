@@ -6,22 +6,12 @@ import {
 } from '../lab/circuit'
 import { forgetStars, loadSolved, markSolved } from '../lib/progress'
 import { Board, LANDSCAPE, PORTRAIT } from './buildLab/Board'
+import { useWide } from '../lib/useWide'
 
 const sameWire = (w: Wire, a: TermId, b: TermId) => (w[0] === a && w[1] === b) || (w[0] === b && w[1] === a)
 const CLOUD_MS = 2500
 const LADDER = [0, 1, 2] as const
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
-// wide screens (tablet landscape, computer) get the landscape board; same query as the CSS layouts
-const WIDE = '(min-width: 1024px), (min-width: 600px) and (orientation: landscape)'
-function useWide() {
-  const [wide, setWide] = useState(() => window.matchMedia(WIDE).matches)
-  useEffect(() => {
-    const mq = window.matchMedia(WIDE), on = () => setWide(mq.matches)
-    mq.addEventListener('change', on)
-    return () => mq.removeEventListener('change', on)
-  }, [])
-  return wide
-}
 type L = 0 | 1 | 2 | 3 | 4 | 5
 
 /** checklist icons: shape and text carry the meaning, not colour */

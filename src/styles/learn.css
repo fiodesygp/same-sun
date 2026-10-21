@@ -29,7 +29,7 @@
 .done-tag { font-weight: 700; color: var(--good); font-size: 14px }
 
 /* ---------- a mission ---------- */
-.mission-view { display: grid; gap: var(--gap) }
+.mission-view { display: grid; gap: var(--gap); max-width: 860px; width: 100% }
 .mission-head { display: grid; gap: 6px; justify-items: start; border-left: 8px solid var(--deck); padding-left: 14px }
 .card-chip { margin: 0; color: var(--muted); font-weight: 600 }
 .mission-goal p { margin: 6px 0 0; font-size: 1.1em; font-weight: 600 }
@@ -42,3 +42,10 @@
 @media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
   .support-cards { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) }
 }
+
+/* ---------- mission simulators and evidence ---------- */
+.mini-lab .seg { justify-self: start }
+.readout { margin: 0; display: flex; gap: 8px; align-items: baseline; font-weight: 600 }
+.num { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums }
+.evidence-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; font-weight: 600 }
+.evidence-list span[aria-hidden] { color: var(--good); font-weight: 800 }
