@@ -99,3 +99,17 @@
 .monitor-grid div { display: grid; gap: 2px; padding: 8px 10px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line) }
 .monitor-grid dt { font-size: 13px; font-weight: 700; color: var(--muted) }
 .monitor-grid dd { margin: 0; font-size: 17px; font-weight: 700 }
+
+/* ---------- parts of the kit ---------- */
+.parts-grid { grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)) }
+.part-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; overflow-wrap: anywhere; text-align: left; cursor: pointer; font: inherit; color: inherit; min-height: 64px }
+.part-tile .learn-card-title { font-size: 16px }
+.part-icon { flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 12px; background: var(--green-soft); color: var(--ink) }
+.part-head { grid-template-columns: auto 1fr; align-items: center; column-gap: 12px }
+.part-card { display: grid; gap: 14px }
+.part-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px }
+.part-tabs button { min-height: 44px; padding: 8px 10px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer }
+.part-tabs button[aria-selected="true"] { border-color: var(--green); background: var(--green-soft); box-shadow: inset 0 0 0 1px var(--green) }
+.part-panel { display: grid; gap: 12px; justify-items: start; font-size: 1.08em }
+.part-panel p { margin: 0 }
+@media (max-width: 599px) { .part-tabs { grid-template-columns: 1fr 1fr } }

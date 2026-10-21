@@ -4,10 +4,12 @@ import { coreDone, loadLearn, markDone, saveEvidence, type LearnState, type Miss
 import { MissionView } from './learn/MissionView'
 import { def, MISSION_DEFS, type Evidence } from './learn/missions'
 import { SunMonitor } from './learn/SunMonitor'
+import { PartView } from './learn/PartView'
+import { PARTS, PartIcon, type PartId } from './learn/parts'
 
 type Props = { active: boolean; onSketch: () => void }
 /** what is open: a mission, or one of the tools */
-type Open = MissionId | 'monitor'
+type Open = MissionId | 'monitor' | `part:${PartId}`
 
 export function Learn({ active, onSketch }: Props) {
   const [state, setState] = useState<LearnState>(loadLearn)
@@ -34,10 +36,14 @@ export function Learn({ active, onSketch }: Props) {
   }
 
   if (open === 'monitor') return <SunMonitor onBack={() => show(null)} />
+  if (open?.startsWith('part:')) {
+    return <PartView id={open.slice(5) as PartId} onBack={() => show(null)} onMission={id => { returnTo.current = null; show(id) }} />
+  }
   if (open) {
+    const id = open as MissionId
     return (
-      <MissionView def={def(open)} record={state[open]} onBack={() => show(null)} onSketch={onSketch}
-        onEvidence={(patch: Evidence) => setState(saveEvidence(open, patch))} onDone={() => setState(markDone(open))} />
+      <MissionView def={def(id)} record={state[id]} onBack={() => show(null)} onSketch={onSketch}
+        onEvidence={(patch: Evidence) => setState(saveEvidence(id, patch))} onDone={() => setState(markDone(id))} />
     )
   }
 
@@ -95,6 +101,17 @@ export function Learn({ active, onSketch }: Props) {
       <section aria-labelledby="learn-bonus">
         <h2 className="h2" id="learn-bonus">{t('learn.bonusTitle')}</h2>
         <div className="learn-grid">{MISSION_DEFS.filter(d => !d.colour).map((d, i) => card(d.id, i))}</div>
+      </section>
+      <section aria-labelledby="learn-parts">
+        <h2 className="h2" id="learn-parts">{t('learn.partsTitle')}</h2>
+        <div className="learn-grid parts-grid">
+          {PARTS.map(p => (
+            <button key={p.id} type="button" ref={el => { cardRefs.current[`part:${p.id}`] = el }} className="card part-tile" onClick={() => show(`part:${p.id}`)}>
+              <span className="part-icon"><PartIcon id={p.id} /></span>
+              <span className="learn-card-title">{t(`learn.part.${p.id}.name`)}</span>
+            </button>
+          ))}
+        </div>
       </section>
       <section aria-labelledby="learn-tools">
         <h2 className="h2" id="learn-tools">{t('learn.toolsTitle')}</h2>
