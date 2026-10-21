@@ -3,14 +3,17 @@ import { t } from '../i18n/t'
 import { coreDone, loadLearn, markDone, saveEvidence, type LearnState, type MissionId } from '../lib/learn'
 import { MissionView } from './learn/MissionView'
 import { def, MISSION_DEFS, type Evidence } from './learn/missions'
+import { SunMonitor } from './learn/SunMonitor'
 
 type Props = { active: boolean; onSketch: () => void }
+/** what is open: a mission, or one of the tools */
+type Open = MissionId | 'monitor'
 
 export function Learn({ active, onSketch }: Props) {
   const [state, setState] = useState<LearnState>(loadLearn)
-  const [open, setOpen] = useState<MissionId | null>(null)
-  const cardRefs = useRef<Partial<Record<MissionId, HTMLButtonElement | null>>>({})
-  const returnTo = useRef<MissionId | null>(null)
+  const [open, setOpen] = useState<Open | null>(null)
+  const cardRefs = useRef<Partial<Record<Open, HTMLButtonElement | null>>>({})
+  const returnTo = useRef<Open | null>(null)
 
   // other tabs (Growth Story's Reflect entry) can change progress, so reload when Learn opens
   useEffect(() => {
@@ -24,12 +27,13 @@ export function Learn({ active, onSketch }: Props) {
     returnTo.current = null
   }, [open])
 
-  function show(id: MissionId | null) {
+  function show(id: Open | null) {
     if (!id) returnTo.current = open
     setOpen(id)
     window.scrollTo(0, 0)
   }
 
+  if (open === 'monitor') return <SunMonitor onBack={() => show(null)} />
   if (open) {
     return (
       <MissionView def={def(open)} record={state[open]} onBack={() => show(null)} onSketch={onSketch}
@@ -91,6 +95,16 @@ export function Learn({ active, onSketch }: Props) {
       <section aria-labelledby="learn-bonus">
         <h2 className="h2" id="learn-bonus">{t('learn.bonusTitle')}</h2>
         <div className="learn-grid">{MISSION_DEFS.filter(d => !d.colour).map((d, i) => card(d.id, i))}</div>
+      </section>
+      <section aria-labelledby="learn-tools">
+        <h2 className="h2" id="learn-tools">{t('learn.toolsTitle')}</h2>
+        <div className="learn-grid">
+          <button type="button" ref={el => { cardRefs.current.monitor = el }} className="card learn-card deck-tool" onClick={() => show('monitor')}>
+            <span className="learn-card-top"><span className="deck-chip" aria-hidden="true">◷</span></span>
+            <span className="learn-card-title">{t('learn.mon.title')}</span>
+            <span className="learn-card-goal">{t('learn.mon.lede')}</span>
+          </button>
+        </div>
       </section>
     </>
   )

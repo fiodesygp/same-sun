@@ -92,3 +92,10 @@
 .tool-target rect { fill: rgba(255, 255, 255, .25); stroke: #17241D; stroke-width: 2.5; stroke-dasharray: 6 4 }
 .tool-target:focus { outline: none }
 .tool-target:focus-visible rect, .tool-target:hover rect { stroke-width: 4; fill: rgba(255, 255, 255, .45) }
+
+/* ---------- Sun Monitor ---------- */
+.deck-tool { --deck: var(--deck-green); --deck-ink: #fff }
+.monitor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin: 0 }
+.monitor-grid div { display: grid; gap: 2px; padding: 8px 10px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line) }
+.monitor-grid dt { font-size: 13px; font-weight: 700; color: var(--muted) }
+.monitor-grid dd { margin: 0; font-size: 17px; font-weight: 700 }
