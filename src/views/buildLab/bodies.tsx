@@ -1,8 +1,8 @@
-// Each mission's simulator and evidence box. Missions fill in step by step.
+// Each step's simulator and evidence box.
 import { t } from '../../i18n/t'
 import type { MissionId } from '../../lib/learn'
 import type { Evidence } from './missions'
-import { MiniLab } from './MiniLab'
+import { LevelLab } from './LevelLab'
 import { M4, M5, M6, M7 } from './benchBodies'
 import { M2, M3 } from './skyBodies'
 import { AgriPV, Reflect } from './bonusBodies'
@@ -21,7 +21,7 @@ function M1({ evidence, save }: BodyProps) {
   return (
     <section className="stack">
       <h2 className="card-title">{t('learn.simulator')}</h2>
-      <MiniLab levels={[{ level: 0, label: 'learn.device.fan' }, { level: 1, label: 'learn.device.led' }]} groupLabel="learn.device"
+      <LevelLab levels={[{ level: 0, label: 'learn.device.fan' }, { level: 1, label: 'learn.device.led' }]} groupLabel="learn.device"
         onSolved={l => {
           const device = l === 0 ? 'fan' : 'led'
           save({ device, worked: worked.includes(device) ? worked : [...worked, device] })
@@ -42,14 +42,25 @@ function Pump({ evidence, save }: BodyProps) {
   return (
     <section className="stack">
       <h2 className="card-title">{t('learn.simulator')}</h2>
-      <MiniLab levels={[{ level: 3, label: 'learn.m.pump.title' }]} onSolved={() => { if (evidence.pumpRan !== true) save({ pumpRan: true }) }}
+      <LevelLab levels={[{ level: 3, label: 'learn.m.pump.title' }]} onSolved={() => { if (evidence.pumpRan !== true) save({ pumpRan: true }) }}
         water={{ ml, onMl: n => { if (n % 10 === 0) save({ ml: n }) } }} />
       {evidence.pumpRan === true && <p className="done-note" aria-live="polite"><span aria-hidden="true">✓ </span>{t('learn.pump.ran')}</p>}
     </section>
   )
 }
 
-const BODIES: Partial<Record<MissionId, (p: BodyProps) => React.ReactNode>> = {
+/** Challenges: a Build Lab circuit (both, all three, fix it); done once it works with the sun on. */
+function Challenge({ level, evidence, save }: BodyProps & { level: number }) {
+  return (
+    <section className="stack">
+      <h2 className="card-title">{t('learn.simulator')}</h2>
+      <LevelLab levels={[{ level, label: 'learn.simulator' }]} onSolved={() => { if (evidence.solved !== true) save({ solved: true }) }} />
+      {evidence.solved === true && <p className="done-note" aria-live="polite"><span aria-hidden="true">✓ </span>{t('learn.challenge.solved')}</p>}
+    </section>
+  )
+}
+
+const BODIES: Record<MissionId, (p: BodyProps) => React.ReactNode> = {
   m1: p => <M1 {...p} />,
   m2: p => <M2 {...p} />,
   m3: p => <M3 {...p} />,
@@ -57,18 +68,14 @@ const BODIES: Partial<Record<MissionId, (p: BodyProps) => React.ReactNode>> = {
   m5: p => <M5 {...p} />,
   m6: p => <M6 {...p} />,
   m7: p => <M7 {...p} />,
+  both: p => <Challenge level={2} {...p} />,
   pump: p => <Pump {...p} />,
+  all: p => <Challenge level={4} {...p} />,
+  fix: p => <Challenge level={5} {...p} />,
   agripv: p => <AgriPV {...p} />,
   reflect: p => <Reflect {...p} />
 }
 
 export function MissionBody({ id, ...props }: BodyProps & { id: MissionId }) {
-  const Body = BODIES[id]
-  if (Body) return <>{Body(props)}</>
-  return (
-    <section className="card">
-      <h2 className="card-title">{t('learn.simulator')}</h2>
-      <p className="hint flat">{t('learn.comingNext')}</p>
-    </section>
-  )
+  return <>{BODIES[id](props)}</>
 }

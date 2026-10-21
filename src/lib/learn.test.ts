@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { coreDone, loadLearn, markDone, saveEvidence } from './learn'
+import { loadLearn, markDone, migrate, PATH, pathDone, saveEvidence } from './learn'
 
 const mem = new Map<string, string>()
 globalThis.localStorage = {
@@ -7,12 +7,12 @@ globalThis.localStorage = {
   clear: () => mem.clear(), key: i => [...mem.keys()][i] ?? null, get length() { return mem.size }
 } as Storage
 
-describe('Learn mission progress', () => {
+describe('Build Lab path progress', () => {
   beforeEach(() => mem.clear())
 
   it('starts empty', () => {
     expect(loadLearn()).toEqual({})
-    expect(coreDone(loadLearn())).toBe(0)
+    expect(pathDone(loadLearn())).toBe(0)
   })
   it('saves evidence and done, and reloads them', () => {
     saveEvidence('m4', { polarityMatters: 'yes' })
@@ -21,7 +21,7 @@ describe('Learn mission progress', () => {
     markDone('reflect')
     const again = loadLearn()
     expect(again.m4).toEqual({ done: true, evidence: { polarityMatters: 'yes', whatHappened: 'The fan spun backwards.' } })
-    expect(coreDone(again)).toBe(1) // bonus missions are not counted in the 7
+    expect(pathDone(again)).toBe(2)
   })
   it('saving evidence keeps a mission done', () => {
     markDone('m1')
@@ -33,5 +33,44 @@ describe('Learn mission progress', () => {
     expect(loadLearn()).toEqual({ m1: { done: false, evidence: {} } })
     mem.set('samesun:learn', '"oops"')
     expect(loadLearn()).toEqual({})
+  })
+})
+
+describe('the merged path', () => {
+  it('has 13 steps in order: 7 deck missions, then challenges and bonus steps', () => {
+    expect(PATH).toEqual(['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7', 'both', 'pump', 'all', 'fix', 'agripv', 'reflect'])
+    expect(new Set(PATH).size).toBe(13)
+  })
+})
+
+describe('carrying old progress over', () => {
+  beforeEach(() => mem.clear())
+
+  it('each solved Build Lab level marks its step done', () => {
+    const s = migrate({}, [0, 1, 2, 3, 4, 5])
+    expect(s.m1).toEqual({ done: true, evidence: { device: 'fan', worked: ['fan', 'led'] } })
+    expect(s.both).toEqual({ done: true, evidence: { solved: true } })
+    expect(s.pump).toEqual({ done: true, evidence: { pumpRan: true } })
+    expect(s.all?.done && s.fix?.done).toBe(true)
+    expect(pathDone(s)).toBe(5)
+  })
+  it('only adds: Learn evidence is kept, and running it again changes nothing', () => {
+    const learn = { m1: { done: false, evidence: { device: 'led', worked: ['led'] } }, m4: { done: true, evidence: { polarity: 'yes' } }, pump: { done: false, evidence: { ml: 40 } } }
+    const once = migrate(learn, [0, 3])
+    expect(once.m1).toEqual({ done: true, evidence: { device: 'led', worked: ['led', 'fan'] } })
+    expect(once.m4).toEqual(learn.m4)
+    expect(once.pump).toEqual({ done: true, evidence: { ml: 40, pumpRan: true } })
+    expect(migrate(once, [0, 3])).toEqual(once)
+  })
+  it('loads both old keys together, saves the merge, and never deletes the old keys', () => {
+    mem.set('samesun:buildLabSolved', JSON.stringify([1, 5]))
+    mem.set('samesun:learn', JSON.stringify({ m7: { done: true, evidence: { series: { v: 10, a: 0.2, w: 2 } } } }))
+    const s = loadLearn()
+    expect(s.m1?.done && s.fix?.done && s.m7?.done).toBe(true)
+    expect(mem.get('samesun:buildLabSolved')).toBe('[1,5]')
+    expect(JSON.parse(mem.get('samesun:learn')!).fix.done).toBe(true)
+  })
+  it('ignores levels that do not exist', () => {
+    expect(migrate({}, [9, -1])).toEqual({})
   })
 })

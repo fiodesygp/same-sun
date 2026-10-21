@@ -1,17 +1,27 @@
-// One part's card, with four tabs: What it is · How it works · Try it · Numbers.
+// One part's card, with four tabs (What it is · How it works · Try it · Numbers) and a quick check.
 import { useEffect, useRef, useState } from 'react'
 import { t, type Key } from '../../i18n/t'
 import type { MissionId } from '../../lib/learn'
+import { CHECKS } from '../../lib/parts'
 import { part, PartIcon, type PartId } from './parts'
 
 const TABS = ['what', 'how', 'try', 'numbers'] as const
 type Tab = (typeof TABS)[number]
 
-type Props = { id: PartId; onBack: () => void; onMission: (id: MissionId) => void }
+type Props = {
+  id: PartId
+  /** this part's quick check was answered right before */
+  checked: boolean
+  /** answer the quick check; returns whether it was right */
+  onAnswer: (choice: string) => boolean
+  onBack: () => void
+  onMission: (id: MissionId) => void
+}
 
-export function PartView({ id, onBack, onMission }: Props) {
+export function PartView({ id, checked, onAnswer, onBack, onMission }: Props) {
   const p = part(id)
   const [tab, setTab] = useState<Tab>('what')
+  const [answer, setAnswer] = useState<{ choice: string; right: boolean } | null>(null)
   const backRef = useRef<HTMLButtonElement>(null)
   const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({})
   useEffect(() => backRef.current?.focus(), [])
@@ -61,6 +71,23 @@ export function PartView({ id, onBack, onMission }: Props) {
           )}
         </div>
       </div>
+
+      <section className="card quick-check" aria-labelledby="qc-title">
+        <h2 className="card-title" id="qc-title">{t('learn.check.title')}</h2>
+        <fieldset>
+          <legend className="qc-question">{t(k('check'))}</legend>
+          <div className="seg">
+            {CHECKS[id].choices.map(c => (
+              <button key={c} type="button" aria-pressed={answer?.choice === c}
+                onClick={() => setAnswer({ choice: c, right: onAnswer(c) })}>{t(`learn.check.${id}.${c}` as Key)}</button>
+            ))}
+          </div>
+        </fieldset>
+        <p className={`qc-result${answer ? (answer.right ? ' ok' : ' no') : ''}`} role="status">
+          {answer ? <><span aria-hidden="true">{answer.right ? '✓ ' : '✗ '}</span>{t(answer.right ? 'learn.check.right' : 'learn.check.wrong')} {t(k(answer.right ? 'checkWhy' : 'checkHint'))}</>
+            : checked ? <><span aria-hidden="true">✓ </span>{t('learn.check.before')}</> : ''}
+        </p>
+      </section>
     </article>
   )
 }

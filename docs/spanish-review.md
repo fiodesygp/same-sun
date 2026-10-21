@@ -51,12 +51,17 @@ Questions for these three:
 | New puzzle | Nuevo reto | — |
 | °F | °F | Fine for a US audience? |
 
-## New: the Learn tab
+## New: Build Lab path (was the Learn tab)
 
 | English | Spanish now | To check |
 |---|---|---|
-| Learn (tab) | Aprende | — |
-| Story (short tab label on phones) | Historia | — |
+| Meet the parts / Try it (Build Lab stages) | Conoce las piezas / Pruébalo | — |
+| Quick check | Pregunta rápida | — |
+| Checked / Not checked yet | Respondida / Sin responder | — |
+| Skip ahead to Try it | Saltar a Pruébalo | — |
+| Challenge (step badge) | Reto | Same word as the old level name "Reto" for New puzzle; clear enough? |
+| Steps done: 4 of 13 | Pasos hechos: 4 de 13 | — |
+| Wires | Cables | — |
 | Solar Power | Energía solar | — |
 | mission / bonus | misión / extra | — |
 | Card: {title} ({colour}) | Tarjeta: {title} ({colour}) | Deck card titles are translated; match the printed deck if it has Spanish? |

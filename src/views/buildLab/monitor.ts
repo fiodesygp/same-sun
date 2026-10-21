@@ -1,6 +1,6 @@
 // Sun Monitor numbers: one October day in the garden with two panels in parallel, an LED, the fan
 // and the smart pump. Soil moisture and when the fan and pump switch on come from the Sun Day
-// simulation; volts, amps, watts, light and fan speed come from the Learn electrical model.
+// simulation; volts, amps, watts, light and fan speed come from the deck missions' electrical model.
 // While the smart pump waters, the fan pauses so the pump gets the current it needs.
 import { lightAt, runBench } from '../../sim/electric'
 import { simulate } from '../../sim/simulate'

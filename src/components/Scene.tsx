@@ -11,7 +11,7 @@ const GAP_PX = { none: 0, small: 11, wide: 22 }
 const FONT = 'Source Sans 3, sans-serif'
 const INK = '#2B2F2C'
 const rad = (d: number) => (d * Math.PI) / 180
-/** where the middle of the panel and the fan are drawn (Learn puts its tool targets there) */
+/** where the middle of the panel and the fan are drawn (Build Lab puts its tool targets there) */
 export const SPOTS = { panel: (height: Design['height']) => [CX, PANEL_Y[height]] as const, fan: [292, 160] as const }
 
 function mix(a: string, b: string, k: number) {
@@ -51,15 +51,15 @@ type Props = {
   className?: string
   /** draw the panels' shadows (off in the Home sky band, where long shadows would end at the picture's edge) */
   shadows?: boolean
-  /** Learn only: the panel's angle (default: the fixed Sun Day angle) */
+  /** Build Lab only: the panel's angle (default: the fixed Sun Day angle) */
   tilt?: number
-  /** Learn only: a cloud in front of the sun */
+  /** Build Lab only: a cloud in front of the sun */
   cloud?: boolean
-  /** Learn only: fan and LED state when there is no played hour; fan speed as seconds per turn */
+  /** Build Lab only: fan and LED state when there is no played hour; fan speed as seconds per turn */
   fanOn?: boolean
   fanSpin?: number
   ledOn?: boolean
-  /** Learn only: extra layers on top (tool targets) */
+  /** Build Lab only: extra layers on top (tool targets) */
   children?: React.ReactNode
 }
 

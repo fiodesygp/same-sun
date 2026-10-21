@@ -1,4 +1,4 @@
-// Electrical model for the Learn missions: volts, amps and watts from one or two small panels
+// Electrical model for the Build Lab deck missions: volts, amps and watts from one or two small panels
 // to a fan, an LED and a pump. Kept simple and correct for 12-year-olds:
 // - Light on the panel comes from the sun's position (sunAt), the panel's tilt and clouds.
 // - One panel: current follows the light; voltage rises quickly in dim light, then holds.
@@ -6,7 +6,7 @@
 //   Power = voltage × current, so identical panels give the same best power either way.
 // - Bench: a switch (off = no current), a potentiometer that scales the fan's voltage, polarity,
 //   and loads that share the current (a fan short of current slows down). Every constant is in model.json (electric), all estimates.
-// Build Lab keeps its own watts budget (src/lab/circuit.ts); this model is for Learn only.
+// The free-wiring circuits keep their own watts budget (src/lab/circuit.ts).
 import defaultModel from '../config/model.json'
 import { sunAt } from './simulate'
 import type { Model, WeatherKey } from './types'

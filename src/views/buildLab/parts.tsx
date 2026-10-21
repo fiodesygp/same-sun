@@ -4,9 +4,10 @@ import model from '../../config/model.json'
 import type { Vars } from '../../i18n/t'
 import { arrayOut, lightToFc, openVoltage, panelOut } from '../../sim/electric'
 import type { MissionId } from '../../lib/learn'
+import type { PartId } from '../../lib/parts'
 import { num } from './Bench'
 
-export type PartId = 'panel' | 'led' | 'fan' | 'pump' | 'switch' | 'pot' | 'lightMeter' | 'multimeter' | 'tachometer'
+export type { PartId }
 
 export interface PartDef {
   id: PartId
@@ -26,6 +27,7 @@ export const PARTS: PartDef[] = [
   { id: 'pump', mission: 'pump', numbers: () => ({ v: num(e.pump.minV), a: num(e.pump.amps, 2), ml: num(e.pump.mlPerMinute, 0) }) },
   { id: 'switch', mission: 'm4', numbers: () => ({}) },
   { id: 'pot', mission: 'm4', numbers: () => ({}) },
+  { id: 'wires', mission: 'm1', numbers: () => ({}) },
   { id: 'lightMeter', mission: 'm3', numbers: () => ({ fc: num(lightToFc(1), 0), cloudFc: num(lightToFc(e.cloudLight), 0) }) },
   { id: 'multimeter', mission: 'm3', numbers: () => ({ v: num(full().v), v2: num(arrayOut(1, 2, 'series').v) }) },
   { id: 'tachometer', mission: 'm3', numbers: () => ({ v: num(full().v), rpm: num(Math.round(e.fan.rpmPerVolt * full().v), 0) }) }
@@ -46,6 +48,7 @@ export function PartIcon({ id }: { id: PartId }) {
     pot: <><circle cx="20" cy="20" r="12" {...S} /><path d="M20 20l6-7M11 31l-3 3M29 31l3 3" {...S} /></>,
     lightMeter: <><rect x="10" y="12" width="20" height="24" rx="3" {...S} /><rect x="14" y="16" width="12" height="7" rx="1" {...S} /><path d="M20 4v4M10 7l2 3M30 7l-2 3" {...S} /></>,
     multimeter: <><rect x="9" y="4" width="22" height="28" rx="3" {...S} /><rect x="13" y="8" width="14" height="7" rx="1" {...S} /><circle cx="20" cy="24" r="4" {...S} /><path d="M14 32l-4 6M26 32l4 6" {...S} /></>,
+    wires: <><path d="M6 10c8 0 8 8 16 8s8-8 12-8M6 22c8 0 8 8 16 8s8-8 12-8" {...S} /><path d="M3 8l4 2-4 2M3 20l4 2-4 2" {...S} /></>,
     tachometer: <><path d="M6 28a14 14 0 1 1 28 0" {...S} /><path d="M20 28l7-9M6 28h28" {...S} /></>
   }
   return <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">{d[id]}</svg>

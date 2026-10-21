@@ -14,7 +14,7 @@ type Props = {
   defaultStage: StageId | null
   /** message to show when the form opens (after saving an edit) */
   initialMsg?: Key
-  /** opened from a Learn mission's sketch button: tag the entry with it */
+  /** opened from a Build Lab step's sketch button: tag the entry with it */
   initialMission?: MissionId
   onSave: (d: Draft) => Promise<StoreErrorKind | null>
   onCancelEdit: () => void

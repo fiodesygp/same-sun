@@ -6,8 +6,10 @@
 - Source of truth: `docs/prototype/same-sun-prototype.html` for screens, wording, layout, colors and the simulation. `docs/game-concept.md` is background. Where they disagree, follow the prototype.
 
 ## Screens
-- Five tabs: Home, Sun Day, Build Lab, Growth Story, Learn. On phones the Growth Story tab label is shortened to "Story".
-- Learn follows the SCN 202 Solar Card Deck (7 missions + bonus AgriPV, pump, Reflect; Sun Monitor; part cards). Its volts/amps/watts model (`src/sim/electric.ts`) is Learn only; Build Lab keeps its watts budget.
+- Four tabs: Home, Sun Day, Build Lab, Growth Story.
+- Build Lab is one guided path in two stages: "Meet the parts" (10 part cards, each with a quick check) unlocks "Try it" (13 steps: the 7 SCN 202 Solar Card Deck missions, then the Build Lab challenges and the bonus cards, in `PATH` in `src/lib/learn.ts`), plus the Sun Monitor. Learners can skip ahead.
+- The free-wiring circuits use the watts budget in `src/lab/`; the deck missions use the volts/amps/watts model in `src/sim/electric.ts`.
+- Saved progress: `samesun:learn` (steps), `samesun:parts` (quick checks). `migrate()` carries old Build Lab levels (`samesun:buildLabSolved`) into the path; it only adds and never deletes old keys.
 - Match the prototype. Tell me before changing a screen's content or flow.
 
 ## Stack

@@ -5,7 +5,6 @@ import { load, save } from './lib/storage'
 import { BuildLab } from './views/BuildLab'
 import { GrowthStory, type SketchRequest } from './views/GrowthStory'
 import { Home } from './views/Home'
-import { Learn } from './views/Learn'
 import { SunDay } from './views/SunDay'
 
 const savedLang = (): Lang => (load<string>('lang', 'en') === 'es' ? 'es' : 'en')
@@ -32,9 +31,8 @@ export function App() {
   const views: Record<TabId, React.ReactNode> = {
     home: <Home onGo={select} active={tab === 'home'} />,
     sunDay: <SunDay />,
-    buildLab: <BuildLab />,
-    growthStory: <GrowthStory active={tab === 'growthStory'} sketch={sketch} />,
-    learn: <Learn active={tab === 'learn'} onSketch={mission => { setSketch(s => ({ mission, n: (s?.n ?? 0) + 1 })); select('growthStory') }} />
+    buildLab: <BuildLab active={tab === 'buildLab'} onSketch={mission => { setSketch(s => ({ mission, n: (s?.n ?? 0) + 1 })); select('growthStory') }} />,
+    growthStory: <GrowthStory active={tab === 'growthStory'} sketch={sketch} />
   }
 
   // every view stays mounted (hidden when inactive) so a tab keeps its state when you switch away

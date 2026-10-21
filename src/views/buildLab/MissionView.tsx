@@ -27,11 +27,12 @@ export function MissionView({ def: d, record, onEvidence, onDone, onBack, onSket
   return (
     <article className="mission-view" aria-labelledby="mission-title">
       <button className="back" type="button" ref={backRef} onClick={onBack}>{t('learn.back')}</button>
-      <header className={`mission-head ${d.colour ? `deck-${d.colour}` : 'deck-bonus'}`}>
-        <span className="deck-chip">{d.colour ? t(`learn.colour.${d.colour}`) : t('learn.bonus')}</span>
+      <header className={`mission-head ${d.colour ? `deck-${d.colour}` : `deck-${d.kind}`}`}>
+        <span className="deck-chip">{d.colour ? t(`learn.colour.${d.colour}`) : t(d.kind === 'challenge' ? 'learn.challenge' : 'learn.bonus')}</span>
         <h1 id="mission-title" className="page-title">{title}</h1>
         <p className="card-chip">
-          {d.colour ? t('learn.cardChip', { title: t(k('card')), colour: t(`learn.colour.${d.colour}`) }) : t('learn.cardChipBonus', { title: t(k('card')) })}
+          {d.colour ? t('learn.cardChip', { title: t(k('card')), colour: t(`learn.colour.${d.colour}`) })
+            : d.kind === 'challenge' ? t('learn.challengeNote') : t('learn.cardChipBonus', { title: t(k('card')) })}
         </p>
       </header>
 

@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { MISSIONS } from '../../lib/learn'
+import { MISSIONS, PATH } from '../../lib/learn'
 import { MISSION_DEFS, READY } from './missions'
 
-describe('Learn missions', () => {
-  it('follow the deck: 7 coloured missions, then 3 bonus cards', () => {
-    expect(MISSION_DEFS.map(d => d.id)).toEqual(MISSIONS)
-    expect(MISSION_DEFS.map(d => d.colour)).toEqual(['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'magenta', null, null, null])
+describe('Build Lab steps', () => {
+  it('follow the path: 7 deck missions in deck colours, then challenges and bonus cards', () => {
+    expect(MISSION_DEFS.map(d => d.id)).toEqual(PATH)
+    expect(MISSION_DEFS.map(d => d.colour)).toEqual(['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'magenta', null, null, null, null, null, null])
+    expect(MISSION_DEFS.map(d => d.kind).join(' ')).toBe('deck deck deck deck deck deck deck challenge bonus challenge challenge bonus bonus')
   })
   it('none can be marked done with no evidence', () => {
     for (const id of MISSIONS) expect(READY[id]({}), id).toBe(false)
@@ -19,6 +20,9 @@ describe('Learn missions', () => {
       m5: { together: [['led', 'fan']] },
       m6: { newlyPowered: [['pump']] },
       m7: { series: { v: 10, a: 0.2, w: 2 }, parallel: { v: 5, a: 0.4, w: 2 } },
+      both: { solved: true },
+      all: { solved: true },
+      fix: { solved: true },
       agripv: { light: 'Read at night', fan: 'Cool the plant', pump: 'Water it', sunScore: 128 },
       pump: { pumpRan: true },
       reflect: { saved: true }

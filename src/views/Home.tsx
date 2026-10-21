@@ -4,7 +4,7 @@ import { Scene } from '../components/Scene'
 import type { TabId } from '../components/Header'
 import { t } from '../i18n/t'
 import { growthStoryStore } from '../lib/growthStory'
-import { loadSolved } from '../lib/progress'
+import { loadLearn, PATH, pathDone } from '../lib/learn'
 import { bestScore } from '../lib/runs'
 
 const HERO_DESIGN = { panels: 'both', height: 'high', weather: 'october', fan: true, pump: true } as const
@@ -48,7 +48,7 @@ export function Home({ onGo, active }: Props) {
   // progress read from this device each time Home opens
   useEffect(() => {
     if (!active) return
-    setProgress(p => ({ ...p, best: bestScore(), solved: loadSolved().length }))
+    setProgress(p => ({ ...p, best: bestScore(), solved: pathDone(loadLearn()) }))
     growthStoryStore.all().then(xs => setProgress(p => ({ ...p, stories: xs.length })), () => setProgress(p => ({ ...p, stories: 0 })))
   }, [active])
 
@@ -56,7 +56,7 @@ export function Home({ onGo, active }: Props) {
     { tab: 'sunDay', icon: ICONS.sun, title: t('tabs.sunDay'), goal: t('home.m.sunDay.goal'),
       progress: progress.best === null ? t('home.m.sunDay.none') : t('home.m.sunDay.progress', { score: progress.best }) },
     { tab: 'buildLab', icon: ICONS.bolt, title: t('tabs.buildLab'), goal: t('home.m.buildLab.goal'),
-      progress: t('home.m.buildLab.progress', { n: progress.solved }) },
+      progress: t('home.m.buildLab.progress', { n: progress.solved, total: PATH.length }) },
     { tab: 'growthStory', icon: ICONS.sprout, title: t('growthStory.eyebrow'), goal: t('home.m.growthStory.goal'),
       progress: progress.stories ? t('home.m.growthStory.progress', { n: progress.stories }) : t('home.m.growthStory.none') }
   ] as const
