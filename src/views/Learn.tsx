@@ -7,7 +7,7 @@ import { SunMonitor } from './learn/SunMonitor'
 import { PartView } from './learn/PartView'
 import { PARTS, PartIcon, type PartId } from './learn/parts'
 
-type Props = { active: boolean; onSketch: () => void }
+type Props = { active: boolean; onSketch: (mission: MissionId) => void }
 /** what is open: a mission, or one of the tools */
 type Open = MissionId | 'monitor' | `part:${PartId}`
 
@@ -42,7 +42,7 @@ export function Learn({ active, onSketch }: Props) {
   if (open) {
     const id = open as MissionId
     return (
-      <MissionView def={def(id)} record={state[id]} onBack={() => show(null)} onSketch={onSketch}
+      <MissionView def={def(id)} record={state[id]} onBack={() => show(null)} onSketch={() => onSketch(id)}
         onEvidence={(patch: Evidence) => setState(saveEvidence(id, patch))} onDone={() => setState(markDone(id))} />
     )
   }

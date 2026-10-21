@@ -6,7 +6,8 @@
 - Source of truth: `docs/prototype/same-sun-prototype.html` for screens, wording, layout, colors and the simulation. `docs/game-concept.md` is background. Where they disagree, follow the prototype.
 
 ## Screens
-- Four tabs: Home, Sun Day, Build Lab, Growth Story.
+- Five tabs: Home, Sun Day, Build Lab, Growth Story, Learn. On phones the Growth Story tab label is shortened to "Story".
+- Learn follows the SCN 202 Solar Card Deck (7 missions + bonus AgriPV, pump, Reflect; Sun Monitor; part cards). Its volts/amps/watts model (`src/sim/electric.ts`) is Learn only; Build Lab keeps its watts budget.
 - Match the prototype. Tell me before changing a screen's content or flow.
 
 ## Stack

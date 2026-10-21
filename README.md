@@ -12,12 +12,13 @@ Same Sun is a short design-and-test game for the **miniAgriPV** project (Girl Sc
 - **Sun Day:** pick a plant, panel and day, predict, then watch a sunny Arizona day and see the Sun Score with feedback.
 - **Build Lab:** wire the panel to a fan, an LED, both, or a water pump.
 - **Growth Story Card:** add a photo and a few words at each step of the real project.
+- **Learn:** seven missions that follow the SCN 202 Solar Card Deck (circuits, measuring, switch and dial, series and parallel), three bonus missions, a Sun Monitor and a card for each part of the kit.
 
 It works on phones, tablets and computers, in English and Spanish, and offline after the first visit.
 
 ## Privacy: everything stays on the device
 
-Players are minors, so the game has no accounts, no backend, no analytics and no tracking. Growth Story entries and photos are stored only in the browser on the device (IndexedDB); the last Sun Day design, test runs and language choice are stored in localStorage. Nothing is uploaded or shared. Clearing the browser's site data removes it all.
+Players are minors, so the game has no accounts, no backend, no analytics and no tracking. Growth Story entries and photos are stored only in the browser on the device (IndexedDB); the last Sun Day design, test runs, Learn mission progress and language choice are stored in localStorage. Nothing is uploaded or shared. Clearing the browser's site data removes it all.
 
 ## For adults: the numbers are estimates
 
@@ -59,10 +60,11 @@ If the tests or build fail, nothing is published on either host.
 
 ## Project layout
 
-- `src/sim/`: the simulation, feedback rules and challenges (pure functions, unit tested)
+- `src/sim/`: the simulation, feedback rules and challenges (pure functions, unit tested); `electric.ts` is the volts/amps/watts model used only by Learn
 - `src/config/model.json`: every simulation constant, to tune with the real kit
 - `src/i18n/en.json`, `src/i18n/es.json`: all UI text
 - `src/lab/`: the Build Lab circuit checker
+- `src/views/learn/`: the Learn missions, bench, Sun Monitor and part cards
 - `src/views/`, `src/components/`, `src/styles/`: screens and styles
 - `docs/`: the prototype (`docs/prototype/same-sun-prototype.html`) and the game concept
 - `CLAUDE.md`: project rules for contributors

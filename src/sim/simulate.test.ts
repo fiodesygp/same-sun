@@ -19,6 +19,11 @@ describe('sunlight and panel power', () => {
   it('no panel means no power at any hour', () => {
     expect(simulate({ ...base, panels: 'none' }).energy).toBe(0)
   })
+
+  it('Sun Day uses the fixed angle; Learn can set its own', () => {
+    expect(simulate({ ...base, tilt: model.fixed.tilt })).toEqual(simulate(base))
+    expect(simulate({ ...base, tilt: 10 }).energy).not.toBe(simulate({ ...base, tilt: 40 }).energy)
+  })
 })
 
 describe('shade', () => {

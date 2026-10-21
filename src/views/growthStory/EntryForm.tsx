@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { t, type Key } from '../../i18n/t'
 import { STAGES, stageKind, type GrowthStoryEntry, type StageId } from '../../lib/growthStory'
+import { CORE, BONUS, type MissionId } from '../../lib/learn'
 import { shrinkPhoto } from '../../lib/photo'
 import type { StoreErrorKind } from '../../lib/storage'
 
-export type Draft = { stage: StageId; story: string; photo: string | null }
+export type Draft = { stage: StageId; story: string; photo: string | null; mission?: MissionId }
 
 type Props = {
   /** the entry being edited, or null for a new one */
@@ -13,16 +14,19 @@ type Props = {
   defaultStage: StageId | null
   /** message to show when the form opens (after saving an edit) */
   initialMsg?: Key
+  /** opened from a Learn mission's sketch button: tag the entry with it */
+  initialMission?: MissionId
   onSave: (d: Draft) => Promise<StoreErrorKind | null>
   onCancelEdit: () => void
 }
 
 const ERR: Record<StoreErrorKind, Key> = { full: 'growthStory.errFull', blocked: 'growthStory.errBlocked', failed: 'growthStory.errFailed' }
 
-export function EntryForm({ editing, defaultStage, initialMsg, onSave, onCancelEdit }: Props) {
+export function EntryForm({ editing, defaultStage, initialMsg, initialMission, onSave, onCancelEdit }: Props) {
   const [stage, setStage] = useState<StageId | null>(editing?.stage ?? defaultStage)
   const [story, setStory] = useState(editing?.story ?? '')
   const [photo, setPhoto] = useState<string | null>(editing?.photo ?? null)
+  const [mission, setMission] = useState<MissionId | ''>(editing?.mission ?? initialMission ?? '')
   const [photoState, setPhotoState] = useState<'idle' | 'loading' | 'error'>('idle')
   const [msg, setMsg] = useState<Key | null>(initialMsg ?? null)
   const [busy, setBusy] = useState(false)
@@ -82,12 +86,13 @@ export function EntryForm({ editing, defaultStage, initialMsg, onSave, onCancelE
       return
     }
     setBusy(true)
-    const err = await onSave({ stage, story: text, photo })
+    const err = await onSave({ stage, story: text, photo, mission: mission || undefined })
     setBusy(false)
     if (err) return setMsg(ERR[err]) // keep everything on screen so nothing is lost
     if (!editing) {
       setStory('')
       setPhoto(null)
+      setMission('')
       setMsg('growthStory.saved')
     }
   }
@@ -121,6 +126,15 @@ export function EntryForm({ editing, defaultStage, initialMsg, onSave, onCancelE
           {photo && <button type="button" className="linkbtn" onClick={() => setPhoto(null)}>{t('growthStory.removePhoto')}</button>}
         </div>
       </fieldset>
+      <div className="field">
+        <label htmlFor="gsMission">{t('growthStory.fromMission')} <span className="opt">{t('growthStory.optional')}</span></label>
+        <select id="gsMission" value={mission} onChange={e => setMission(e.target.value as MissionId | '')}>
+          <option value="">{t('growthStory.noMission')}</option>
+          {[...CORE, ...BONUS].map((m, i) => (
+            <option key={m} value={m}>{i < CORE.length ? t('learn.missionNumber', { n: i + 1 }) + ' · ' : ''}{t(`learn.m.${m}.title`)}</option>
+          ))}
+        </select>
+      </div>
       <fieldset>
         <legend><label htmlFor="gsStory">{t('growthStory.whatHappened')}</label></legend>
         <textarea id="gsStory" ref={storyRef} rows={5} maxLength={1200} placeholder={t('growthStory.placeholder')}

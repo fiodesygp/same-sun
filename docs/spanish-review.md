@@ -51,4 +51,36 @@ Questions for these three:
 | New puzzle | Nuevo reto | — |
 | °F | °F | Fine for a US audience? |
 
+## New: the Learn tab
+
+| English | Spanish now | To check |
+|---|---|---|
+| Learn (tab) | Aprende | — |
+| Story (short tab label on phones) | Historia | — |
+| Solar Power | Energía solar | — |
+| mission / bonus | misión / extra | — |
+| Card: {title} ({colour}) | Tarjeta: {title} ({colour}) | Deck card titles are translated; match the printed deck if it has Spanish? |
+| Mark as done | Marcar como terminada | — |
+| Values are estimates until we measure the real kit. | Los valores son estimaciones hasta que midamos el kit de verdad. | — |
+| switch / dial (potentiometer) | interruptor / perilla (potenciómetro) | "perilla" or "botón giratorio"? |
+| flip the polarity | invertir la polaridad | — |
+| in series / in parallel | en serie / en paralelo | — |
+| test bench | banco de pruebas | — |
+| light meter | luxómetro | It reads foot-candles (FC), not lux. "Medidor de luz" instead? |
+| foot-candles (FC) | pies-candela (FC) | — |
+| multimeter / tachometer | multímetro / tacómetro | — |
+| volts / amps / watts | voltios / amperios / vatios | — |
+| only a trickle (pump) | solo un hilito | Natural? |
+| Sun Monitor | Monitor solar | — |
+| Run the day | Correr el día | Or "Simular el día"? |
+| soil moisture | humedad del suelo | — |
+| Parts of your kit | Las piezas de tu kit | — |
+| What it is / How it works / Try it / Numbers | Qué es / Cómo funciona / Pruébalo / Números | — |
+| Reflect (Growth Story step) | Reflexiona | — |
+| From a mission (photo tag) | De una misión | — |
+| Shade on the plant: A little / Some / A lot | Sombra sobre la planta: Poca / Media / Mucha | — |
+| Low / Medium / High (light), Slow / Medium / Fast (fan) | Poca / Media / Mucha, Lento / Medio / Rápido | — |
+
+The four Reflect questions (`learn.m.reflect.q.0`–`3`) and the part cards (`learn.part.*`) are short and written for a grade 3–4 reading level; please check that the Spanish keeps them as simple.
+
 The partner names in the credits (Girl Scouts Beyond Bars, ASU Mary Lou Fulton College for Teaching and Learning Innovation) are left in English. Is there an official Spanish form?

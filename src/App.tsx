@@ -3,7 +3,7 @@ import { Header, TABS, type TabId } from './components/Header'
 import { setLang, type Lang } from './i18n/t'
 import { load, save } from './lib/storage'
 import { BuildLab } from './views/BuildLab'
-import { GrowthStory } from './views/GrowthStory'
+import { GrowthStory, type SketchRequest } from './views/GrowthStory'
 import { Home } from './views/Home'
 import { Learn } from './views/Learn'
 import { SunDay } from './views/SunDay'
@@ -13,6 +13,7 @@ const savedLang = (): Lang => (load<string>('lang', 'en') === 'es' ? 'es' : 'en'
 export function App() {
   const [tab, setTab] = useState<TabId>('home')
   const [lang, setLangState] = useState<Lang>(savedLang)
+  const [sketch, setSketch] = useState<SketchRequest | null>(null)
   // t() reads the language when each view renders, so set it before rendering the tree
   setLang(lang)
 
@@ -32,8 +33,8 @@ export function App() {
     home: <Home onGo={select} active={tab === 'home'} />,
     sunDay: <SunDay />,
     buildLab: <BuildLab />,
-    growthStory: <GrowthStory active={tab === 'growthStory'} />,
-    learn: <Learn active={tab === 'learn'} onSketch={() => select('growthStory')} />
+    growthStory: <GrowthStory active={tab === 'growthStory'} sketch={sketch} />,
+    learn: <Learn active={tab === 'learn'} onSketch={mission => { setSketch(s => ({ mission, n: (s?.n ?? 0) + 1 })); select('growthStory') }} />
   }
 
   // every view stays mounted (hidden when inactive) so a tab keeps its state when you switch away

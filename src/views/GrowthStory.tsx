@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { t, type Key } from '../i18n/t'
 import { growthStoryStore, newestFirst, type GrowthStoryEntry } from '../lib/growthStory'
+import type { MissionId } from '../lib/learn'
 import { loadRuns, type SavedRun } from '../lib/runs'
 import { StoreError } from '../lib/storage'
 import { EntryForm, type Draft } from './growthStory/EntryForm'
@@ -8,22 +9,34 @@ import { EntryList } from './growthStory/EntryList'
 import { EntryView } from './growthStory/EntryView'
 import { RunsTable } from './growthStory/RunsTable'
 
-export function GrowthStory({ active }: { active: boolean }) {
+/** a request from Learn to add a photo for a mission; n changes on every request */
+export type SketchRequest = { mission: MissionId; n: number }
+
+export function GrowthStory({ active, sketch }: { active: boolean; sketch?: SketchRequest | null }) {
   const [entries, setEntries] = useState<GrowthStoryEntry[]>([])
   const [loadFailed, setLoadFailed] = useState(false)
   const [openId, setOpenId] = useState<number | null>(null)
   const [editing, setEditing] = useState<GrowthStoryEntry | null>(null)
   // a new key remounts the form fresh (after an edit is saved or cancelled)
-  const [form, setForm] = useState<{ key: number; msg?: Key }>({ key: 0 })
+  const [form, setForm] = useState<{ key: number; msg?: Key; mission?: MissionId }>({ key: 0 })
   const [runs, setRuns] = useState<SavedRun[]>([])
   const [pinned, setPinned] = useState(false)
   const formRef = useRef<HTMLDivElement>(null)
   const listHeadingRef = useRef<HTMLHeadingElement>(null)
   const focusList = useRef(false)
 
+  // Learn's Reflect saves entries while this tab is hidden, so reload each time it opens
   useEffect(() => {
-    growthStoryStore.all().then(xs => setEntries(newestFirst(xs)), () => setLoadFailed(true))
-  }, [])
+    if (active) growthStoryStore.all().then(xs => setEntries(newestFirst(xs)), () => setLoadFailed(true))
+  }, [active])
+
+  // from a Learn mission's sketch button: a fresh form tagged with that mission
+  useEffect(() => {
+    if (!sketch) return
+    setEditing(null)
+    setOpenId(null)
+    setForm(f => ({ key: f.key + 1, mission: sketch.mission }))
+  }, [sketch])
   // pin the form (wide layouts) only while it fits under the header; a photo or a long story
   // can make it taller, and then it should scroll with the page so Save is never out of reach
   useEffect(() => {
@@ -113,7 +126,7 @@ export function GrowthStory({ active }: { active: boolean }) {
       ) : (
         <div className="cols jcols">
           <div ref={formRef} className={pinned ? 'gs-form pinned' : 'gs-form'}>
-            <EntryForm key={form.key} editing={editing} defaultStage={entries[0]?.stage ?? null} initialMsg={form.msg} onSave={save}
+            <EntryForm key={form.key} editing={editing} defaultStage={entries[0]?.stage ?? null} initialMsg={form.msg} initialMission={form.mission} onSave={save}
               onCancelEdit={() => { setEditing(null); setForm({ key: form.key + 1 }) }} />
           </div>
           <div className="stack">

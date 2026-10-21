@@ -161,7 +161,7 @@ export function M3({ evidence: e, save }: BodyProps) {
             <legend>{t(k === 'light' ? 'learn.m3.rateLight' : 'learn.m3.rateFan')}</legend>
             <div className="seg">
               {LEVELS[k].map(v => (
-                <button key={v} type="button" aria-pressed={senses[k] === v} onClick={() => save({ senses: { ...senses, [k]: v } })}>{t(`learn.rate.${v}` as Key)}</button>
+                <button key={v} type="button" aria-pressed={senses[k] === v} onClick={() => save({ senses: { ...senses, [k]: v } })}>{t((k === 'fan' && v === 'medium' ? 'learn.rate.mediumFan' : `learn.rate.${v}`) as Key)}</button>
               ))}
             </div>
           </fieldset>

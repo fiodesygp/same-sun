@@ -25,6 +25,7 @@ export function EntryView({ entry: x, onBack, onEdit, onDelete }: Props) {
       <div className="meta">
         <span className={`stag ${stageKind(x.stage)}`}>{step}</span>
         <span className="when">{fmtDate(x.when)}</span>
+        {x.mission && <span className="mtag">{t('growthStory.missionTag', { title: t(`learn.m.${x.mission}.title`) })}</span>}
       </div>
       {x.photo && <img src={x.photo} alt={t('growthStory.photoAlt', { step })} />}
       {x.story && <p>{x.story}</p>}

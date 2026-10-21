@@ -5,6 +5,7 @@ import type { Evidence } from './missions'
 import { MiniLab } from './MiniLab'
 import { M4, M5, M6, M7 } from './benchBodies'
 import { M2, M3 } from './skyBodies'
+import { AgriPV, Reflect } from './bonusBodies'
 
 export interface BodyProps {
   evidence: Evidence
@@ -56,7 +57,9 @@ const BODIES: Partial<Record<MissionId, (p: BodyProps) => React.ReactNode>> = {
   m5: p => <M5 {...p} />,
   m6: p => <M6 {...p} />,
   m7: p => <M7 {...p} />,
-  pump: p => <Pump {...p} />
+  pump: p => <Pump {...p} />,
+  agripv: p => <AgriPV {...p} />,
+  reflect: p => <Reflect {...p} />
 }
 
 export function MissionBody({ id, ...props }: BodyProps & { id: MissionId }) {

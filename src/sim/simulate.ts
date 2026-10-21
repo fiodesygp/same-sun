@@ -37,9 +37,9 @@ function powerAt(h: number, panels: PanelKey, tilt: number, w: Weather, m: Model
   return sun * m.panels[panels].area * m.eta * tiltFactor
 }
 
-/** Panel power (W) at hour h, at the fixed tilt. */
-export function panelPower(h: number, d: Pick<Design, 'panels' | 'weather'>, m: Model = defaultModel) {
-  return powerAt(h, d.panels, m.fixed.tilt, m.weather[d.weather], m)
+/** Panel power (W) at hour h, at the fixed tilt (or the design's own, in Learn). */
+export function panelPower(h: number, d: Pick<Design, 'panels' | 'weather' | 'tilt'>, m: Model = defaultModel) {
+  return powerAt(h, d.panels, d.tilt ?? m.fixed.tilt, m.weather[d.weather], m)
 }
 
 /**
