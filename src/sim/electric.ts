@@ -5,7 +5,7 @@
 // - Two panels: series adds the voltages (same current); parallel adds the currents (same voltage).
 //   Power = voltage × current, so identical panels give the same best power either way.
 // - Bench: a switch (off = no current), a potentiometer that scales the fan's voltage, polarity,
-//   and loads that share the current. Every constant is in model.json (electric), all estimates.
+//   and loads that share the current (a fan short of current slows down). Every constant is in model.json (electric), all estimates.
 // Build Lab keeps its own watts budget (src/lab/circuit.ts); this model is for Learn only.
 import defaultModel from '../config/model.json'
 import { sunAt } from './simulate'
@@ -124,9 +124,11 @@ export function runBench(b: Bench, m: Model = defaultModel): BenchResult {
     } else if (load === 'fan') {
       const fv = v * clamp(b.pot, 0, 1)
       res.fan.v = fv
-      if (fv < e.fan.startV || left < e.fan.amps) continue
-      res.fan = { v: fv, a: e.fan.amps, rpm: dir * Math.round(e.fan.rpmPerVolt * fv) }
-      left -= e.fan.amps
+      // short of current, the motor slows down; below startShare of what it needs, it stalls
+      const share = Math.min(1, left / e.fan.amps)
+      if (fv < e.fan.startV || share < e.fan.startShare) continue
+      res.fan = { v: fv, a: e.fan.amps * share, rpm: dir * Math.round(e.fan.rpmPerVolt * fv * share) }
+      left -= res.fan.a
     } else {
       if (v < e.pump.minV || left < e.pump.amps) continue
       // pumps have a + and a - side: wired backwards they only trickle

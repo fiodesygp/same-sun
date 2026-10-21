@@ -51,7 +51,7 @@
     "voltageKnee": 0.2,
     "fcFullSun": 10000,
     "cloudLight": 0.25,
-    "fan": { "startV": 0.8, "rpmPerVolt": 1100, "amps": 0.15 },
+    "fan": { "startV": 0.8, "rpmPerVolt": 1100, "amps": 0.15, "startShare": 0.3 },
     "led": { "minV": 1.8, "amps": 0.02 },
     "pump": { "minV": 3.0, "amps": 0.22, "mlPerMinute": 120 }
   },

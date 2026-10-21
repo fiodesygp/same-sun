@@ -11,6 +11,8 @@ const GAP_PX = { none: 0, small: 11, wide: 22 }
 const FONT = 'Source Sans 3, sans-serif'
 const INK = '#2B2F2C'
 const rad = (d: number) => (d * Math.PI) / 180
+/** where the middle of the panel and the fan are drawn (Learn puts its tool targets there) */
+export const SPOTS = { panel: (height: Design['height']) => [CX, PANEL_Y[height]] as const, fan: [292, 160] as const }
 
 function mix(a: string, b: string, k: number) {
   const pa = a.match(/\w\w/g)!.map(x => parseInt(x, 16)), pb = b.match(/\w\w/g)!.map(x => parseInt(x, 16))
@@ -19,8 +21,8 @@ function mix(a: string, b: string, k: number) {
 
 type Seg = { big: boolean; x1: number; y1: number; x2: number; y2: number }
 
-function panelSegs(d: Pick<Design, 'panels' | 'height'>): Seg[] {
-  const tilt = rad(model.fixed.tilt * 0.6), py = PANEL_Y[d.height]
+function panelSegs(d: Pick<Design, 'panels' | 'height'>, tiltDeg: number): Seg[] {
+  const tilt = rad(tiltDeg * 0.6), py = PANEL_Y[d.height]
   const g = GAP_PX[model.fixed.gap as keyof typeof GAP_PX]
   let parts: [number, number, boolean][] = []
   if (d.panels === 'small') parts = [[-32, 32, false]]
@@ -49,9 +51,20 @@ type Props = {
   className?: string
   /** draw the panels' shadows (off in the Home sky band, where long shadows would end at the picture's edge) */
   shadows?: boolean
+  /** Learn only: the panel's angle (default: the fixed Sun Day angle) */
+  tilt?: number
+  /** Learn only: a cloud in front of the sun */
+  cloud?: boolean
+  /** Learn only: fan and LED state when there is no played hour; fan speed as seconds per turn */
+  fanOn?: boolean
+  fanSpin?: number
+  ledOn?: boolean
+  /** Learn only: extra layers on top (tool targets) */
+  children?: React.ReactNode
 }
 
-export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, led = false, label, className = 'scene', shadows: showShadows = true }: Props) {
+export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, led = false, label, className = 'scene', shadows: showShadows = true,
+  tilt = model.fixed.tilt, cloud = false, fanOn: fanOverride, fanSpin, ledOn = false, children }: Props) {
   const w = model.weather[d.weather]
   const h = hr ? hr.h : idleHour
   const sun = sunAt(h, w)
@@ -59,7 +72,7 @@ export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, le
   const sx = 20 + ((h - model.hours.start) / (model.hours.end - model.hours.start)) * 320
   const sy = 186 - (sun.elev / 85) * 168
   const sunUp = sun.sun > 0 || !hr
-  const segs = panelSegs(d)
+  const segs = panelSegs(d, tilt)
 
   // shadow of each panel, cast from the sun onto the ground
   const shadows = sunUp && showShadows
@@ -92,7 +105,7 @@ export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, le
     ]
   })
 
-  const pumpOn = !!hr?.on.pump, fanOn = !!hr?.on.fan
+  const pumpOn = !!hr?.on.pump, fanOn = fanOverride ?? !!hr?.on.fan
   const L = segs[0], R = segs[segs.length - 1]
 
   return (
@@ -104,6 +117,11 @@ export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, le
           <circle cx={sx} cy={sy} r={20} fill="#FFE7A3" opacity={0.6} />
           <circle cx={sx} cy={sy} r={13} fill="#F2B705" />
         </>
+      )}
+      {cloud && sunUp && (
+        <g fill="#F4F6F8" stroke="#9AA6B2" strokeWidth={1.5}>
+          <path d={`M${sx - 30} ${sy + 12}a12 12 0 0 1 8-20a16 16 0 0 1 30-4a12 12 0 0 1 22 10a10 10 0 0 1 -2 14z`} />
+        </g>
       )}
       <rect x={-2000} y={GY} width={4360} height={34} fill="#C9A779" />
       <rect x={-2000} y={GY} width={4360} height={3} fill="#A8865A" />
@@ -147,7 +165,8 @@ export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, le
 
       {led && (
         <g>
-          <circle cx={226} cy={186} r={5} fill="#d9d4c2" stroke="#7a6a3a" strokeWidth={1} />
+          {ledOn && <circle cx={226} cy={186} r={11} fill="#FFE066" opacity={0.7} />}
+          <circle cx={226} cy={186} r={5} fill={ledOn ? '#FFD000' : '#d9d4c2'} stroke="#7a6a3a" strokeWidth={1} />
           <text x={226} y={210} textAnchor="middle" fontSize={9} fontFamily={FONT} fill={INK}>{t('scene.led')}</text>
         </g>
       )}
@@ -157,7 +176,7 @@ export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, le
           <rect x={296} y={172} width={8} height={24} fill="#7d7a72" />
           <rect x={286} y={192} width={28} height={5} rx={2} fill="#7d7a72" />
           <rect x={296} y={152} width={22} height={16} rx={4} fill="#B4B2A9" stroke="#5F5E5A" />
-          <g className={fanOn ? 'spin' : undefined}>
+          <g className={fanOn ? 'spin' : undefined} style={fanSpin ? { ['--spin' as string]: `${fanSpin}s` } : undefined}>
             <g className="blades">
               <ellipse cx={292} cy={147} rx={3} ry={13} fill="#378ADD" />
               <ellipse cx={292} cy={173} rx={3} ry={13} fill="#378ADD" />
@@ -177,6 +196,7 @@ export function Scene({ design: d, hour: hr, growth, tank = 1, idleHour = 12, le
       {hr && sun.sun <= 0 && (
         <text x={180} y={30} textAnchor="middle" fontSize={12} fill="#fff" fontFamily={FONT}>{t('scene.night')}</text>
       )}
+      {children}
     </svg>
   )
 }

@@ -82,3 +82,13 @@
 .readings th, .readings td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line) }
 .readings thead th { font-size: 13px; color: var(--muted) }
 .support-line { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--sun-soft); font-weight: 600 }
+
+/* ---------- missions 2 and 3: the scene and the tools ---------- */
+.learn-scene { justify-self: stretch; margin: 0 auto }
+.power-meter { display: grid; gap: 6px; font-weight: 600 }
+.best { font-family: var(--body); font-weight: 700; color: var(--good) }
+.tool-note { margin: 0; font-weight: 600 }
+.tool-target { cursor: pointer }
+.tool-target rect { fill: rgba(255, 255, 255, .25); stroke: #17241D; stroke-width: 2.5; stroke-dasharray: 6 4 }
+.tool-target:focus { outline: none }
+.tool-target:focus-visible rect, .tool-target:hover rect { stroke-width: 4; fill: rgba(255, 255, 255, .45) }

@@ -108,6 +108,12 @@ describe('bench: limits, two panels, series and parallel', () => {
     expect(s.fan.rpm).toBeGreaterThan(p.fan.rpm)
     expect(runBench(bench({ panels: 2, wiring: 'series', loads: { fan: true, led: true, pump: true } })).pump.on).toBe(false)
   })
+  it('in dim light the fan slows down, then stops', () => {
+    const rpm = (g: number) => runBench(bench({ g })).fan.rpm
+    expect(rpm(0.6)).toBeGreaterThan(0)
+    expect(rpm(0.6)).toBeLessThan(rpm(1))
+    expect(rpm(0.1)).toBe(0)
+  })
   it('the devices share the current: what they draw is never more than the panels give', () => {
     const r = runBench(bench({ panels: 2, loads: { fan: true, led: true, pump: true } }))
     expect(r.drawn.a).toBeLessThanOrEqual(r.supply.a + 1e-9)
