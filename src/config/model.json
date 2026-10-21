@@ -45,6 +45,17 @@
     "chili":   { "sat": 820, "hi": 90, "stress": 100, "water": 0.8 }
   },
 
+  "electric": {
+    "_todo": "TODO: replace with values measured on the real kit. Learn missions only; Build Lab uses lab.panelWatts.",
+    "panel": { "voc": 6.0, "vmp": 5.0, "imp": 0.2 },
+    "voltageKnee": 0.2,
+    "fcFullSun": 10000,
+    "cloudLight": 0.25,
+    "fan": { "startV": 0.8, "rpmPerVolt": 1100, "amps": 0.15 },
+    "led": { "minV": 1.8, "amps": 0.02 },
+    "pump": { "minV": 3.0, "amps": 0.22, "mlPerMinute": 120 }
+  },
+
   "lab": { "panelWatts": { "small": 0.6, "big": 1.8 }, "cloudShare": 0.1, "trickleWatts": 0.2 },
 
   "fixed": { "tilt": 30, "gap": "small", "priority": "fan", "trigger": 0.45, "tank": "large" },
