@@ -3,6 +3,7 @@ import { t } from '../../i18n/t'
 import type { MissionId } from '../../lib/learn'
 import type { Evidence } from './missions'
 import { MiniLab } from './MiniLab'
+import { M4, M5, M6, M7 } from './benchBodies'
 
 export interface BodyProps {
   evidence: Evidence
@@ -48,6 +49,10 @@ function Pump({ evidence, save }: BodyProps) {
 
 const BODIES: Partial<Record<MissionId, (p: BodyProps) => React.ReactNode>> = {
   m1: p => <M1 {...p} />,
+  m4: p => <M4 {...p} />,
+  m5: p => <M5 {...p} />,
+  m6: p => <M6 {...p} />,
+  m7: p => <M7 {...p} />,
   pump: p => <Pump {...p} />
 }
 

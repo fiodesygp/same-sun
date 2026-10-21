@@ -49,3 +49,36 @@
 .num { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums }
 .evidence-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; font-weight: 600 }
 .evidence-list span[aria-hidden] { color: var(--good); font-weight: 800 }
+
+/* ---------- the bench (missions 4-7, Sun Monitor) ---------- */
+.bench-svg { display: block; width: 100%; height: auto; max-height: 45svh; border-radius: 12px }
+.bench-controls { display: grid; gap: 12px }
+.slider { display: grid; gap: 4px; font-weight: 600 }
+.slider-top { display: flex; justify-content: space-between; gap: 8px }
+.slider input[type="range"] { width: 100%; min-height: 44px; margin: 0; accent-color: var(--green); cursor: pointer }
+.readouts { display: grid; gap: 8px; padding: 12px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line) }
+.readout-title { font-size: 14px; font-weight: 700; color: var(--muted) }
+.vaw { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 }
+.vaw div { display: grid; gap: 2px }
+.vaw dt, .device-states dt { font-size: 13px; font-weight: 700; color: var(--muted) }
+.vaw dd { margin: 0; font-size: 18px; font-weight: 700 }
+.device-states { display: grid; gap: 4px; margin: 0 }
+.device-states div { display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); padding-top: 4px }
+.device-states dt { font-size: 15px; color: var(--ink) }
+.device-states dd { margin: 0; font-weight: 600; text-align: right }
+.evidence .sub { font-size: 15px; margin: 0 }
+.evidence-list.checks li, .evidence-list.results li { font-weight: 600; color: var(--muted) }
+.evidence-list li.ok { color: var(--ink) }
+.evidence-list li.ok span[aria-hidden] { color: var(--good) }
+.evidence-list li.no span[aria-hidden] { color: var(--warn) }
+.answer { display: grid; gap: 6px }
+.answer label { font-weight: 700 }
+.optional { font-weight: 400; color: var(--muted) }
+.power-map { width: 100%; max-width: 280px; height: auto; justify-self: center; background: #fff; border-radius: 12px; border: 1px solid var(--line) }
+.sketch { display: grid; gap: 8px; justify-items: start; padding-top: 8px; border-top: 1px solid var(--line) }
+.save-reading { margin-top: 12px }
+.table-wrap { overflow-x: auto }
+.readings { width: 100%; border-collapse: collapse; font-size: 15px }
+.readings th, .readings td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line) }
+.readings thead th { font-size: 13px; color: var(--muted) }
+.support-line { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--sun-soft); font-weight: 600 }
