@@ -66,7 +66,7 @@ Questions for these three:
 | flip the polarity | invertir la polaridad | — |
 | in series / in parallel | en serie / en paralelo | — |
 | test bench | banco de pruebas | — |
-| light meter | luxómetro | It reads foot-candles (FC), not lux. "Medidor de luz" instead? |
+| light meter | medidor de luz | Changed from "luxómetro", because the meter reads foot-candles (FC), not lux. Is "medidor de luz" natural? |
 | foot-candles (FC) | pies-candela (FC) | — |
 | multimeter / tachometer | multímetro / tacómetro | — |
 | volts / amps / watts | voltios / amperios / vatios | — |

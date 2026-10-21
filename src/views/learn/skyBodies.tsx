@@ -71,7 +71,7 @@ export function M2({ evidence: e, save, onSketch }: BodyProps) {
                 {tries.map((x, i) => (
                   <tr key={i}>
                     <th scope="row">{setting(x)}</th>
-                    <td className="num">{num(x.w, 2)}{x.w === best && best > 0 && <span className="best"> ★ {t('learn.m2.most')}</span>}</td>
+                    <td><span className="num">{num(x.w, 2)}</span>{x.w === best && best > 0 && <span className="best-tag">{t('learn.m2.best')}</span>}</td>
                   </tr>
                 ))}
               </tbody>

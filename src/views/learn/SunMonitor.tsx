@@ -74,6 +74,7 @@ export function SunMonitor({ onBack }: { onBack: () => void }) {
         <div className="row wrap">
           <button className="btn" type="button" aria-pressed={running} onClick={run}>{t(running ? 'learn.mon.stop' : 'learn.mon.run')}</button>
         </div>
+        <p className="hint flat">{t('learn.mon.pumpFirst')}</p>
         <dl className="monitor-grid">
           {rows.map(([k, v]) => <div key={k}><dt>{k}</dt><dd className="num">{v}</dd></div>)}
         </dl>

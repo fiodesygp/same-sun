@@ -86,7 +86,7 @@
 /* ---------- missions 2 and 3: the scene and the tools ---------- */
 .learn-scene { justify-self: stretch; margin: 0 auto }
 .power-meter { display: grid; gap: 6px; font-weight: 600 }
-.best { font-family: var(--body); font-weight: 700; color: var(--good) }
+.best-tag { display: inline-block; margin-left: 8px; padding: 1px 8px; border: 1.5px solid var(--good); border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--ink); white-space: nowrap }
 .tool-note { margin: 0; font-weight: 600 }
 .tool-target { cursor: pointer }
 .tool-target rect { fill: rgba(255, 255, 255, .25); stroke: #17241D; stroke-width: 2.5; stroke-dasharray: 6 4 }
