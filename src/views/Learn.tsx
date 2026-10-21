@@ -57,7 +57,7 @@ export function Learn({ active, onSketch }: Props) {
         aria-label={t('learn.openMission', { label, title, status: t(done ? 'learn.statusDone' : 'learn.statusTodo') })}
         onClick={() => show(id)}>
         <span className="learn-card-top">
-          <span className="deck-chip">{d.colour ? i + 1 : '★'}</span>
+          <span className="deck-chip">{d.colour ? i + 1 : t('learn.bonus')}</span>
           {done && <span className="done-tag"><span aria-hidden="true">✓</span> {t('learn.statusDone')}</span>}
         </span>
         <span className="learn-card-title">{title}</span>
