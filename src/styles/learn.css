@@ -125,3 +125,7 @@
 .qc-result { margin: 0; min-height: 1.4em; font-weight: 600 }
 .qc-result.ok span[aria-hidden] { color: var(--good) }
 .qc-result.no span[aria-hidden] { color: var(--warn) }
+
+/* ---------- part illustrations (a light workbench plate in both themes) ---------- */
+.part-figure { margin: 0 }
+.part-art { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto }

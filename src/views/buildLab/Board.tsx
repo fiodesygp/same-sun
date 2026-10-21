@@ -7,6 +7,7 @@
 // 44 px tap target at every size the board is shown.
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { t, type Key } from '../../i18n/t'
+import { Blades, Led, Motor, PanelFace, Pump } from '../../components/parts/art'
 import { evaluate, levelTerms, LEVELS, nets, type Power, type TermId, type Wire } from '../../lab/circuit'
 
 const HIT = 27
@@ -203,8 +204,7 @@ export function Board(props: Props) {
       {/* big panel on two posts, above the plant */}
       <line x1={bx + 6} y1={by + 9} x2={bx + 6} y2={G} stroke="#8A7A62" strokeWidth={5} />
       <line x1={bx + 194} y1={by - 4} x2={bx + 194} y2={G} stroke="#8A7A62" strokeWidth={5} />
-      <polygon points={`${bx},${by} ${bx + 206},${by - 14} ${bx + 206},${by - 4} ${bx},${by + 10}`} fill="#1B3E66" stroke="#0C2A47" />
-      <path d={`M${bx + 48} ${by - 3.3} v10 M${bx + 100} ${by - 6.8} v10 M${bx + 152} ${by - 10.3} v10`} stroke="#4F7FB0" strokeWidth={1.2} />
+      <PanelFace x={bx} y={by} w={206} h={10} skew={14} cols={6} rows={1} />
       {txt(bx + 44, by - 18, t(two ? 'lab.svg.bigPanel' : 'lab.svg.panel'), { bold: true })}
       <path d={`M${bx + 90} ${by + 4} L${T['p+'][0]} ${T['p+'][1] - 8}`} stroke={RED} strokeWidth={3} fill="none" />
       <path d={`M${bx + 134} ${by + 1} L${T['p-'][0]} ${T['p-'][1] - 8}`} stroke={INK} strokeWidth={3} fill="none" />
@@ -212,8 +212,7 @@ export function Board(props: Props) {
       {two && (
         <g>
           <line x1={sx + 6} y1={sy + 8} x2={sx + 6} y2={G} stroke="#8A7A62" strokeWidth={4} />
-          <polygon points={`${sx},${sy} ${sx + 88},${sy - 8} ${sx + 88},${sy + 1} ${sx},${sy + 9}`} fill="#1B3E66" stroke="#0C2A47" />
-          <path d={`M${sx + 44} ${sy - 4} v9`} stroke="#4F7FB0" strokeWidth={1.2} />
+          <PanelFace x={sx} y={sy} w={88} h={9} skew={8} cols={3} rows={1} />
           {txt(sx + 44, sy - 18, t('lab.svg.smallPanel'), { bold: true, size: 11 })}
           <path d={`M${sx + 22} ${sy + 7} L${T['q+'][0]} ${T['q+'][1] - 8}`} stroke={RED} strokeWidth={3} fill="none" />
           <path d={`M${sx + 76} ${sy + 2} L${T['q-'][0]} ${T['q-'][1] - 8}`} stroke={INK} strokeWidth={3} fill="none" />
@@ -242,17 +241,10 @@ export function Board(props: Props) {
 
       {Lv.parts.includes('led') && (
         <g>
-          {ledOn && <circle cx={lx} cy={ly} r={20} fill="#FFE066" opacity={0.75} />}
+          <line x1={lx - 4} y1={ly + 16} x2={T.lL[0]} y2={T.lL[1]} stroke="#9AA3A8" strokeWidth={2} />
+          <line x1={lx + 4} y1={ly + 16} x2={T.lS[0]} y2={T.lS[1]} stroke="#9AA3A8" strokeWidth={2} />
           {burnt && <circle key={burntAt} className="flash" cx={lx} cy={ly} r={24} fill="#fff7c2" opacity={0} />}
-          <path d={`M${lx - 10} ${ly + 12} V${ly} A10 10 0 0 1 ${lx + 10} ${ly} V${ly + 12} Z`} fill={burnt ? '#5b5650' : ledOn ? '#FFD000' : '#E2DED0'} stroke="#7a6a3a" />
-          {burnt && (
-            <g aria-hidden="true">
-              <ellipse cx={lx} cy={ly + 2} rx={6} ry={4} fill="#1d1a17" opacity={0.75} />
-              <path d={`M${lx - 5} ${ly - 12} q3 -5 0 -9 M${lx + 3} ${ly - 12} q3 -5 0 -9`} fill="none" stroke="#6f6a64" strokeWidth={1.5} strokeLinecap="round" />
-            </g>
-          )}
-          <line x1={lx - 4} y1={ly + 12} x2={T.lL[0]} y2={T.lL[1]} stroke="#888" strokeWidth={2} />
-          <line x1={lx + 4} y1={ly + 12} x2={T.lS[0]} y2={T.lS[1]} stroke="#888" strokeWidth={2} />
+          <Led x={lx} y={ly} on={ledOn} burnt={burnt} />
           {txt(lx + Y.ledLabel[0], ly + Y.ledLabel[1], t('lab.svg.led'), { bold: true, size: 11 })}
         </g>
       )}
@@ -261,7 +253,7 @@ export function Board(props: Props) {
         <g>
           <rect x={tx} y={ty} width={56} height={40} rx={4} fill="#E9F3FA" stroke="#5c7a8f" strokeWidth={1.5} />
           <rect x={tx + 2} y={ty + 10} width={52} height={28} rx={2} fill="#3E8FD1" opacity={0.75} />
-          <rect x={tx + 18} y={ty + 20} width={22} height={14} rx={4} fill={pumpFull ? '#F2B705' : '#9aa7ad'} stroke="#4a5a62" />
+          <Pump x={tx + 29} y={ty + 16} s={0.45} running={pumpFull} />
           <path d={`M${T['w+'][0]} ${T['w+'][1] + 8} Q ${T['w+'][0]} ${ty + 4} ${tx + 22} ${ty + 20} M${T['w-'][0]} ${T['w-'][1] + 8} Q ${T['w-'][0] - 2} ${ty + 4} ${tx + 36} ${ty + 20}`} fill="none" stroke="#888" strokeWidth={2} />
           <path d={tubePath(Y.tank, Y.plant, G)} fill="none" stroke="#5c7a8f" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
           {txt(Y.tankLabel[0], Y.tankLabel[1], t('lab.svg.tank'), { size: 11, bold: true })}
@@ -278,19 +270,14 @@ export function Board(props: Props) {
         <g>
           <rect x={fx + 26} y={fy + 36} width={14} height={G - fy - 36} fill="#7d7a72" />
           <rect x={fx + 14} y={G - 4} width={38} height={4} rx={2} fill="#7d7a72" />
-          <rect x={fx} y={fy} width={66} height={36} rx={8} fill="#B4B2A9" stroke="#5F5E5A" />
-          <rect x={fx - 14} y={fy + 15} width={14} height={6} fill="#5F5E5A" />
+          <Motor x={fx} y={fy} />
           {txt(Y.motorLabel[0], Y.motorLabel[1], t('lab.svg.motor'), { bold: true, size: 11 })}
-          <line x1={T.mA[0]} y1={T.mA[1] + 8} x2={T.mA[0]} y2={fy} stroke="#888" strokeWidth={2} />
-          <line x1={T.mB[0]} y1={T.mB[1] + 8} x2={T.mB[0]} y2={fy} stroke="#888" strokeWidth={2} />
+          <line x1={T.mA[0]} y1={T.mA[1] + 8} x2={T.mA[0]} y2={fy - 7} stroke="#888" strokeWidth={2} />
+          <line x1={T.mB[0]} y1={T.mB[1] + 8} x2={T.mB[0]} y2={fy - 7} stroke="#888" strokeWidth={2} />
           {/* the fan spins slower when there is less power for it */}
           <g className={motorDir ? (motorDir < 0 ? 'spin rev' : 'spin') : undefined}
             style={motorDir ? ({ '--spin': `${0.5 / Math.max(0.2, pw.motor)}s` } as React.CSSProperties) : undefined}>
-            <g className="blades">
-              <ellipse cx={blades[0]} cy={blades[1] - 14} rx={4} ry={14} fill="#378ADD" />
-              <ellipse cx={blades[0]} cy={blades[1] + 14} rx={4} ry={14} fill="#378ADD" />
-              <circle cx={blades[0]} cy={blades[1]} r={4} fill="#1f5f9e" />
-            </g>
+            <Blades x={blades[0]} y={blades[1]} />
           </g>
           {motorDir !== 0 && (
             <g>

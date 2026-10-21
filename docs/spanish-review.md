@@ -86,6 +86,24 @@ Questions for these three:
 | Shade on the plant: A little / Some / A lot | Sombra sobre la planta: Poca / Media / Mucha | — |
 | Low / Medium / High (light), Slow / Medium / Fast (fan) | Poca / Media / Mucha, Lento / Medio / Rápido | — |
 
+### Part drawings (labels in the pictures)
+
+| English | Spanish now | To check |
+|---|---|---|
+| Cells / Busbars / Frame | Celdas / Barras colectoras / Marco | "Barras colectoras" is technical; simpler word? |
+| + lead (red) / − lead (black) | Cable + (rojo) / Cable − (negro) | — |
+| Bulb / Flat edge (−) / Long leg (+) / Short leg (−) | Bulbo / Borde plano (−) / Pata larga (+) / Pata corta (−) | — |
+| Motor body / Shaft / Fan blades / 2 terminals | Cuerpo del motor / Eje / Aspas / 2 terminales | — |
+| Water in / Water out / Tube | Entra el agua / Sale el agua / Tubo | — |
+| Lever / On / Off | Palanca / Encendido / Apagado | — |
+| Knob / 3 pins / Use the middle pin and one side | Perilla / 3 patas / Usa la del medio y una de un lado | "patas" or "pines"? |
+| Alligator clip / Bare end | Pinza de cocodrilo / Punta pelada | — |
+| Light sensor / Reading in FC | Sensor de luz / Lectura en FC | — |
+| Screen / Dial: V or A / Red probe (+) / Black probe (−) | Pantalla / Selector: V o A / Punta roja (+) / Punta negra (−) | — |
+| Sensor window / Reading in RPM / Button | Ventana del sensor / Lectura en RPM / Botón | — |
+
+Each drawing also has a one-sentence description for screen readers (`learn.art.*.alt`).
+
 The four Reflect questions (`learn.m.reflect.q.0`–`3`) and the part cards (`learn.part.*`) are short and written for a grade 3–4 reading level; please check that the Spanish keeps them as simple.
 
 The partner names in the credits (Girl Scouts Beyond Bars, ASU Mary Lou Fulton College for Teaching and Learning Innovation) are left in English. Is there an official Spanish form?

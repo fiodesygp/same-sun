@@ -1,6 +1,7 @@
 // The pre-wired test bench for missions 4-7 and the Sun Monitor: one or two panels, a switch,
 // a dial (potentiometer) for the fan, and an LED, a fan and a pump side by side. The drawing is a
 // picture of the state; every control is an ordinary button or slider below it.
+import { Blades, Led, Motor, PanelFace, Pot, Pump, Switch } from '../../components/parts/art'
 import { getLang, t, type Key } from '../../i18n/t'
 import { LOADS, runBench, type Bench as BenchIn, type BenchResult, type Load, type Out } from '../../sim/electric'
 
@@ -156,8 +157,7 @@ function BenchDrawing({ s, r, label }: { s: BenchState; r: BenchResult; label: s
         const y = s.panels === 1 ? 78 : 30 + i * 84
         return (
           <g key={i}>
-            <rect x="12" y={y} width="62" height="40" rx="3" fill="#1D3A5F" stroke="#0E2238" strokeWidth="2" />
-            <path d={`M33 ${y}v40M53 ${y}v40M12 ${y + 20}h62`} stroke="#4C79A8" strokeWidth="1.5" />
+            <PanelFace x={12} y={y} w={62} h={40} cols={3} rows={2} />
             <text x="43" y={y - 6} textAnchor="middle" fontSize="12.5" fontWeight="700" fontFamily={FONT} fill={INK}>{t('learn.svg.panel', { n: i + 1 })}</text>
             <text x="82" y={y + 10} fontSize="13" fontWeight="800" fontFamily={FONT} fill={PLUS}>+</text>
             <text x="82" y={y + 38} fontSize="13" fontWeight="800" fontFamily={FONT} fill={INK}>−</text>
@@ -187,39 +187,32 @@ function BenchDrawing({ s, r, label }: { s: BenchState; r: BenchResult; label: s
       <text x="112" y={BOTTOM - 6} fontSize="12" fontWeight="800" fontFamily={FONT} fill={INK}>−</text>
 
       {/* switch */}
-      <circle cx="118" cy={TOP} r="4" fill={INK} />
-      <circle cx="150" cy={TOP} r="4" fill={INK} />
-      <path d={s.switchOn ? `M118 ${TOP}L150 ${TOP}` : `M118 ${TOP}L146 ${TOP - 20}`} stroke={INK} strokeWidth="4" strokeLinecap="round" />
-      <text x="134" y={TOP + 20} textAnchor="middle" fontSize="12.5" fontWeight="700" fontFamily={FONT} fill={INK}>{t('learn.svg.switch')}</text>
+      <Switch x={134} y={TOP - 4} s={0.5} on={s.switchOn} />
+      <text x="134" y={TOP + 26} textAnchor="middle" fontSize="12.5" fontWeight="700" fontFamily={FONT} fill={INK}>{t('learn.svg.switch')}</text>
       <path d={`M150 ${TOP}H${X.pump}`} fill="none" stroke={plus} strokeWidth="3" />
 
       {/* the three devices, side by side between the rails */}
       {LOADS.map(load => {
-        const x = X[load], on = s.loads[load], c = (v: string) => (on ? v : OFF)
+        const x = X[load], on = s.loads[load]
         const mid = (TOP + BOTTOM) / 2
         return (
           <g key={load} opacity={on ? 1 : 0.55}>
             <path d={`M${x} ${TOP}V${mid - 24}`} stroke={on ? plus : OFF} strokeWidth="3" strokeDasharray={on ? undefined : '4 5'} />
             <path d={`M${x} ${mid + 24}V${BOTTOM}`} stroke={on ? minus : OFF} strokeWidth="3" strokeDasharray={on ? undefined : '4 5'} />
             {load === 'fan' && s.loads.fan && <Dial x={x} y={TOP + 18} pot={s.pot} />}
-            {load === 'led' && (
-              <g>
-                {r.led.on && <circle cx={x} cy={mid} r="22" fill="#FFE066" opacity=".75" />}
-                <circle cx={x} cy={mid} r="13" fill={r.led.on ? '#FFD000' : '#F2F2EA'} stroke={c(INK)} strokeWidth="2.5" />
-              </g>
-            )}
+            {load === 'led' && <Led x={x} y={mid - 4} s={1.1} on={r.led.on} />}
             {load === 'fan' && (
-              <g className={r.fan.rpm !== 0 ? 'spin' : undefined} style={{ ['--spin' as string]: `${spin}s` }}>
-                <circle cx={x} cy={mid} r="18" fill="#fff" stroke={c(INK)} strokeWidth="2.5" />
-                <g className="blades" style={{ animationDirection: r.fan.rpm < 0 ? 'reverse' : undefined }}>
-                  <path d={`M${x} ${mid}l-4 -14a4 4 0 0 1 8 0zM${x} ${mid}l12 8a4 4 0 0 1 -4 7zM${x} ${mid}l-12 8a4 4 0 0 0 4 7z`} fill={c('#2F6F8F')} />
+              <g>
+                <Motor x={x - 12} y={mid - 9} s={0.5} />
+                <g className={r.fan.rpm !== 0 ? 'spin' : undefined} style={{ ['--spin' as string]: `${spin}s` }}>
+                  <Blades x={x - 21} y={mid} s={0.6} reverse={r.fan.rpm < 0} />
                 </g>
-                {r.fan.rpm < 0 && <text x={x} y={mid - 26} textAnchor="middle" fontSize="16" fontWeight="800" fontFamily={FONT} fill={INK}>↺</text>}
+                {r.fan.rpm < 0 && <text x={x} y={mid - 22} textAnchor="middle" fontSize="16" fontWeight="800" fontFamily={FONT} fill={INK}>↺</text>}
               </g>
             )}
             {load === 'pump' && (
               <g>
-                <rect x={x - 16} y={mid - 14} width="32" height="28" rx="5" fill={r.pump.flow !== 'off' ? '#8EC5E8' : '#F2F2EA'} stroke={c(INK)} strokeWidth="2.5" />
+                <Pump x={x} y={mid - 20} s={0.8} running={r.pump.flow !== 'off'} />
                 {r.pump.flow !== 'off' && (
                   <g fill="#2A7AB8">
                     {(r.pump.flow === 'full' ? [0, 1, 2] : [0]).map(i => <circle key={i} className="drop" cx={x - 8 + i * 8} cy={mid + 22} r="2.6" />)}
@@ -239,11 +232,9 @@ function BenchDrawing({ s, r, label }: { s: BenchState; r: BenchResult; label: s
 
 /** The potentiometer: a knob whose pointer turns with the setting. */
 function Dial({ x, y, pot }: { x: number; y: number; pot: number }) {
-  const a = ((-135 + 270 * pot) * Math.PI) / 180
   return (
     <g>
-      <circle cx={x} cy={y} r="9" fill="#fff" stroke={INK} strokeWidth="2" />
-      <path d={`M${x} ${y}l${8 * Math.sin(a)} ${-8 * Math.cos(a)}`} stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+      <Pot x={x} y={y} s={0.32} value={pot} />
       <text x={x - 13} y={y + 4} textAnchor="end" fontSize="11.5" fontWeight="700" fontFamily={FONT} fill={INK}>{t('learn.svg.dial')}</text>
     </g>
   )

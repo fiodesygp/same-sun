@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { t, type Key } from '../../i18n/t'
 import type { MissionId } from '../../lib/learn'
+import { PartIllustration } from '../../components/parts/art'
 import { CHECKS } from '../../lib/parts'
 import { part, PartIcon, type PartId } from './parts'
 
@@ -44,6 +45,10 @@ export function PartView({ id, checked, onAnswer, onBack, onMission }: Props) {
         <span className="part-icon"><PartIcon id={id} /></span>
         <h1 id="part-title" className="page-title">{t(k('name'))}</h1>
       </header>
+
+      <figure className="part-figure">
+        <PartIllustration id={id} />
+      </figure>
 
       <div className="card part-card">
         <div className="part-tabs" role="tablist" aria-label={t(k('name'))} onKeyDown={onKey}>
