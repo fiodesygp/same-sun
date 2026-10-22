@@ -94,7 +94,7 @@ Questions for these three:
 |---|---|---|
 | Structure (tab) | Estructura | — |
 | Hinge / Angle stop | Bisagra / Tope de ángulo | Clear for the age? |
-| Facility check (tag) | Revisión del centro | "Facility" here means the program's facility. Is "centro" right, or "instalación"? |
+| Safety & prep check (tag and test; was "Facility check") | Revisión de seguridad y preparación | Long on small phones; is it natural? |
 | sharp edge / an adult uses a tool first / nothing to prepare | borde filoso / un adulto usa una herramienta antes / nada que preparar | — |
 | Meet the materials | Conoce los materiales | — |
 | What it is / Good for / Watch out / Try it | Qué es / Sirve para / Cuidado / Pruébalo | — |
@@ -123,7 +123,7 @@ Questions for these three:
 | Save / build it for real / Build it for real | Guardar / constrúyela de verdad / Constrúyela de verdad | — |
 | Build (Growth Story step) / From Structure | Construir / Desde Estructura | — |
 | This matches our printed sheet: … | Coincide con nuestra hoja impresa: … | — |
-| Sheet names: Cup + pipe-cleaner frame / Cup + straw + rubber-band frame / Craft sticks + rubber bands / Paper angle wedge | Vaso + estructura de limpiapipas / Vaso + estructura de pajillas y ligas / Palitos + ligas / Cuña de papel para el ángulo | The printed sheets are in English. Translate the names, or keep the English so they match the paper? |
+| Sheet names | Spanish name, then the English sheet name in brackets: Marco de vaso + limpiapipas (Cup + pipe-cleaner frame) / Marco de vaso + popotes + ligas (Cup + straw + rubber-band frame) / Palitos + ligas (Craft sticks + rubber bands) / Cuña de papel para el ángulo (Paper angle wedge) | The straw sheet says "popotes"; the material cards say "pajillas". Pick one word for both. |
 | Build steps (`st.how.*`) | — | Short instructions for the real build; please check they are clear and match the sheets. |
 
 ### 3D bench

@@ -11,7 +11,7 @@ Same Sun is a short design-and-test game for the **miniAgriPV** project (Girl Sc
 
 - **Sun Day:** pick a plant, panel and day, predict, then watch a sunny Arizona day and see the Sun Score with feedback.
 - **Power:** meet the parts of the kit (a card and a quick check for each), then try 10 steps: the seven SCN 202 Solar Card Deck missions (circuits, measuring, switch and dial, series and parallel) and three bonus missions; then three harder wiring challenges, and a Sun Monitor.
-- **Structure:** meet the materials (cup, straws, rubber bands, pipe cleaners, craft sticks, cardstock, clothespins, tape), build a frame that holds the panel above the plant, and test it (angle, slip, wobble, heat, shade and a facility check). An adjustable panel needs a hinge and an angle stop. Save the design, with its materials list and steps, to the Growth Story Card.
+- **Structure:** meet the materials (cup, straws, rubber bands, pipe cleaners, craft sticks, cardstock, clothespins, tape), build a frame that holds the panel above the plant, and test it (angle, slip, wobble, heat, shade and a safety & prep check). An adjustable panel needs a hinge and an angle stop. Save the design, with its materials list and steps, to the Growth Story Card.
 - **Growth Story Card:** add a photo and a few words at each step of the real project.
 
 It works on phones, tablets and computers, in English and Spanish, and offline after the first visit. The Power bench can also be shown in 3D: that part (about 240 KB zipped) downloads only the first time someone opens it, then works offline too. Devices without WebGL, with reduced motion on, or that look low-power start in 2D.
