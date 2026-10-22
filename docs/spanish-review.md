@@ -99,7 +99,7 @@ Questions for these three:
 | Meet the materials | Conoce los materiales | — |
 | What it is / Good for / Watch out / Try it | Qué es / Sirve para / Cuidado / Pruébalo | — |
 | Clear 24 oz cup | Vaso transparente de 24 oz | — |
-| Thick and thin straws (boba) | Pajillas gruesas y delgadas | "pajillas", "popotes" or "pitillos" in this region? |
+| Thick and thin straws (boba) | Popotes gruesos y delgados | We chose "popotes" (Mexican Spanish, common in Arizona; avoids "pajilla"). Please confirm. |
 | Rubber bands | Ligas | Or "gomitas", "elásticos"? |
 | Pipe cleaners | Limpiapipas | — |
 | Jumbo craft sticks | Palitos de manualidades grandes | "palitos de paleta"? |
@@ -110,7 +110,7 @@ Questions for these three:
 | Build (stage) / Build your frame | Construir / Construye tu estructura | — |
 | Base / Posts / Joining posts to the base / Hinge / Angle stop / Panel holder | Base / Postes / Unir los postes a la base / Bisagra / Tope de ángulo / Soporte del panel | — |
 | Upside-down cup / Craft-stick tower / Cardstock easel | Vaso boca abajo / Torre de palitos / Caballete de cartulina | — |
-| Thin-straw axle / eye loops / figure 8 / tape hinge | Eje de pajilla delgada / ojales / liga en forma de 8 / bisagra de cinta | "ojales" clear for kids? |
+| Thin-straw axle / eye loops / figure 8 / tape hinge | Eje de popote delgado / ojales / liga en forma de 8 / bisagra de cinta | "ojales" clear for kids? |
 | Rubber-band stoppers / loop ladder / notches / swap-in wedges / clothespin + printed dial | Topes de liga / escalera de aros / muescas / cuñas para cambiar / pinza + disco impreso | — |
 | Cardstock tray with a front lip | Bandeja de cartulina con borde al frente | — |
 | It fits. / It won't attach: … | Encaja. / No se puede unir: … | — |
@@ -123,7 +123,7 @@ Questions for these three:
 | Save / build it for real / Build it for real | Guardar / constrúyela de verdad / Constrúyela de verdad | — |
 | Build (Growth Story step) / From Structure | Construir / Desde Estructura | — |
 | This matches our printed sheet: … | Coincide con nuestra hoja impresa: … | — |
-| Sheet names | Spanish name, then the English sheet name in brackets: Marco de vaso + limpiapipas (Cup + pipe-cleaner frame) / Marco de vaso + popotes + ligas (Cup + straw + rubber-band frame) / Palitos + ligas (Craft sticks + rubber bands) / Cuña de papel para el ángulo (Paper angle wedge) | The straw sheet says "popotes"; the material cards say "pajillas". Pick one word for both. |
+| Sheet names | Spanish name, then the English sheet name in brackets: Marco de vaso + limpiapipas (Cup + pipe-cleaner frame) / Marco de vaso + popotes + ligas (Cup + straw + rubber-band frame) / Palitos + ligas (Craft sticks + rubber bands) / Cuña de papel para el ángulo (Paper angle wedge) | "Popotes" is now used everywhere for straws (cards, builder, steps, sheet names). Please confirm it is the right word for these learners. |
 | Build steps (`st.how.*`) | — | Short instructions for the real build; please check they are clear and match the sheets. |
 
 ### 3D bench
