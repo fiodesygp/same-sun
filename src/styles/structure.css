@@ -1,0 +1,7 @@
+/* ---------- Structure ---------- */
+.key-idea { display: grid; gap: 4px }
+.key-idea p { margin: 0 }
+.facility-tag { display: inline-block; justify-self: start; padding: 2px 8px; border-radius: 6px; border: 1.5px solid var(--line); font-size: 13px; font-weight: 700; color: var(--muted) }
+.facility-tag.flag { border-color: var(--warn); color: var(--ink) }
+.facility-tag.flag::before { content: "⚠ "; color: var(--warn) }
+.part-head .part-tag { grid-column: 1 / -1 }

@@ -30,11 +30,12 @@
 .mission-card { text-align: left; cursor: pointer; display: grid; gap: 6px; align-content: start; font: inherit; color: inherit; border-top: 6px solid var(--green) }
 .mission-card.power { border-top-color: var(--sun) }
 .mission-card.growthStory { border-top-color: var(--maroon) }
+.mission-card.structure { border-top-color: var(--deck-blue) }
 .mission-icon { color: var(--green) }
 .mission-title { font-family: var(--display); font-weight: 700; font-size: 18px }
 .mission-goal { color: var(--ink) }
 .mission-progress { justify-self: start; margin-top: 4px; padding: 4px 12px; border-radius: 999px; background: var(--bg); font-weight: 700; font-variant-numeric: tabular-nums }
-@media (hover: hover) { .mission-card:hover { border-color: var(--green) } .mission-card.power:hover { border-top-color: var(--sun) } .mission-card.growthStory:hover { border-top-color: var(--maroon) } }
+@media (hover: hover) { .mission-card:hover { border-color: var(--green) } .mission-card.power:hover { border-top-color: var(--sun) } .mission-card.growthStory:hover { border-top-color: var(--maroon) } .mission-card.structure:hover { border-top-color: var(--deck-blue) } }
 
 /* ---------- footer ---------- */
 .home-foot { display: grid; gap: 4px; justify-items: center; text-align: center; font-size: 13px; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--line) }
@@ -42,12 +43,12 @@
 .home-foot a { color: var(--green); font-weight: 700; display: inline-flex; align-items: center; min-height: 44px }
 
 /* ---------- layouts ---------- */
-/* tablet portrait: missions three in a row if they fit, otherwise 2 + 1 */
+/* tablet portrait: the four missions 2 x 2 */
 @media (min-width: 600px) and (max-width: 1023px) and (orientation: portrait) {
-  .trio { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) }
+  .trio { grid-template-columns: repeat(2, minmax(0, 1fr)) }
 }
-/* wide: title beside the mission card; missions in a row of three */
+/* wide: title beside the mission card; the four missions 2 x 2 */
 @media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
   .splash-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) }
-  .trio { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  .trio { grid-template-columns: repeat(2, minmax(0, 1fr)) }
 }

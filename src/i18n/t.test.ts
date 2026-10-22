@@ -31,7 +31,7 @@ describe('t() slots', () => {
 describe('Spanish', () => {
   // brand names, units and labels that are the same in both languages
   const SAME = new Set(['app.name', 'lang.en', 'lang.es', 'growthStory.runsDesignValue', 'lab.level.1', 'lab.svg.led', 'scene.led',
-    'lab.term.mA', 'lab.term.mB', 'lab.probe', 'scene.panelAt', 'learn.openMission', 'learn.device.led', 'learn.ml', 'lab.view.2d', 'lab.view.3d', 'power.openPart', 'learn.check.switch.no', 'learn.part.led.name', 'learn.fan.rpm', 'learn.svg.panel', 'learn.ctl.panels1', 'learn.no', 'learn.colour.magenta', 'learn.m.agripv.title', 'gauges.wh', 'gauges.degF'])
+    'lab.term.mA', 'lab.term.mB', 'lab.probe', 'scene.panelAt', 'learn.openMission', 'learn.device.led', 'learn.ml', 'st.facility.metal', 'lab.view.2d', 'lab.view.3d', 'power.openPart', 'learn.check.switch.no', 'learn.part.led.name', 'learn.fan.rpm', 'learn.svg.panel', 'learn.ctl.panels1', 'learn.no', 'learn.colour.magenta', 'learn.m.agripv.title', 'gauges.wh', 'gauges.degF'])
   const slots = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort()
 
   it('uses the same {slots} as English', () => {

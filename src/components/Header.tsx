@@ -6,6 +6,7 @@ export const TABS = [
   { id: 'home', label: 'tabs.home' },
   { id: 'sunDay', label: 'tabs.sunDay' },
   { id: 'power', label: 'tabs.power' },
+  { id: 'structure', label: 'tabs.structure' },
   { id: 'growthStory', label: 'tabs.growthStory' }
 ] as const satisfies readonly { id: string; label: Key }[]
 
@@ -20,6 +21,7 @@ const ICON_PROPS = { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', 
 const ICONS: Record<TabId, React.ReactNode> = {
   home: <svg {...ICON_PROPS}><path d="M3 11 12 4l9 7" /><path d="M5 10v10h14V10" /><path d="M10 20v-6h4v6" /></svg>,
   sunDay: <svg {...ICON_PROPS}><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>,
+  structure: <svg {...ICON_PROPS}><path d="M4 20h16" /><path d="M7 20V9M17 20V6" /><path d="M5 9l14-4" /><circle cx="7" cy="9" r="1.6" /></svg>,
   power: <svg {...ICON_PROPS}><path d="M13 2 4 14h7l-1 8 9-12h-7z" /></svg>,
   growthStory: <svg {...ICON_PROPS}><path d="M12 21V11" /><path d="M12 13c-5 0-7-3-7-7 4 0 7 2 7 7z" /><path d="M12 11c0-4 2-6 6-6 0 4-2 6-6 6z" /></svg>
 }

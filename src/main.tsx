@@ -9,6 +9,7 @@ import './styles/sunday.css'
 import './styles/power.css'
 import './styles/growthstory.css'
 import './styles/learn.css'
+import './styles/structure.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

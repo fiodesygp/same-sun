@@ -88,6 +88,26 @@ Questions for these three:
 | Shade on the plant: A little / Some / A lot | Sombra sobre la planta: Poca / Media / Mucha | — |
 | Low / Medium / High (light), Slow / Medium / Fast (fan) | Poca / Media / Mucha, Lento / Medio / Rápido | — |
 
+## New: Structure tab
+
+| English | Spanish now | To check |
+|---|---|---|
+| Structure (tab) | Estructura | — |
+| Hinge / Angle stop | Bisagra / Tope de ángulo | Clear for the age? |
+| Facility check (tag) | Revisión del centro | "Facility" here means the program's facility. Is "centro" right, or "instalación"? |
+| sharp edge / an adult uses a tool first / nothing to prepare | borde filoso / un adulto usa una herramienta antes / nada que preparar | — |
+| Meet the materials | Conoce los materiales | — |
+| What it is / Good for / Watch out / Try it | Qué es / Sirve para / Cuidado / Pruébalo | — |
+| Clear 24 oz cup | Vaso transparente de 24 oz | — |
+| Thick and thin straws (boba) | Pajillas gruesas y delgadas | "pajillas", "popotes" or "pitillos" in this region? |
+| Rubber bands | Ligas | Or "gomitas", "elásticos"? |
+| Pipe cleaners | Limpiapipas | — |
+| Jumbo craft sticks | Palitos de manualidades grandes | "palitos de paleta"? |
+| Cardstock | Cartulina | — |
+| Clothespins | Pinzas de ropa | — |
+| Tape | Cinta adhesiva | — |
+| your facilitator | tu facilitador/a | — |
+
 ### 3D bench
 
 | English | Spanish now | To check |

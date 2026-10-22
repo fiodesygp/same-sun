@@ -6,7 +6,7 @@
 - Source of truth: `docs/prototype/same-sun-prototype.html` for screens, wording, layout, colors and the simulation. `docs/game-concept.md` is background. Where they disagree, follow the prototype.
 
 ## Screens
-- Four tabs: Home, Sun Day, Power (was "Build Lab"; Spanish "Energía"), Growth Story. In code the tab is `power` (`src/views/Power.tsx`, `src/views/power/`); old storage keys such as `samesun:buildLabSolved` keep their names so saved progress loads.
+- Five tabs: Home, Sun Day, Power (was "Build Lab"; Spanish "Energía"), Structure ("Estructura"), Growth Story. In code the tab is `power` (`src/views/Power.tsx`, `src/views/power/`); old storage keys such as `samesun:buildLabSolved` keep their names so saved progress loads.
 - Power is one guided path in two stages: "Meet the parts" (10 part cards, each with a quick check) unlocks "Try it": 10 steps (the 7 SCN 202 Solar Card Deck missions, then the 3 bonus cards), then 3 Power challenges in their own section with their own counter (`STEPS` and `CHALLENGES` in `src/lib/learn.ts`), then the Sun Monitor. Learners can skip ahead.
 - The free-wiring circuits use the watts budget in `src/lab/`; the deck missions use the volts/amps/watts model in `src/sim/electric.ts`.
 - Saved progress: `samesun:learn` (steps), `samesun:parts` (quick checks). `migrate()` carries old Build Lab (now Power) levels (`samesun:buildLabSolved`) into the path; it only adds and never deletes old keys.
@@ -14,6 +14,7 @@
 
 ## Stack
 - Vite + React + TypeScript, SVG for scenes, Vitest for tests, vite-plugin-pwa for offline use.
+- Structure (`src/views/Structure.tsx`, `src/views/structure/`, rules and data in `src/structure/` and `src/config/structure.json`): meet the materials, build a frame, test it, save it. Key idea: an adjustable panel needs a hinge and an angle stop. Saved as `samesun:structure`.
 - 3D (Power bench only): three and @react-three/fiber, pinned exact (+ @types/three, dev only). The 3D view is a lazy chunk, not precached; it is cached at runtime the first time it opens. 2D must always work on its own.
 - Ask before adding any other dependency.
 

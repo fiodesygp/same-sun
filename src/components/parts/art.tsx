@@ -5,7 +5,7 @@
 import { t, type Key } from '../../i18n/t'
 
 export const ART_FONT = 'Source Sans 3, system-ui, sans-serif'
-const INK = '#2B2F2C', RED = '#C62828', BLACK = '#1E2326', COPPER = '#B87333', SILVER = '#B9C0C5', METAL = '#9AA3A8'
+export const INK = '#2B2F2C', RED = '#C62828', BLACK = '#1E2326', COPPER = '#B87333', SILVER = '#B9C0C5', METAL = '#9AA3A8'
 
 // ---------- glyphs ----------
 
@@ -159,7 +159,7 @@ export function wrap(s: string, max = 13) {
 }
 
 /** a label with a leader line to the thing it names; side says where the text sits */
-function Callout({ to, at, side, k }: { to: [number, number]; at: [number, number]; side: 'left' | 'right'; k: Key }) {
+export function Callout({ to, at, side, k }: { to: [number, number]; at: [number, number]; side: 'left' | 'right'; k: Key }) {
   const lines = wrap(t(k)), tx = side === 'left' ? at[0] - 5 : at[0] + 5
   return (
     <g>
@@ -174,7 +174,7 @@ function Callout({ to, at, side, k }: { to: [number, number]; at: [number, numbe
 
 export type ArtId = 'panel' | 'led' | 'fan' | 'pump' | 'switch' | 'pot' | 'wires' | 'lightMeter' | 'multimeter' | 'tachometer'
 
-const L = 112, R = 248 // where left and right labels end and start
+export const L = 112, R = 248 // where left and right labels end and start
 
 const ART: Record<ArtId, () => React.ReactNode> = {
   panel: () => (
@@ -311,12 +311,19 @@ const ART: Record<ArtId, () => React.ReactNode> = {
   )
 }
 
+/** A labelled drawing on a light workbench plate (readable in light and dark mode). */
+export function ArtPlate({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <svg className="part-art" viewBox="0 0 360 224" role="img" aria-label={label}>
+      <rect x={1} y={1} width={358} height={222} rx={14} fill="#FBF7EE" stroke="#E2DBC9" strokeWidth={2} />
+      {children}
+    </svg>
+  )
+}
+
 /** A part's labelled drawing on a light workbench plate, for its card. */
 export function PartIllustration({ id }: { id: ArtId }) {
   return (
-    <svg className="part-art" viewBox="0 0 360 224" role="img" aria-label={t(`learn.art.${id}.alt` as Key)}>
-      <rect x={1} y={1} width={358} height={222} rx={14} fill="#FBF7EE" stroke="#E2DBC9" strokeWidth={2} />
-      {ART[id]()}
-    </svg>
+    <ArtPlate label={t(`learn.art.${id}.alt` as Key)}>{ART[id]()}</ArtPlate>
   )
 }

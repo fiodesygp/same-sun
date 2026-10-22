@@ -5,6 +5,7 @@ import { load, save } from './lib/storage'
 import { Power } from './views/Power'
 import { GrowthStory, type SketchRequest } from './views/GrowthStory'
 import { Home } from './views/Home'
+import { Structure } from './views/Structure'
 import { SunDay } from './views/SunDay'
 
 const savedLang = (): Lang => (load<string>('lang', 'en') === 'es' ? 'es' : 'en')
@@ -32,6 +33,7 @@ export function App() {
     home: <Home onGo={select} active={tab === 'home'} />,
     sunDay: <SunDay />,
     power: <Power active={tab === 'power'} onSketch={mission => { setSketch(s => ({ mission, n: (s?.n ?? 0) + 1 })); select('growthStory') }} />,
+    structure: <Structure active={tab === 'structure'} />,
     growthStory: <GrowthStory active={tab === 'growthStory'} sketch={sketch} />
   }
 
