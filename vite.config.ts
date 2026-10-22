@@ -67,11 +67,22 @@ export default defineConfig({
       workbox: {
         // cache every built file so the game works offline after the first visit
         globPatterns: ['**/*.{html,js,css,woff2,svg,png,txt}'],
-        // 404.html only redirects to the app; no need to keep it offline
-        globIgnores: ['**/404.html']
+        // 404.html only redirects to the app; no need to keep it offline. The 3D bench (about 240 KB
+        // zipped) is left out too, so learners on limited data only fetch it if they open 3D
+        globIgnores: ['**/404.html', '**/assets/Board3D-*.js'],
+        // ...and once they have, it stays cached so 3D works offline after that
+        runtimeCaching: [{
+          urlPattern: ({ url }) => /\/assets\/Board3D-[^/]+\.js$/.test(url.pathname),
+          handler: 'CacheFirst',
+          options: { cacheName: 'samesun-3d', expiration: { maxEntries: 4 } }
+        }]
       }
     })
   ],
+  build: {
+    // the lazy 3D bench (three.js) is one ~950 KB chunk on purpose; everything else stays small
+    chunkSizeWarningLimit: 1000
+  },
   test: {
     include: ['src/**/*.test.ts']
   }

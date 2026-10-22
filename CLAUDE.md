@@ -14,6 +14,7 @@
 
 ## Stack
 - Vite + React + TypeScript, SVG for scenes, Vitest for tests, vite-plugin-pwa for offline use.
+- 3D (Build Lab bench only): three and @react-three/fiber, pinned exact (+ @types/three, dev only). The 3D view is a lazy chunk, not precached; it is cached at runtime the first time it opens. 2D must always work on its own.
 - Ask before adding any other dependency.
 
 ## Hosting

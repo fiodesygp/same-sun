@@ -62,3 +62,25 @@
 /* compact switch in the row under the board */
 .toggle.compact { width: auto; min-height: 48px; padding-inline: 10px 14px }
 .probe-readout { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--surface); border: 1px dashed var(--field); font-weight: 600 }
+
+/* ---------- 2D / 3D bench ---------- */
+.view-row { align-items: center; gap: 8px }
+.view-row .hint { flex: 1 1 200px }
+.view-seg { flex: 0 0 auto }
+.view-seg button { min-width: 56px }
+.board3d { display: grid; gap: 8px }
+.board3d-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: 62svh; border-radius: 12px; overflow: hidden; background: #F6F0E3; touch-action: none }
+@media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) { .board3d-stage { aspect-ratio: 16 / 10; max-height: 70svh } }
+.board3d-stage canvas { display: block }
+.board3d-loading { margin: 0; min-height: 200px; display: grid; place-items: center; border-radius: 12px; background: #F6F0E3; color: #2B2F2C; font-weight: 700 }
+/* terminals and wires on top of the 3D view: real buttons, 44 px, with a visible label */
+.t3d, .w3d { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0; border: 0; background: transparent; cursor: pointer; display: grid; place-items: center }
+.t3d span { display: grid; place-items: center; min-width: 26px; height: 26px; padding: 0 4px; border-radius: 999px; border: 2.5px solid #6b5520; background: rgba(255, 250, 235, .82);
+  font: 800 13px/1 var(--body); color: #2B2F2C; white-space: nowrap }
+.t3d.sel span { border-color: #0B6B47; background: #DCEFE4; box-shadow: 0 0 0 3px #0B6B47 }
+.w3d span { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 2px solid; font: 800 12px/1 var(--body) }
+.w3d.plus span { border-color: #C62828; color: #B3261E } .w3d.minus span { border-color: #262B2E; color: #262B2E } .w3d.loose span { border-color: #9AA0A6; color: #5A6B60 }
+.t3d:focus-visible span, .w3d:focus-visible span { outline: 3px solid #0B6B47; outline-offset: 2px }
+.cam-buttons { display: flex; flex-wrap: wrap; gap: 6px }
+.cam-buttons .btn { min-width: 48px; padding-inline: 12px; font-size: 18px }
+.cam-buttons .btn:last-child { font-size: 15px }

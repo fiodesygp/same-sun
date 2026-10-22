@@ -1,6 +1,6 @@
 // Free wiring on one of the Build Lab circuits (steps 1, 8-11 of the path): the board, the sun,
 // the checklist, hints after two tries, the Tester for Fix it, and the real-kit tip once solved.
-import { useEffect, useRef, useState } from 'react'
+import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import model from '../../config/model.json'
 import { t, type Key } from '../../i18n/t'
 import {
@@ -8,7 +8,44 @@ import {
   type Part, type PartState, type Puzzle, type TermId, type Wire
 } from '../../lab/circuit'
 import { useWide } from '../../lib/useWide'
-import { Board, LANDSCAPE, PORTRAIT } from './Board'
+import { detectDevice, loadView, saveView, startView, type View } from '../../lib/view3d'
+import { Board, LANDSCAPE, PORTRAIT, type BoardProps } from './Board'
+import { TILTS, type Tilt } from './sky'
+
+// the 3D bench is its own chunk, fetched the first time someone opens it; a failed fetch makes a
+// fresh loader so the next try can work (once the device is online)
+const make3D = () => lazy(() => import('./Board3D'))
+let Board3D = make3D()
+const device = typeof window === 'undefined' ? null : detectDevice()
+
+/**
+ * Can the 3D chunk load right now? Online, yes; offline, only if an earlier visit cached it. Checking
+ * first matters: a browser remembers a failed import for the rest of the page's life, so a doomed
+ * offline try would also block 3D after the device comes back online.
+ */
+async function can3DNow() {
+  if (navigator.onLine) return true
+  try {
+    return (await (await caches.open('samesun-3d')).keys()).length > 0
+  } catch {
+    return false
+  }
+}
+
+/** catches a 3D chunk that will not load, or a 3D view that crashes, and reports it */
+class Fallback3D extends Component<{ onFail: () => void; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false }
+  static getDerivedStateFromError() {
+    return { failed: true }
+  }
+  componentDidCatch() {
+    Board3D = make3D()
+    this.props.onFail()
+  }
+  render() {
+    return this.state.failed ? null : this.props.children
+  }
+}
 
 const sameWire = (w: Wire, a: TermId, b: TermId) => (w[0] === a && w[1] === b) || (w[0] === b && w[1] === a)
 const CLOUD_MS = 2500
@@ -59,6 +96,31 @@ export function LevelLab({ levels, groupLabel, onSolved, water }: Props) {
   const [failed, setFailed] = useState(0)
   const [hints, setHints] = useState(0)
   const wide = useWide()
+  const can3d = !!device?.webgl
+  const [view, setView] = useState<View>('2d')
+  const [viewMsg, setViewMsg] = useState<Key | null>(null)
+  const [tilt, setTilt] = useState<Tilt>(25)
+
+  // start in the saved (or default) view, once we know 3D can load
+  useEffect(() => {
+    if (device && startView(loadView(), device) === '3d') chooseView('3d', false)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function chooseView(v: View, remember = true) {
+    setViewMsg(null)
+    if (remember) saveView(v)
+    if (v === '3d' && !(await can3DNow())) {
+      setView('2d')
+      setViewMsg('lab.view.offline')
+      return
+    }
+    setView(v)
+  }
+  // 3D could not load or stopped: back to 2D, with a short reason
+  function fail3D() {
+    setView('2d')
+    setViewMsg(navigator.onLine ? 'lab.view.failed' : 'lab.view.offline')
+  }
 
   const Lv = LEVELS[level], L = level as L
   const ev = evaluate(wires, level)
@@ -135,6 +197,14 @@ export function LevelLab({ levels, groupLabel, onSolved, water }: Props) {
     return () => clearInterval(id)
   }, [flow])
 
+  // the same props drive the 2D board and the 3D bench
+  const boardProps: BoardProps = {
+    level, wires, selected, sunOn, power: pw, cloud, burnt, burntAt, tester,
+    probe: tester && probe ? { term: probe, power: hasPower(probe, wires, level, sunOn) } : null,
+    onPick: pick, onConnect: connect, onCancel: () => setSelected(null),
+    onRemove: i => { setWires(wires.filter((_, j) => j !== i)); setSelected(null) }
+  }
+
   /** start a circuit fresh, with the sun off */
   function start(l: number, pz: Puzzle | null = puzzle) {
     let p = pz
@@ -175,11 +245,33 @@ export function LevelLab({ levels, groupLabel, onSolved, water }: Props) {
             ))}
           </div>
         )}
-        <p className="hint flat">{t('lab.howTo')}</p>
-        <Board layout={wide ? LANDSCAPE : PORTRAIT} level={level} wires={wires} selected={selected} sunOn={sunOn} power={pw} cloud={cloud} burnt={burnt} burntAt={burntAt}
-          tester={tester} probe={tester && probe ? { term: probe, power: hasPower(probe, wires, level, sunOn) } : null}
-          onPick={pick} onConnect={connect} onCancel={() => setSelected(null)}
-          onRemove={i => { setWires(wires.filter((_, j) => j !== i)); setSelected(null) }} />
+        <div className="row wrap between view-row">
+          <p className="hint flat">{t('lab.howTo')}</p>
+          <div className="seg view-seg" role="group" aria-label={t('lab.view.label')}>
+            <button type="button" aria-pressed={view === '2d'} onClick={() => chooseView('2d')}>{t('lab.view.2d')}</button>
+            <button type="button" aria-pressed={view === '3d'} disabled={!can3d} onClick={() => chooseView('3d')}>{t('lab.view.3d')}</button>
+          </div>
+        </div>
+        {!can3d && <p className="hint flat">{t('lab.view.noWebgl')}</p>}
+        {viewMsg && <p className="notice flat" role="status">{t(viewMsg)}</p>}
+        {view === '3d' ? (
+          <>
+            <Fallback3D onFail={fail3D}>
+              <Suspense fallback={<p className="board3d-loading" role="status">{t('lab.view.loading')}</p>}>
+                <Board3D {...boardProps} tilt={tilt} onFail={fail3D} />
+              </Suspense>
+            </Fallback3D>
+            <fieldset>
+              <legend>{t('learn.ctl.tilt')}</legend>
+              <div className="seg">
+                {TILTS.map(a => <button key={a} type="button" aria-pressed={tilt === a} onClick={() => setTilt(a)}>{a}°</button>)}
+              </div>
+            </fieldset>
+            <p className="hint flat">{t('lab.view.tiltNote')}</p>
+          </>
+        ) : (
+          <Board layout={wide ? LANDSCAPE : PORTRAIT} {...boardProps} />
+        )}
         <div className="row wrap">
           <button className="btn" type="button" aria-pressed={sunOn} onClick={() => setSunOn(!sunOn)}>
             {t(sunOn ? 'lab.sunOff' : 'lab.sunOn')}

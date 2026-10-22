@@ -13,7 +13,7 @@ Same Sun is a short design-and-test game for the **miniAgriPV** project (Girl Sc
 - **Build Lab:** meet the parts of the kit (a card and a quick check for each), then try 13 steps: the seven SCN 202 Solar Card Deck missions (circuits, measuring, switch and dial, series and parallel), wiring challenges and bonus missions, plus a Sun Monitor.
 - **Growth Story Card:** add a photo and a few words at each step of the real project.
 
-It works on phones, tablets and computers, in English and Spanish, and offline after the first visit.
+It works on phones, tablets and computers, in English and Spanish, and offline after the first visit. The Build Lab bench can also be shown in 3D: that part (about 240 KB zipped) downloads only the first time someone opens it, then works offline too. Devices without WebGL, with reduced motion on, or that look low-power start in 2D.
 
 ## Privacy: everything stays on the device
 
@@ -63,7 +63,9 @@ If the tests or build fail, nothing is published on either host.
 - `src/config/model.json`: every simulation constant, to tune with the real kit
 - `src/i18n/en.json`, `src/i18n/es.json`: all UI text
 - `src/lab/`: the Build Lab circuit checker
-- `src/views/buildLab/`: the Build Lab board, steps, bench, Sun Monitor and part cards
+- `src/views/buildLab/`: the Build Lab board (2D, and `Board3D.tsx` for 3D), steps, bench, Sun Monitor and part cards
+- `src/components/parts/`: the part drawings shared by the part cards, the board and the bench
+- `src/lab/board.ts`: what the board shows for a circuit, shared by the 2D and 3D views
 - `src/views/`, `src/components/`, `src/styles/`: screens and styles
 - `docs/`: the prototype (`docs/prototype/same-sun-prototype.html`) and the game concept
 - `CLAUDE.md`: project rules for contributors

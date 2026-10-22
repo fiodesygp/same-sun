@@ -8,7 +8,8 @@
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { t, type Key } from '../../i18n/t'
 import { Blades, Led, Motor, PanelFace, Pump } from '../../components/parts/art'
-import { evaluate, levelTerms, LEVELS, nets, type Power, type TermId, type Wire } from '../../lab/circuit'
+import { boardModel } from '../../lab/board'
+import { LEVELS, type Power, type TermId, type Wire } from '../../lab/circuit'
 
 const HIT = 27
 const FONT = 'Source Sans 3, sans-serif'
@@ -86,8 +87,8 @@ function tubePath(tank: Pt, pot: Pt, ground: number) {
     `V${gy - 4} Q${wall} ${gy} ${wall + dir * 8} ${gy} H${pot[0] - dir * 26} Q${pot[0] - dir * 18} ${gy} ${pot[0] - dir * 16} ${gy - 8} L${pot[0] - dir * 10} ${pot[1] + 4}`
 }
 
-type Props = {
-  layout: Layout
+/** what both the 2D board and the 3D bench need: the circuit, its state, and what a tap does */
+export type BoardProps = {
   level: number
   wires: Wire[]
   selected: TermId | null
@@ -108,16 +109,13 @@ type Props = {
   onCancel: () => void
 }
 
-export function Board(props: Props) {
+export function Board(props: BoardProps & { layout: Layout }) {
   const { layout: Y, level, wires, selected, sunOn, power: pw, cloud, burnt, burntAt, tester, probe, onPick, onConnect, onRemove, onCancel } = props
   const T = terminals(Y)
   const svgRef = useRef<SVGSVGElement>(null)
   const [drag, setDrag] = useState<{ from: TermId; x: number; y: number; moved: boolean } | null>(null)
   const justDragged = useRef(false)
-  const Lv = LEVELS[level], terms = levelTerms(level)
-  const ev = sunOn ? evaluate(wires, level) : null
-  const f = nets(wires)
-  const posNets = new Set(Lv.panels.map(p => f(p === 'big' ? 'p+' : 'q+'))), negNets = new Set(Lv.panels.map(p => f(p === 'big' ? 'p-' : 'q-')))
+  const Lv = LEVELS[level], m = boardModel(level, wires, sunOn, pw, burnt), terms = m.terms
   const two = Lv.panels.length === 2
   const G = Y.ground, [bx, by] = Y.big, [sx, sy] = Y.small, [px, py] = Y.plant, [rx, ry] = Y.res, [lx, ly] = Y.led, [fx, fy] = Y.fan, [tx, ty] = Y.tank
   const blades: Pt = [fx - 18, fy + 18]
@@ -167,11 +165,7 @@ export function Board(props: Props) {
     } else if (e.key === 'Escape') onCancel()
   }
 
-  // a part runs only when it is wired and its panel has enough power left for it
-  const motorDir = ev && pw.motor > 0 && !ev.chain.includes('motor') ? ev.conn.motor.dir : 0
-  const ledOn = !!ev && ev.conn.led.dir === 1 && pw.led && !burnt && !ev.chain.includes('led')
-  const pumpDir = ev && pw.pump !== 'off' && !ev.chain.includes('pump') ? ev.conn.pump.dir : 0
-  const pumpFull = pumpDir > 0 && pw.pump === 'full'
+  const { motorDir, ledOn, pumpDir, pumpFull } = m
   const sunFill = sunOn ? (cloud > 0.5 ? '#c9b25a' : '#F2B705') : '#c9cdc4'
   const [sunX, sunY] = Y.sun
   const pumpDropX = px + (tx > px ? 10 : -10)
@@ -291,7 +285,7 @@ export function Board(props: Props) {
 
       {wires.map(([a, b], i) => {
         const [x1, y1] = T[a], [x2, y2] = T[b]
-        const net = posNets.has(f(a)) ? '+' : negNets.has(f(a)) ? '−' : null
+        const net = m.wireNet[i]
         const col = net === '+' ? RED : net === '−' ? INK : LOOSE
         const my = Math.min(Y.h - 10, Math.max(y1, y2) + 26)
         const d = `M${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`

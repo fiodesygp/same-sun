@@ -86,6 +86,15 @@ Questions for these three:
 | Shade on the plant: A little / Some / A lot | Sombra sobre la planta: Poca / Media / Mucha | — |
 | Low / Medium / High (light), Slow / Medium / Fast (fan) | Poca / Media / Mucha, Lento / Medio / Rápido | — |
 
+### 3D bench
+
+| English | Spanish now | To check |
+|---|---|---|
+| Bench view: 2D / 3D | Vista del banco: 2D / 3D | — |
+| Turn left / Turn right / Zoom in / Zoom out / Reset view | Girar a la izquierda / Girar a la derecha / Acercar / Alejar / Volver a la vista inicial | — |
+| 3D needs the internet the first time. | El 3D necesita internet la primera vez. | — |
+| Loading 3D… | Cargando 3D… | — |
+
 ### Part drawings (labels in the pictures)
 
 | English | Spanish now | To check |
