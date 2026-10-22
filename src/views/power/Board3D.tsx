@@ -1,4 +1,4 @@
-// The Build Lab bench in 3D: the same circuit, props and wiring as the 2D board (tap a terminal,
+// The Power bench in 3D: the same circuit, props and wiring as the 2D board (tap a terminal,
 // then another), drawn as a small table scene built from simple shapes. Loaded on demand as its own
 // chunk. The terminals and wires are real HTML buttons laid over the canvas at their on-screen
 // spots, so Tab, Enter and screen readers work exactly as in 2D. Draws only when something changes,

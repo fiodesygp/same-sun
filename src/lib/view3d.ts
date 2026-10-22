@@ -1,4 +1,4 @@
-// 2D or 3D for the Build Lab board. 3D is the default only where it should run well: WebGL works,
+// 2D or 3D for the Power board. 3D is the default only where it should run well: WebGL works,
 // reduced motion is off, and the device does not look low-power. The learner's own choice is
 // remembered on the device and wins after that (3D is never offered without WebGL).
 import { load, save } from './storage'

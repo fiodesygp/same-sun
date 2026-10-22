@@ -1,4 +1,4 @@
-// Build Lab progress on this device, for the level buttons and the Home missions: which levels are solved.
+// Power progress on this device, for the level buttons and the Home missions: which levels are solved.
 import { load, save } from './storage'
 
 const SOLVED = 'buildLabSolved'

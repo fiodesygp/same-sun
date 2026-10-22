@@ -46,7 +46,7 @@
   },
 
   "electric": {
-    "_todo": "TODO: replace with values measured on the real kit. Build Lab deck missions only; the free-wiring circuits use lab.panelWatts.",
+    "_todo": "TODO: replace with values measured on the real kit. Power deck missions only; the free-wiring circuits use lab.panelWatts.",
     "panel": { "voc": 6.0, "vmp": 5.0, "imp": 0.2 },
     "voltageKnee": 0.2,
     "fcFullSun": 10000,

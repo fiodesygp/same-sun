@@ -1,4 +1,4 @@
-// Electrical model for the Build Lab deck missions: volts, amps and watts from one or two small panels
+// Electrical model for the Power deck missions: volts, amps and watts from one or two small panels
 // to a fan, an LED and a pump. Kept simple and correct for 12-year-olds:
 // - Light on the panel comes from the sun's position (sunAt), the panel's tilt and clouds.
 // - One panel: current follows the light; voltage rises quickly in dim light, then holds.

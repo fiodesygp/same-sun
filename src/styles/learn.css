@@ -113,7 +113,7 @@
 .part-panel p { margin: 0 }
 @media (max-width: 599px) { .part-tabs { grid-template-columns: 1fr 1fr } }
 
-/* ---------- Build Lab: two stages, challenges, quick checks ---------- */
+/* ---------- Power: two stages, challenges, quick checks ---------- */
 .deck-challenge { --deck: #3D4A43; --deck-ink: #fff }
 .stages button { display: grid; gap: 2px; justify-items: center; font-family: var(--display); font-weight: 700; font-size: 16px; padding: 8px 10px }
 .stages button small { font-family: var(--body); font-weight: 600; font-size: 13px; color: var(--muted) }

@@ -10,7 +10,7 @@
   --display: "Montserrat", "Segoe UI", system-ui, sans-serif;
   --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --radius: 14px;
-  /* Solar Card Deck colours (Build Lab steps). Text on each: dark on orange and yellow, white on the rest (all AA). */
+  /* Solar Card Deck colours (Power steps). Text on each: dark on orange and yellow, white on the rest (all AA). */
   --deck-red: #B3261E; --deck-orange: #F28C28; --deck-yellow: #F2B705; --deck-green: #0B6B47;
   --deck-blue: #1B5FA8; --deck-purple: #6B3FA0; --deck-magenta: #A3195B; --deck-bonus: #5A6B60;
   color-scheme: light;

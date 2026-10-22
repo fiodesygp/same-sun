@@ -10,14 +10,14 @@ Same Sun is a short design-and-test game for the **miniAgriPV** project (Girl Sc
 **Our big question:** *In a desert where land, water, and shade are hard to come by, how can you use STEM to build a micro-lab that shows your family how one sunny space can grow food and power other things at once?*
 
 - **Sun Day:** pick a plant, panel and day, predict, then watch a sunny Arizona day and see the Sun Score with feedback.
-- **Build Lab:** meet the parts of the kit (a card and a quick check for each), then try 10 steps: the seven SCN 202 Solar Card Deck missions (circuits, measuring, switch and dial, series and parallel) and three bonus missions; then three harder wiring challenges, and a Sun Monitor.
+- **Power:** meet the parts of the kit (a card and a quick check for each), then try 10 steps: the seven SCN 202 Solar Card Deck missions (circuits, measuring, switch and dial, series and parallel) and three bonus missions; then three harder wiring challenges, and a Sun Monitor.
 - **Growth Story Card:** add a photo and a few words at each step of the real project.
 
-It works on phones, tablets and computers, in English and Spanish, and offline after the first visit. The Build Lab bench can also be shown in 3D: that part (about 240 KB zipped) downloads only the first time someone opens it, then works offline too. Devices without WebGL, with reduced motion on, or that look low-power start in 2D.
+It works on phones, tablets and computers, in English and Spanish, and offline after the first visit. The Power bench can also be shown in 3D: that part (about 240 KB zipped) downloads only the first time someone opens it, then works offline too. Devices without WebGL, with reduced motion on, or that look low-power start in 2D.
 
 ## Privacy: everything stays on the device
 
-Players are minors, so the game has no accounts, no backend, no analytics and no tracking. Growth Story entries and photos are stored only in the browser on the device (IndexedDB); the last Sun Day design, test runs, Build Lab progress and language choice are stored in localStorage. Nothing is uploaded or shared. Clearing the browser's site data removes it all.
+Players are minors, so the game has no accounts, no backend, no analytics and no tracking. Growth Story entries and photos are stored only in the browser on the device (IndexedDB); the last Sun Day design, test runs, Power progress and language choice are stored in localStorage. Nothing is uploaded or shared. Clearing the browser's site data removes it all.
 
 ## For adults: the numbers are estimates
 
@@ -59,11 +59,11 @@ If the tests or build fail, nothing is published on either host.
 
 ## Project layout
 
-- `src/sim/`: the simulation, feedback rules and challenges (pure functions, unit tested); `electric.ts` is the volts/amps/watts model for the Build Lab deck missions
+- `src/sim/`: the simulation, feedback rules and challenges (pure functions, unit tested); `electric.ts` is the volts/amps/watts model for the Power deck missions
 - `src/config/model.json`: every simulation constant, to tune with the real kit
 - `src/i18n/en.json`, `src/i18n/es.json`: all UI text
-- `src/lab/`: the Build Lab circuit checker
-- `src/views/buildLab/`: the Build Lab board (2D, and `Board3D.tsx` for 3D), steps, bench, Sun Monitor and part cards
+- `src/lab/`: the Power circuit checker
+- `src/views/power/`: the Power board (2D, and `Board3D.tsx` for 3D), steps, bench, Sun Monitor and part cards
 - `src/components/parts/`: the part drawings shared by the part cards, the board and the bench
 - `src/lab/board.ts`: what the board shows for a circuit, shared by the 2D and 3D views
 - `src/views/`, `src/components/`, `src/styles/`: screens and styles

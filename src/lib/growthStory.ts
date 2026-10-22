@@ -5,7 +5,7 @@ import { idbStore } from './storage'
 
 export const STAGES = ['s1', 'h1', 's2', 'h2', 's3', 'reflect'] as const
 export type StageId = (typeof STAGES)[number]
-/** s = troop session (green), h = at home (yellow), r = Reflect, from Build Lab (purple) */
+/** s = troop session (green), h = at home (yellow), r = Reflect, from Power (purple) */
 export const stageKind = (s: StageId) => (s === 'reflect' ? 'r' : s.startsWith('s') ? 's' : 'h')
 
 export interface GrowthStoryEntry {
@@ -16,7 +16,7 @@ export interface GrowthStoryEntry {
   story: string
   /** a shrunk JPEG as a data URL, or null */
   photo: string | null
-  /** the Build Lab step this is from (a sketch photo, or Reflect) */
+  /** the Power step this is from (a sketch photo, or Reflect) */
   mission?: MissionId
 }
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { MISSIONS, PATH } from '../../lib/learn'
 import { MISSION_DEFS, READY } from './missions'
 
-describe('Build Lab steps', () => {
+describe('Power steps', () => {
   it('follow the path: 7 deck missions in deck colours, the bonus cards, then the challenges', () => {
     expect(MISSION_DEFS.map(d => d.id)).toEqual(PATH)
     expect(MISSION_DEFS.map(d => d.colour)).toEqual(['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'magenta', null, null, null, null, null, null])

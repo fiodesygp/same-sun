@@ -1,4 +1,4 @@
-// The Build Lab wiring board. Two layouts share the same parts, terminals, wires and logic:
+// The Power wiring board. Two layouts share the same parts, terminals, wires and logic:
 // - portrait (360 x 340) for phones and tablets held upright,
 // - landscape (640 x 320) for wide screens, parts spread left to right: small panel, big panel
 //   above the plant, resistor, LED, fan, water tank.

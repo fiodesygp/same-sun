@@ -7,7 +7,7 @@ globalThis.localStorage = {
   clear: () => mem.clear(), key: i => [...mem.keys()][i] ?? null, get length() { return mem.size }
 } as Storage
 
-describe('Build Lab path progress', () => {
+describe('Power path progress', () => {
   beforeEach(() => mem.clear())
 
   it('starts empty', () => {
@@ -49,7 +49,7 @@ describe('the merged path', () => {
 describe('carrying old progress over', () => {
   beforeEach(() => mem.clear())
 
-  it('each solved Build Lab level marks its step done', () => {
+  it('each solved Power level marks its step done', () => {
     const s = migrate({}, [0, 1, 2, 3, 4, 5])
     expect(s.m1).toEqual({ done: true, evidence: { device: 'fan', worked: ['fan', 'led'] } })
     expect(s.both).toEqual({ done: true, evidence: { solved: true } })

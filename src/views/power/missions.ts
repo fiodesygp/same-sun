@@ -1,5 +1,5 @@
-// Build Lab's "Try it" page: the Solar Card Deck missions in deck order and the bonus cards, then the
-// harder Build Lab challenges. For each: its kind and deck colour, how many "Try it"
+// Power's "Try it" page: the Solar Card Deck missions in deck order and the bonus cards, then the
+// harder Power challenges. For each: its kind and deck colour, how many "Try it"
 // lines and support cards it has, and when the learner may mark it done (pure, unit tested).
 import type { MissionId } from '../../lib/learn'
 

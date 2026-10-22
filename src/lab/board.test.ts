@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { TERM3D } from '../views/buildLab/layout3d'
+import { TERM3D } from '../views/power/layout3d'
 import { boardModel } from './board'
 import { evaluate, LEVELS, levelTerms, partStates, power, TERMS, type Wire } from './circuit'
 

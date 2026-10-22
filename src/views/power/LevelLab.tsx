@@ -1,4 +1,4 @@
-// Free wiring on one of the Build Lab circuits (steps 1, 8-11 of the path): the board, the sun,
+// Free wiring on one of the Power circuits (steps 1, 8-11 of the path): the board, the sun,
 // the checklist, hints after two tries, the Tester for Fix it, and the real-kit tip once solved.
 import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import model from '../../config/model.json'

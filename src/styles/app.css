@@ -99,7 +99,7 @@ legend { font-size: 14px; font-weight: 700; margin-bottom: 6px; padding: 0 }
 .seg button:disabled { opacity: .4; cursor: not-allowed }
 select { font: inherit; width: 100%; padding: 10px; border-radius: 10px; border: 1.5px solid var(--field); background: var(--surface); color: var(--ink); min-height: 44px }
 
-/* on/off switch buttons (Sun Day fan and pump, Build Lab cloud) */
+/* on/off switch buttons (Sun Day fan and pump, Power cloud) */
 .toggle { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 8px 12px; text-align: left;
   border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); cursor: pointer; font-weight: 600 }
 .toggle[aria-pressed="true"] { border-color: var(--green); background: var(--green-soft); box-shadow: inset 0 0 0 1px var(--green) }

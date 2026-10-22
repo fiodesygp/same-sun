@@ -6,15 +6,15 @@
 - Source of truth: `docs/prototype/same-sun-prototype.html` for screens, wording, layout, colors and the simulation. `docs/game-concept.md` is background. Where they disagree, follow the prototype.
 
 ## Screens
-- Four tabs: Home, Sun Day, Build Lab, Growth Story.
-- Build Lab is one guided path in two stages: "Meet the parts" (10 part cards, each with a quick check) unlocks "Try it": 10 steps (the 7 SCN 202 Solar Card Deck missions, then the 3 bonus cards), then 3 Build Lab challenges in their own section with their own counter (`STEPS` and `CHALLENGES` in `src/lib/learn.ts`), then the Sun Monitor. Learners can skip ahead.
+- Four tabs: Home, Sun Day, Power (was "Build Lab"; Spanish "Energía"), Growth Story. In code the tab is `power` (`src/views/Power.tsx`, `src/views/power/`); old storage keys such as `samesun:buildLabSolved` keep their names so saved progress loads.
+- Power is one guided path in two stages: "Meet the parts" (10 part cards, each with a quick check) unlocks "Try it": 10 steps (the 7 SCN 202 Solar Card Deck missions, then the 3 bonus cards), then 3 Power challenges in their own section with their own counter (`STEPS` and `CHALLENGES` in `src/lib/learn.ts`), then the Sun Monitor. Learners can skip ahead.
 - The free-wiring circuits use the watts budget in `src/lab/`; the deck missions use the volts/amps/watts model in `src/sim/electric.ts`.
-- Saved progress: `samesun:learn` (steps), `samesun:parts` (quick checks). `migrate()` carries old Build Lab levels (`samesun:buildLabSolved`) into the path; it only adds and never deletes old keys.
+- Saved progress: `samesun:learn` (steps), `samesun:parts` (quick checks). `migrate()` carries old Build Lab (now Power) levels (`samesun:buildLabSolved`) into the path; it only adds and never deletes old keys.
 - Match the prototype. Tell me before changing a screen's content or flow.
 
 ## Stack
 - Vite + React + TypeScript, SVG for scenes, Vitest for tests, vite-plugin-pwa for offline use.
-- 3D (Build Lab bench only): three and @react-three/fiber, pinned exact (+ @types/three, dev only). The 3D view is a lazy chunk, not precached; it is cached at runtime the first time it opens. 2D must always work on its own.
+- 3D (Power bench only): three and @react-three/fiber, pinned exact (+ @types/three, dev only). The 3D view is a lazy chunk, not precached; it is cached at runtime the first time it opens. 2D must always work on its own.
 - Ask before adding any other dependency.
 
 ## Hosting
@@ -54,7 +54,7 @@
 - Spanish: `es.json` has the same keys as `en.json`, with English text as placeholders for now. Claude drafts the Spanish later; a native speaker on the team reviews it before launch.
 - Reading level: 7th grade (ages 12-13). Keep the prototype's wording.
 - Naming: the tab label is "Growth Story". The page heading and the Home card say "Growth Story Card". In code, use `growthStory` for the component, files and storage keys. Never "plan" or "journal".
-- Build Lab layout: the app (`src/views/buildLab/Board.tsx`) is the reference, not the prototype. Terminals were spread for 44 px targets; do not copy them back into `docs/prototype`.
+- Power board layout: the app (`src/views/power/Board.tsx`) is the reference, not the prototype. Terminals were spread for 44 px targets; do not copy them back into `docs/prototype`.
 
 ## Workflow
 - Work in small steps.

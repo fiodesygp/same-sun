@@ -1,4 +1,4 @@
-// Detailed drawings of the kit's parts, shared by the part cards, the Build Lab board and the bench,
+// Detailed drawings of the kit's parts, shared by the part cards, the Power board and the bench,
 // so a part looks the same everywhere. Each glyph is drawn around its own anchor point, so the board
 // keeps its terminals exactly where they were. The colours are the real parts' colours; the card
 // view puts them on a light "workbench" plate so they keep their contrast in dark mode too.

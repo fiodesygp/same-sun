@@ -19,7 +19,7 @@ export interface Design {
   fan: boolean
   /** true = smart pump from the tank; false = hand watering each morning */
   pump: boolean
-  /** Build Lab's AgriPV step only: the panel's angle; Sun Day uses the fixed angle */
+  /** Power's AgriPV step only: the panel's angle; Sun Day uses the fixed angle */
   tilt?: number
 }
 

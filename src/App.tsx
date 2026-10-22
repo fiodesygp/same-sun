@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Header, TABS, type TabId } from './components/Header'
 import { setLang, type Lang } from './i18n/t'
 import { load, save } from './lib/storage'
-import { BuildLab } from './views/BuildLab'
+import { Power } from './views/Power'
 import { GrowthStory, type SketchRequest } from './views/GrowthStory'
 import { Home } from './views/Home'
 import { SunDay } from './views/SunDay'
@@ -31,7 +31,7 @@ export function App() {
   const views: Record<TabId, React.ReactNode> = {
     home: <Home onGo={select} active={tab === 'home'} />,
     sunDay: <SunDay />,
-    buildLab: <BuildLab active={tab === 'buildLab'} onSketch={mission => { setSketch(s => ({ mission, n: (s?.n ?? 0) + 1 })); select('growthStory') }} />,
+    power: <Power active={tab === 'power'} onSketch={mission => { setSketch(s => ({ mission, n: (s?.n ?? 0) + 1 })); select('growthStory') }} />,
     growthStory: <GrowthStory active={tab === 'growthStory'} sketch={sketch} />
   }
 

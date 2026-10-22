@@ -25,7 +25,7 @@ Questions for these three:
 | Same Sun | Same Sun (English) | Keep the name, or "El mismo sol"? |
 | Sun Score | Puntaje Sol | Natural? "puntaje" or "puntuación"? |
 | Sun Day | Día de sol | — |
-| Build Lab | Taller | Clear enough? Level 1 is "1 · Motor" because "Ventilador" does not fit on a phone. |
+| Power (tab, was Build Lab) | Energía | Was "Taller". Clear as a tab name? |
 | Growth Story (tab) / Growth Story Card | Mi historia / Tarjeta Mi historia | Right name for the reflection card? |
 | Your mission / Your missions | Tu misión / Tus misiones | — |
 | series / parallel / short circuit | en serie / en paralelo / cortocircuito | Same words as the troop sessions? |
@@ -51,11 +51,11 @@ Questions for these three:
 | New puzzle | Nuevo reto | — |
 | °F | °F | Fine for a US audience? |
 
-## New: Build Lab path (was the Learn tab)
+## New: Power path (was the Learn tab)
 
 | English | Spanish now | To check |
 |---|---|---|
-| Meet the parts / Try it (Build Lab stages) | Conoce las piezas / Pruébalo | — |
+| Meet the parts / Try it (Power stages) | Conoce las piezas / Pruébalo | — |
 | Quick check | Pregunta rápida | — |
 | Checked / Not checked yet | Respondida / Sin responder | — |
 | Skip ahead to Try it | Saltar a Pruébalo | — |

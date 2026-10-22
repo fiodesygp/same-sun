@@ -1,4 +1,4 @@
-// Build Lab circuit checker. Wires join terminals into nets (union-find). Parts do not conduct,
+// Power circuit checker. Wires join terminals into nets (union-find). Parts do not conduct,
 // so a part works when one of its terminals is on a panel's + net and the other on that panel's
 // - net. The resistor is the one part that passes power along: an LED may reach its panel through
 // it. Levels 1-2 use only the big panel; from level 3 there is a small panel and a resistor too.

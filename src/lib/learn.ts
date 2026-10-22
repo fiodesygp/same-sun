@@ -1,12 +1,12 @@
-// Build Lab path progress on this device: for each step, whether it is done and the evidence the
-// learner saved. Nothing leaves the device. The path joins the old Build Lab levels and the old
+// Power path progress on this device: for each step, whether it is done and the evidence the
+// learner saved. Nothing leaves the device. The path joins the old Power levels and the old
 // Learn missions; migrate() carries both kinds of saved progress over.
 import { loadSolved } from './progress'
 import { load, save } from './storage'
 
 /** the seven Solar Card Deck missions */
 export const CORE = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7'] as const
-/** Build Lab circuits with no deck card */
+/** Power circuits with no deck card */
 export const CHALLENGES = ['both', 'all', 'fix'] as const
 export const BONUS = ['pump', 'agripv', 'reflect'] as const
 export type CoreId = (typeof CORE)[number]
@@ -19,7 +19,7 @@ export const STEPS: MissionId[] = [...CORE, ...BONUS]
 export const PATH: MissionId[] = [...STEPS, ...CHALLENGES]
 export const MISSIONS = PATH
 
-/** the old Build Lab levels (0-5) and the step each one became */
+/** the old Power levels (0-5) and the step each one became */
 export const LEVEL_STEP: MissionId[] = ['m1', 'm1', 'both', 'pump', 'all', 'fix']
 /** what a solved old level counts as, in the step's own evidence */
 const LEVEL_EVIDENCE: Record<string, unknown>[] = [
@@ -36,7 +36,7 @@ export type LearnState = Partial<Record<MissionId, MissionRecord>>
 const KEY = 'learn'
 
 /**
- * Carry old Build Lab progress into the path: each solved level marks its step done. Only ever
+ * Carry old Power progress into the path: each solved level marks its step done. Only ever
  * adds: nothing already saved is changed or removed, so running it again changes nothing.
  */
 export function migrate(s: LearnState, solved: number[]): LearnState {
@@ -57,7 +57,7 @@ export function migrate(s: LearnState, solved: number[]): LearnState {
   return out
 }
 
-/** Saved progress, with old Build Lab levels carried over; anything unknown or broken is dropped. */
+/** Saved progress, with old Power levels carried over; anything unknown or broken is dropped. */
 export function loadLearn(): LearnState {
   const s = readLearn(), merged = migrate(s, loadSolved())
   if (JSON.stringify(merged) !== JSON.stringify(s)) save(KEY, merged)

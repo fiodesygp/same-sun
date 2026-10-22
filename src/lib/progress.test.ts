@@ -27,7 +27,7 @@ describe('Home mission progress', () => {
     for (let i = 0; i < 30; i++) saveRun(run(80))
     expect(bestScore()).toBe(150)
   })
-  it('remembers each solved Build Lab level once', () => {
+  it('remembers each solved Power level once', () => {
     expect(loadSolved()).toEqual([])
     markSolved(2); markSolved(0); markSolved(2)
     expect(loadSolved()).toEqual([0, 2])

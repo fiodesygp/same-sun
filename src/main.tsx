@@ -6,7 +6,7 @@ import './styles/tokens.css'
 import './styles/app.css'
 import './styles/home.css'
 import './styles/sunday.css'
-import './styles/buildlab.css'
+import './styles/power.css'
 import './styles/growthstory.css'
 import './styles/learn.css'
 

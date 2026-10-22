@@ -9,7 +9,7 @@ import { EntryList } from './growthStory/EntryList'
 import { EntryView } from './growthStory/EntryView'
 import { RunsTable } from './growthStory/RunsTable'
 
-/** a request from Build Lab to add a photo for a mission; n changes on every request */
+/** a request from Power to add a photo for a mission; n changes on every request */
 export type SketchRequest = { mission: MissionId; n: number }
 
 export function GrowthStory({ active, sketch }: { active: boolean; sketch?: SketchRequest | null }) {
@@ -25,12 +25,12 @@ export function GrowthStory({ active, sketch }: { active: boolean; sketch?: Sket
   const listHeadingRef = useRef<HTMLHeadingElement>(null)
   const focusList = useRef(false)
 
-  // Build Lab's Reflect step saves entries while this tab is hidden, so reload each time it opens
+  // Power's Reflect step saves entries while this tab is hidden, so reload each time it opens
   useEffect(() => {
     if (active) growthStoryStore.all().then(xs => setEntries(newestFirst(xs)), () => setLoadFailed(true))
   }, [active])
 
-  // from a Build Lab step's sketch button: a fresh form tagged with that mission
+  // from a Power step's sketch button: a fresh form tagged with that mission
   useEffect(() => {
     if (!sketch) return
     setEditing(null)

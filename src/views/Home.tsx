@@ -55,8 +55,8 @@ export function Home({ onGo, active }: Props) {
   const missions = [
     { tab: 'sunDay', icon: ICONS.sun, title: t('tabs.sunDay'), goal: t('home.m.sunDay.goal'),
       progress: progress.best === null ? t('home.m.sunDay.none') : t('home.m.sunDay.progress', { score: progress.best }) },
-    { tab: 'buildLab', icon: ICONS.bolt, title: t('tabs.buildLab'), goal: t('home.m.buildLab.goal'),
-      progress: t('home.m.buildLab.progress', { n: progress.solved, total: STEPS.length }) },
+    { tab: 'power', icon: ICONS.bolt, title: t('tabs.power'), goal: t('home.m.power.goal'),
+      progress: t('home.m.power.progress', { n: progress.solved, total: STEPS.length }) },
     { tab: 'growthStory', icon: ICONS.sprout, title: t('growthStory.eyebrow'), goal: t('home.m.growthStory.goal'),
       progress: progress.stories ? t('home.m.growthStory.progress', { n: progress.stories }) : t('home.m.growthStory.none') }
   ] as const
@@ -86,7 +86,7 @@ export function Home({ onGo, active }: Props) {
                 <svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1 L13 7 L2 13 Z" fill="currentColor" /></svg>
                 {t('home.start')}
               </button>
-              <button className="btn ghost" type="button" onClick={() => onGo('buildLab')}>{t('home.wire')}</button>
+              <button className="btn ghost" type="button" onClick={() => onGo('power')}>{t('home.wire')}</button>
             </div>
           </div>
         </div>

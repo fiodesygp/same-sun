@@ -1,16 +1,16 @@
-// Build Lab: one guided path in two stages. "Meet the parts" (a card and a quick check for each
-// part of the kit) unlocks "Try it" (the Solar Card Deck missions, the Build Lab challenges and the
+// Power: one guided path in two stages. "Meet the parts" (a card and a quick check for each
+// part of the kit) unlocks "Try it" (the Solar Card Deck missions, the Power challenges and the
 // bonus cards, in order). A learner can skip ahead, and anyone with saved progress starts on Try it.
 import { useEffect, useRef, useState } from 'react'
 import { t, type Key } from '../i18n/t'
 import { challengesDone, CHALLENGES, CORE, hasProgress, loadLearn, markDone, saveEvidence, STEPS, stepsDone, type LearnState, type MissionId } from '../lib/learn'
 import { allChecked, answerCheck, loadParts, PART_IDS, skipParts, type PartsState } from '../lib/parts'
 import { forgetStars } from '../lib/progress'
-import { MissionView } from './buildLab/MissionView'
-import { def, type Evidence } from './buildLab/missions'
-import { PartView } from './buildLab/PartView'
-import { PartIcon, type PartId } from './buildLab/parts'
-import { SunMonitor } from './buildLab/SunMonitor'
+import { MissionView } from './power/MissionView'
+import { def, type Evidence } from './power/missions'
+import { PartView } from './power/PartView'
+import { PartIcon, type PartId } from './power/parts'
+import { SunMonitor } from './power/SunMonitor'
 
 type Props = { active: boolean; onSketch: (mission: MissionId) => void }
 type Stage = 'parts' | 'try'
@@ -19,7 +19,7 @@ type Open = MissionId | 'monitor' | `part:${PartId}`
 
 const TOTAL = STEPS.length
 
-export function BuildLab({ active, onSketch }: Props) {
+export function Power({ active, onSketch }: Props) {
   const [state, setState] = useState<LearnState>(loadLearn)
   const [parts, setParts] = useState<PartsState>(loadParts)
   const [stage, setStage] = useState<Stage>(() => (hasProgress(loadLearn()) || allChecked(loadParts()) || loadParts().skipped ? 'try' : 'parts'))
@@ -30,7 +30,7 @@ export function BuildLab({ active, onSketch }: Props) {
   // older versions saved stars; the game no longer has them
   useEffect(() => forgetStars(), [])
 
-  // other tabs (Growth Story's Reflect entry) can change progress, so reload when Build Lab opens
+  // other tabs (Growth Story's Reflect entry) can change progress, so reload when Power opens
   useEffect(() => {
     if (active) setState(loadLearn())
   }, [active])
@@ -93,17 +93,17 @@ export function BuildLab({ active, onSketch }: Props) {
   return (
     <>
       <div>
-        <div className="eyebrow">{t('buildLab.eyebrow')}</div>
-        <h1 className="page-title">{t('buildLab.title')}</h1>
-        <p className="lede">{t('buildLab.lede')}</p>
+        <div className="eyebrow">{t('power.eyebrow')}</div>
+        <h1 className="page-title">{t('power.title')}</h1>
+        <p className="lede">{t('power.lede')}</p>
       </div>
 
-      <div className="seg stages" role="group" aria-label={t('buildLab.stages')}>
+      <div className="seg stages" role="group" aria-label={t('power.stages')}>
         <button type="button" aria-pressed={stage === 'parts'} onClick={() => setStage('parts')}>
-          {t('buildLab.stage.parts')}<small>{t('buildLab.checks', { n: checked, total: PART_IDS.length })}</small>
+          {t('power.stage.parts')}<small>{t('power.checks', { n: checked, total: PART_IDS.length })}</small>
         </button>
         <button type="button" aria-pressed={stage === 'try'} onClick={() => goTry(!unlocked)}>
-          {t('buildLab.stage.try')}<small>{unlocked || parts.skipped || hasProgress(state) ? t('learn.progress', { n, total: TOTAL }) : t('buildLab.skipAhead')}</small>
+          {t('power.stage.try')}<small>{unlocked || parts.skipped || hasProgress(state) ? t('learn.progress', { n, total: TOTAL }) : t('power.skipAhead')}</small>
         </button>
       </div>
 
@@ -111,17 +111,17 @@ export function BuildLab({ active, onSketch }: Props) {
         <>
           <section aria-labelledby="bl-parts">
             <h2 className="h2" id="bl-parts">{t('learn.partsTitle')}</h2>
-            <p className="hint">{t('buildLab.partsHint')}</p>
+            <p className="hint">{t('power.partsHint')}</p>
             <div className="learn-grid parts-grid">
               {PART_IDS.map(p => {
                 const ok = parts.checked.includes(p)
                 return (
                   <button key={p} type="button" ref={el => { cardRefs.current[`part:${p}`] = el }} className={`card part-tile${ok ? ' is-done' : ''}`}
-                    aria-label={t('buildLab.openPart', { title: t(`learn.part.${p}.name` as Key), status: t(ok ? 'buildLab.checkDone' : 'buildLab.checkTodo') })}
+                    aria-label={t('power.openPart', { title: t(`learn.part.${p}.name` as Key), status: t(ok ? 'power.checkDone' : 'power.checkTodo') })}
                     onClick={() => show(`part:${p}`)}>
                     <span className="part-icon"><PartIcon id={p} /></span>
                     <span className="learn-card-title">{t(`learn.part.${p}.name` as Key)}</span>
-                    {ok && <span className="done-tag"><span aria-hidden="true">✓</span> {t('buildLab.checkDone')}</span>}
+                    {ok && <span className="done-tag"><span aria-hidden="true">✓</span> {t('power.checkDone')}</span>}
                   </button>
                 )
               })}
@@ -130,13 +130,13 @@ export function BuildLab({ active, onSketch }: Props) {
           <div className="card unlock" aria-live="polite">
             {unlocked ? (
               <>
-                <p className="flat"><b>{t('buildLab.unlocked')}</b></p>
-                <button className="btn" type="button" onClick={() => goTry(false)}>{t('buildLab.goTry')}</button>
+                <p className="flat"><b>{t('power.unlocked')}</b></p>
+                <button className="btn" type="button" onClick={() => goTry(false)}>{t('power.goTry')}</button>
               </>
             ) : (
               <>
-                <p className="flat">{t('buildLab.toUnlock', { n: PART_IDS.length - checked })}</p>
-                <button className="btn ghost" type="button" onClick={() => goTry(true)}>{t('buildLab.skip')}</button>
+                <p className="flat">{t('power.toUnlock', { n: PART_IDS.length - checked })}</p>
+                <button className="btn ghost" type="button" onClick={() => goTry(true)}>{t('power.skip')}</button>
               </>
             )}
           </div>
@@ -165,13 +165,13 @@ export function BuildLab({ active, onSketch }: Props) {
           </div>
 
           <section aria-labelledby="bl-steps">
-            <h2 className="h2" id="bl-steps">{t('buildLab.stepsTitle')}</h2>
+            <h2 className="h2" id="bl-steps">{t('power.stepsTitle')}</h2>
             <div className="learn-grid">{STEPS.map(stepCard)}</div>
           </section>
           <section aria-labelledby="bl-challenges">
-            <h2 className="h2" id="bl-challenges">{t('buildLab.challengesTitle')}</h2>
-            <p className="hint flat">{t('buildLab.challengesIntro')}</p>
-            <p className="challenge-count">{t('buildLab.challengesProgress', { n: nc, total: CHALLENGES.length })}</p>
+            <h2 className="h2" id="bl-challenges">{t('power.challengesTitle')}</h2>
+            <p className="hint flat">{t('power.challengesIntro')}</p>
+            <p className="challenge-count">{t('power.challengesProgress', { n: nc, total: CHALLENGES.length })}</p>
             <div className="learn-grid">{CHALLENGES.map(stepCard)}</div>
           </section>
           <section aria-labelledby="bl-tools">

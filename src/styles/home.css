@@ -28,13 +28,13 @@
 .h2 { font-size: clamp(20px, 0.8vw + 17px, 28px); margin-bottom: 12px }
 .trio { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap) }
 .mission-card { text-align: left; cursor: pointer; display: grid; gap: 6px; align-content: start; font: inherit; color: inherit; border-top: 6px solid var(--green) }
-.mission-card.buildLab { border-top-color: var(--sun) }
+.mission-card.power { border-top-color: var(--sun) }
 .mission-card.growthStory { border-top-color: var(--maroon) }
 .mission-icon { color: var(--green) }
 .mission-title { font-family: var(--display); font-weight: 700; font-size: 18px }
 .mission-goal { color: var(--ink) }
 .mission-progress { justify-self: start; margin-top: 4px; padding: 4px 12px; border-radius: 999px; background: var(--bg); font-weight: 700; font-variant-numeric: tabular-nums }
-@media (hover: hover) { .mission-card:hover { border-color: var(--green) } .mission-card.buildLab:hover { border-top-color: var(--sun) } .mission-card.growthStory:hover { border-top-color: var(--maroon) } }
+@media (hover: hover) { .mission-card:hover { border-color: var(--green) } .mission-card.power:hover { border-top-color: var(--sun) } .mission-card.growthStory:hover { border-top-color: var(--maroon) } }
 
 /* ---------- footer ---------- */
 .home-foot { display: grid; gap: 4px; justify-items: center; text-align: center; font-size: 13px; color: var(--muted); padding-top: 8px; border-top: 1px solid var(--line) }

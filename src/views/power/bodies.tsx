@@ -36,7 +36,7 @@ function M1({ evidence, save }: BodyProps) {
   )
 }
 
-/** Bonus: the Build Lab pump level, with a count of the water pumped. */
+/** Bonus: the Power pump level, with a count of the water pumped. */
 function Pump({ evidence, save }: BodyProps) {
   const ml = typeof evidence.ml === 'number' ? evidence.ml : 0
   return (
@@ -49,7 +49,7 @@ function Pump({ evidence, save }: BodyProps) {
   )
 }
 
-/** Challenges: a Build Lab circuit (both, all three, fix it); done once it works with the sun on. */
+/** Challenges: a Power circuit (both, all three, fix it); done once it works with the sun on. */
 function Challenge({ level, evidence, save }: BodyProps & { level: number }) {
   return (
     <section className="stack">
