@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { FACILITY, isRightMaterial, MATERIAL_CHECKS, MATERIAL_IDS } from './materials'
-import { allMaterialsChecked, answerMaterial, loadStructure, skipMaterials } from './progress'
+import { allMaterialsChecked, answerMaterial, loadDraft, loadStructure, saveDraft, skipMaterials } from './progress'
 
 const mem = new Map<string, string>()
 globalThis.localStorage = {
@@ -32,5 +32,15 @@ describe('Structure materials', () => {
   it('remembers skipping ahead', () => {
     skipMaterials()
     expect(loadStructure().skipped).toBe(true)
+  })
+})
+
+describe('the frame being built', () => {
+  beforeEach(() => mem.clear())
+  it('saves and reloads the picks, and drops anything that is not an option', () => {
+    saveDraft({ cupOpen: false, base: 'cup', posts: 'pipe', join: 'pipeWrap' })
+    expect(loadDraft()).toEqual({ cupOpen: false, base: 'cup', posts: 'pipe', join: 'pipeWrap' })
+    mem.set('samesun:structure', JSON.stringify({ design: { base: 'rocket', hinge: 'axle' } }))
+    expect(loadDraft()).toEqual({ cupOpen: true, hinge: 'axle' })
   })
 })

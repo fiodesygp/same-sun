@@ -5,3 +5,23 @@
 .facility-tag.flag { border-color: var(--warn); color: var(--ink) }
 .facility-tag.flag::before { content: "⚠ "; color: var(--warn) }
 .part-head .part-tag { grid-column: 1 / -1 }
+
+/* ---------- the builder ---------- */
+.builder { display: grid; gap: var(--gap) }
+.builder-cols { display: grid; gap: var(--gap) }
+.builder-scene { display: grid; gap: 6px; padding: 8px; align-self: start; position: sticky; top: calc(var(--header-h, 72px) + 8px); z-index: 2 }
+.frame2d { display: block; width: 100%; height: auto; max-height: 30svh; border-radius: 12px }
+@media (min-width: 600px) { .frame2d { max-height: 45svh } }
+.builder-said { margin: 0; min-height: 1.4em; font-weight: 700 }
+.slots { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px }
+.slot fieldset { display: grid; gap: 8px }
+.slot legend { font-family: var(--display); font-size: 17px; font-weight: 700; margin-bottom: 0 }
+.slot-n { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--deck-blue); color: #fff; font-size: 14px; margin-right: 4px }
+.slot.locked { opacity: .65 }
+.slot .options button { flex: 1 1 140px }
+.wont { margin: 0; font-weight: 700; color: var(--warn) }
+.cup-q { display: grid; gap: 6px; padding-top: 6px; border-top: 1px solid var(--line) }
+/* wide: the drawing stays in view beside the slots */
+@media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
+  .builder-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start }
+}

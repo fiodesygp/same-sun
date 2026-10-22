@@ -2,6 +2,7 @@
 // learner skipped ahead, the frame being built, and the last test results. Nothing leaves the device.
 import { load, save } from '../lib/storage'
 import { isRightMaterial, MATERIAL_IDS, type MaterialId } from './materials'
+import { OPTIONS, SLOTS, type Draft } from './options'
 
 export interface StructureState {
   checked: MaterialId[]
@@ -37,3 +38,21 @@ export function skipMaterials(): StructureState {
 }
 
 export const allMaterialsChecked = (s: StructureState) => s.checked.length === MATERIAL_IDS.length
+
+// ---------- the frame being built ----------
+
+export const EMPTY_DRAFT: Draft = { cupOpen: true }
+
+/** the saved draft; picks that are not real options are dropped */
+export function loadDraft(): Draft {
+  const x = read().design
+  const o = x && typeof x === 'object' ? (x as Record<string, unknown>) : {}
+  const d: Draft = { cupOpen: o.cupOpen !== false }
+  for (const s of SLOTS) {
+    const v = o[s]
+    if (typeof v === 'string' && ((OPTIONS[s] as readonly string[]).includes(v) || (s === 'join' && v === 'none'))) (d as Record<string, unknown>)[s] = v
+  }
+  return d
+}
+
+export const saveDraft = (d: Draft) => write({ design: d })

@@ -5,14 +5,22 @@ import { useEffect, useRef, useState } from 'react'
 import { MaterialIcon } from '../components/materials/art'
 import { t, type Key } from '../i18n/t'
 import { MATERIAL_IDS, type MaterialId } from '../structure/materials'
-import { allMaterialsChecked, answerMaterial, loadStructure, type StructureState } from '../structure/progress'
+import { SLOTS, type Draft } from '../structure/options'
+import { allMaterialsChecked, answerMaterial, loadDraft, loadStructure, skipMaterials, type StructureState } from '../structure/progress'
+import { Builder } from './structure/Builder'
 import { FacilityTag, MaterialView } from './structure/MaterialView'
 
-type Stage = 'materials'
+type Stage = 'materials' | 'build'
+const picked = (d: Draft) => SLOTS.filter(s => d[s] !== undefined).length
 
 export function Structure({ active }: { active: boolean }) {
   const [state, setState] = useState<StructureState>(loadStructure)
-  const [stage, setStage] = useState<Stage>('materials')
+  const [draft, setDraft] = useState<Draft>(loadDraft)
+  // a learner who already built something, skipped ahead, or checked every material starts on Build
+  const [stage, setStage] = useState<Stage>(() => {
+    const s = loadStructure()
+    return picked(loadDraft()) > 0 || s.skipped || allMaterialsChecked(s) ? 'build' : 'materials'
+  })
   const [open, setOpen] = useState<MaterialId | null>(null)
   const tileRefs = useRef<Partial<Record<MaterialId, HTMLButtonElement | null>>>({})
   const returnTo = useRef<MaterialId | null>(null)
@@ -27,6 +35,11 @@ export function Structure({ active }: { active: boolean }) {
     tileRefs.current[returnTo.current]?.focus()
     returnTo.current = null
   }, [open])
+
+  function goBuild(skip: boolean) {
+    if (skip) setState(skipMaterials())
+    setStage('build')
+  }
 
   function show(id: MaterialId | null) {
     if (!id) returnTo.current = open
@@ -60,7 +73,13 @@ export function Structure({ active }: { active: boolean }) {
         <button type="button" aria-pressed={stage === 'materials'} onClick={() => setStage('materials')}>
           {t('st.stage.materials')}<small>{t('power.checks', { n: checked, total: MATERIAL_IDS.length })}</small>
         </button>
+        <button type="button" aria-pressed={stage === 'build'} onClick={() => goBuild(!unlocked)}>
+          {t('st.stage.build')}<small>{t('st.picked', { n: picked(draft), total: SLOTS.length })}</small>
+        </button>
       </div>
+
+      {stage === 'build' && <Builder draft={draft} onChange={setDraft} />}
+      {stage === 'materials' && (<>
 
       <section aria-labelledby="st-materials">
         <h2 className="h2" id="st-materials">{t('st.materialsTitle')}</h2>
@@ -83,7 +102,11 @@ export function Structure({ active }: { active: boolean }) {
       </section>
       <div className="card unlock" aria-live="polite">
         <p className="flat">{unlocked ? <b>{t('st.unlocked')}</b> : t('st.toUnlock', { n: MATERIAL_IDS.length - checked })}</p>
+        {unlocked
+          ? <button className="btn" type="button" onClick={() => goBuild(false)}>{t('st.goBuild')}</button>
+          : <button className="btn ghost" type="button" onClick={() => goBuild(true)}>{t('st.skip')}</button>}
       </div>
+      </>)}
     </>
   )
 }

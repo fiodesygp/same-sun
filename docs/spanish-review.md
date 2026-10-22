@@ -107,6 +107,14 @@ Questions for these three:
 | Clothespins | Pinzas de ropa | — |
 | Tape | Cinta adhesiva | — |
 | your facilitator | tu facilitador/a | — |
+| Build (stage) / Build your frame | Construir / Construye tu estructura | — |
+| Base / Posts / Joining posts to the base / Hinge / Angle stop / Panel holder | Base / Postes / Unir los postes a la base / Bisagra / Tope de ángulo / Soporte del panel | — |
+| Upside-down cup / Craft-stick tower / Cardstock easel | Vaso boca abajo / Torre de palitos / Caballete de cartulina | — |
+| Thin-straw axle / eye loops / figure 8 / tape hinge | Eje de pajilla delgada / ojales / liga en forma de 8 / bisagra de cinta | "ojales" clear for kids? |
+| Rubber-band stoppers / loop ladder / notches / swap-in wedges / clothespin + printed dial | Topes de liga / escalera de aros / muescas / cuñas para cambiar / pinza + disco impreso | — |
+| Cardstock tray with a front lip | Bandeja de cartulina con borde al frente | — |
+| It fits. / It won't attach: … | Encaja. / No se puede unir: … | — |
+| Cut the cup's bottom open? | ¿Cortar el fondo del vaso? | — |
 
 ### 3D bench
 
