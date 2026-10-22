@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { FACILITY, isRightMaterial, MATERIAL_CHECKS, MATERIAL_IDS } from './materials'
-import { allMaterialsChecked, answerMaterial, loadDraft, loadStructure, saveDraft, skipMaterials } from './progress'
+import { allMaterialsChecked, answerMaterial, lastPassed, loadDraft, loadRuns, loadStructure, saveDraft, saveRun, skipMaterials } from './progress'
+import { PROTOTYPES, runTests } from './rules'
 
 const mem = new Map<string, string>()
 globalThis.localStorage = {
@@ -42,5 +43,18 @@ describe('the frame being built', () => {
     expect(loadDraft()).toEqual({ cupOpen: false, base: 'cup', posts: 'pipe', join: 'pipeWrap' })
     mem.set('samesun:structure', JSON.stringify({ design: { base: 'rocket', hinge: 'axle' } }))
     expect(loadDraft()).toEqual({ cupOpen: true, hinge: 'axle' })
+  })
+})
+
+describe('test runs', () => {
+  beforeEach(() => mem.clear())
+  it('keeps the last two runs, newest first, to compare', () => {
+    const run = (i: number) => { const d = PROTOTYPES[i].design; return { design: d, status: Object.fromEntries(runTests(d).map(t => [t.id, t.status])) as never } }
+    expect(lastPassed(loadRuns())).toBeNull()
+    saveRun(run(0)); saveRun(run(1)); saveRun(run(3))
+    const runs = loadRuns()
+    expect(runs).toHaveLength(2)
+    expect(runs[0].design).toEqual(PROTOTYPES[3].design)
+    expect(lastPassed(runs)).toBeGreaterThanOrEqual(3)
   })
 })

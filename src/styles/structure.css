@@ -25,3 +25,35 @@
 @media (min-width: 1024px), (min-width: 600px) and (orientation: landscape) {
   .builder-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start }
 }
+
+/* ---------- the tests ---------- */
+.testbench { display: grid; gap: var(--gap) }
+.tests { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)) }
+.test { display: grid; gap: 8px; align-content: start }
+.test.waiting { opacity: .8 }
+.test-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap }
+.test-fig .frame2d { max-height: 200px }
+/* the result labels are text; the border style differs too, so colour is never the only cue */
+.chip-status, .result b { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 14px; font-weight: 800; border: 2px solid }
+.chip-status.pass, .result.pass b { border-color: var(--good); color: var(--good) }
+.chip-status.needsWork, .result.needsWork b { border-color: var(--warn); color: var(--warn); border-style: dashed }
+.chip-status.ask, .result.ask b { border-color: var(--deck-blue); color: var(--ink); border-style: dotted }
+.results { display: grid; gap: 12px }
+.result-row ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px }
+.result { display: flex; align-items: center; gap: 6px; font-weight: 600 }
+.try-next { color: var(--ink) }
+.facility-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-weight: 700 }
+.sun-angle { display: grid; gap: 10px }
+.sun-svg { display: block; width: 100%; height: auto; max-height: 220px; border-radius: 12px }
+/* short animations; none with reduced motion */
+@keyframes sway-s { 0%, 100% { transform: rotate(-1deg) } 50% { transform: rotate(1deg) } }
+@keyframes sway-b { 0%, 100% { transform: rotate(-6deg) } 50% { transform: rotate(6deg) } }
+.sway.small { animation: sway-s .5s ease-in-out 3 }
+.sway.big { animation: sway-b .45s ease-in-out 3 }
+@keyframes rise { from { transform: translateY(0); opacity: 1 } to { transform: translateY(-70px); opacity: 0 } }
+@keyframes trapped { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-14px) } }
+.heat.open .wave, .heat.noCover .wave { animation: rise 1.2s ease-out infinite }
+.heat.closed .wave { animation: trapped .7s ease-in-out infinite }
+@keyframes fade-in { from { opacity: 0 } }
+.shadow { animation: fade-in 1s ease-out }
+@media (prefers-reduced-motion: reduce) { .sway, .wave, .shadow { animation: none !important } }

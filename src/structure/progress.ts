@@ -2,7 +2,8 @@
 // learner skipped ahead, the frame being built, and the last test results. Nothing leaves the device.
 import { load, save } from '../lib/storage'
 import { isRightMaterial, MATERIAL_IDS, type MaterialId } from './materials'
-import { OPTIONS, SLOTS, type Draft } from './options'
+import { OPTIONS, SLOTS, type Design, type Draft } from './options'
+import { TESTS, type Status, type TestId } from './rules'
 
 export interface StructureState {
   checked: MaterialId[]
@@ -56,3 +57,33 @@ export function loadDraft(): Draft {
 }
 
 export const saveDraft = (d: Draft) => write({ design: d })
+
+// ---------- the last test run ----------
+
+export interface Run {
+  design: Design
+  status: Record<TestId, Status>
+}
+
+const STATUSES: Status[] = ['pass', 'needsWork', 'ask']
+
+/** the last two runs, newest first (to compare after changing one part) */
+export function loadRuns(): Run[] {
+  const x = read().runs
+  if (!Array.isArray(x)) return []
+  return x.flatMap(r => {
+    const o = r && typeof r === 'object' ? (r as Record<string, unknown>) : null
+    const st = o?.status && typeof o.status === 'object' ? (o.status as Record<string, unknown>) : null
+    if (!o || !st || !o.design || !TESTS.every(id => STATUSES.includes(st[id] as Status))) return []
+    return [{ design: o.design as Design, status: st as Record<TestId, Status> }]
+  }).slice(0, 2)
+}
+
+export function saveRun(run: Run): Run[] {
+  const runs = [run, ...loadRuns()].slice(0, 2)
+  write({ runs })
+  return runs
+}
+
+/** how many tests passed in the last run (null before the first run) */
+export const lastPassed = (runs: Run[]) => (runs[0] ? TESTS.filter(id => runs[0].status[id] === 'pass').length : null)

@@ -7,14 +7,15 @@ import { growthStoryStore } from '../lib/growthStory'
 import { loadLearn, STEPS, stepsDone } from '../lib/learn'
 import { bestScore } from '../lib/runs'
 import { MATERIAL_IDS } from '../structure/materials'
-import { loadStructure } from '../structure/progress'
+import { lastPassed, loadRuns, loadStructure } from '../structure/progress'
+import { TESTS } from '../structure/rules'
 
 const HERO_DESIGN = { panels: 'both', height: 'high', weather: 'october', fan: true, pump: true } as const
 // the sun crosses the sky once every 40 s; the scene is redrawn about 12 times a second
 const DAY_MS = 40000, FRAME_MS = 80, SUNRISE = 6.4, SUNSET = 18.6
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-type Progress = { best: number | null; solved: number; materials: number; stories: number }
+type Progress = { best: number | null; solved: number; materials: number; tests: number | null; stories: number }
 
 const ICON_PROPS = { width: 28, height: 28, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true } as const
 const ICONS = {
@@ -30,7 +31,7 @@ type Props = { onGo: (tab: TabId) => void; active: boolean }
 
 export function Home({ onGo, active }: Props) {
   const [hour, setHour] = useState(10)
-  const [progress, setProgress] = useState<Progress>({ best: null, solved: 0, materials: 0, stories: 0 })
+  const [progress, setProgress] = useState<Progress>({ best: null, solved: 0, materials: 0, tests: null, stories: 0 })
 
   // the sun moves along its arc while Home is open (still with reduced motion)
   useEffect(() => {
@@ -51,7 +52,7 @@ export function Home({ onGo, active }: Props) {
   // progress read from this device each time Home opens
   useEffect(() => {
     if (!active) return
-    setProgress(p => ({ ...p, best: bestScore(), solved: stepsDone(loadLearn()), materials: loadStructure().checked.length }))
+    setProgress(p => ({ ...p, best: bestScore(), solved: stepsDone(loadLearn()), materials: loadStructure().checked.length, tests: lastPassed(loadRuns()) }))
     growthStoryStore.all().then(xs => setProgress(p => ({ ...p, stories: xs.length })), () => setProgress(p => ({ ...p, stories: 0 })))
   }, [active])
 
@@ -61,7 +62,7 @@ export function Home({ onGo, active }: Props) {
     { tab: 'power', icon: ICONS.bolt, title: t('tabs.power'), goal: t('home.m.power.goal'),
       progress: t('home.m.power.progress', { n: progress.solved, total: STEPS.length }) },
     { tab: 'structure', icon: ICONS.frame, title: t('tabs.structure'), goal: t('home.m.structure.goal'),
-      progress: t('home.m.structure.materials', { n: progress.materials, total: MATERIAL_IDS.length }) },
+      progress: progress.tests === null ? t('home.m.structure.materials', { n: progress.materials, total: MATERIAL_IDS.length }) : t('home.m.structure.tests', { n: progress.tests, total: TESTS.length }) },
     { tab: 'growthStory', icon: ICONS.sprout, title: t('growthStory.eyebrow'), goal: t('home.m.growthStory.goal'),
       progress: progress.stories ? t('home.m.growthStory.progress', { n: progress.stories }) : t('home.m.growthStory.none') }
   ] as const

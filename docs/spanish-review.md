@@ -115,6 +115,11 @@ Questions for these three:
 | Cardstock tray with a front lip | Bandeja de cartulina con borde al frente | — |
 | It fits. / It won't attach: … | Encaja. / No se puede unir: … | — |
 | Cut the cup's bottom open? | ¿Cortar el fondo del vaso? | — |
+| Test it / Run the tests / Run again / Change a part | Probarla / Hacer las pruebas / Probar otra vez / Cambiar una parte | — |
+| Angle / Slip / Wobble / Heat / Shade test | Prueba de ángulo / de resbalón / de bamboleo / de calor / de sombra | "bamboleo" natural? |
+| Pass / Needs work / Ask your facilitator | Pasa / Necesita mejoras / Pregunta a tu facilitador/a | — |
+| Try next: | Prueba después: | Or "Intenta:"? |
+| Sun angle | Ángulo del sol | — |
 
 ### 3D bench
 

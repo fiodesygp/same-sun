@@ -14,6 +14,9 @@ const INK = '#2B2F2C', WOOD = '#E2C48E', WOOD_D = '#9C7A45', CARD = '#F4E9D2', C
 const FONT = 'Source Sans 3, system-ui, sans-serif'
 const rad = (d: number) => (d * Math.PI) / 180
 
+/** where things are drawn, for the tests' overlays */
+export const FRAME2D = { GROUND, PX, FRONT, BACK, CM }
+
 /** the panel's pose for a draft: angle (degrees, up toward the back) */
 export function panelPose(d: Draft, hinge: boolean, stop: boolean, angle = 25) {
   if (!d.posts) return null
@@ -38,9 +41,15 @@ type Props = {
   angle?: number
   /** a short line for screen readers */
   label: string
+  /** slip test: how far the panel has slid down its slope (0 to 1) */
+  slide?: number
+  /** extra drawings on top (heat, sun and shadow in the tests) */
+  overlay?: React.ReactNode
+  /** the frame's own group gets this class (the wobble test sways it) */
+  frameClass?: string
 }
 
-export function Frame2D({ draft: d, angle = 25, label }: Props) {
+export function Frame2D({ draft: d, angle = 25, label, slide = 0, overlay, frameClass }: Props) {
   const a = attach(d)
   const baseTop = d.base ? GROUND - config.base[d.base].height * CM : GROUND
   const hasPosts = !!d.posts && d.posts !== 'none'
@@ -94,6 +103,7 @@ export function Frame2D({ draft: d, angle = 25, label }: Props) {
       ))}
       <path d={`M${PX - 30} ${GROUND - 34}A30 ${config.plant.domeTop * CM - 34} 0 0 1 ${PX + 30} ${GROUND - 34}`} fill="rgba(160,215,240,.3)" stroke="#7FB6D6" strokeWidth={1.5} />
 
+      <g className={frameClass} style={{ transformOrigin: `${PX}px ${GROUND}px` }}>
       {/* base */}
       {d.base === 'cup' && (
         <g>
@@ -150,7 +160,7 @@ export function Frame2D({ draft: d, angle = 25, label }: Props) {
       {/* the panel, its holder, and the hinge it turns on */}
       {pose !== null && (
         <g>
-          <g transform={`rotate(${-pose} ${H[0]} ${H[1]})`}>
+          <g transform={`rotate(${-pose} ${H[0]} ${H[1]}) translate(${-slide * 70} ${slide * 40})`} opacity={1 - slide * 0.6}>
             {d.holder === 'tray' && <path d={`M${H[0] - 6} ${H[1] - 2}V${H[1] - 14}M${H[0] - 6} ${H[1] - 2}H${H[0] + L + 2}`} fill="none" stroke={CARD_D} strokeWidth={4} />}
             <rect x={H[0]} y={H[1] - 10} width={L} height={7} rx={1.5} fill="#1B3E66" stroke="#9AA3A8" strokeWidth={1.5} />
             <path d={`M${H[0] + 21} ${H[1] - 10}v7M${H[0] + 43} ${H[1] - 10}v7M${H[0] + 64} ${H[1] - 10}v7`} stroke="#4F7FB0" strokeWidth={1} />
@@ -168,6 +178,8 @@ export function Frame2D({ draft: d, angle = 25, label }: Props) {
         </g>
       )}
 
+      </g>
+      {overlay}
       {/* a short caption, in case of no picks yet */}
       {!d.base && <text x={180} y={40} textAnchor="middle" fontSize={14} fontWeight={700} fontFamily={FONT} fill={INK}>{t('st.scene.start' as Key)}</text>}
     </svg>

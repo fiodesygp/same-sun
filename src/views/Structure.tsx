@@ -6,16 +6,19 @@ import { MaterialIcon } from '../components/materials/art'
 import { t, type Key } from '../i18n/t'
 import { MATERIAL_IDS, type MaterialId } from '../structure/materials'
 import { SLOTS, type Draft } from '../structure/options'
-import { allMaterialsChecked, answerMaterial, loadDraft, loadStructure, skipMaterials, type StructureState } from '../structure/progress'
+import { allMaterialsChecked, answerMaterial, lastPassed, loadDraft, loadRuns, loadStructure, skipMaterials, type Run, type StructureState } from '../structure/progress'
+import { isComplete, TESTS } from '../structure/rules'
 import { Builder } from './structure/Builder'
+import { TestBench } from './structure/TestBench'
 import { FacilityTag, MaterialView } from './structure/MaterialView'
 
-type Stage = 'materials' | 'build'
+type Stage = 'materials' | 'build' | 'test'
 const picked = (d: Draft) => SLOTS.filter(s => d[s] !== undefined).length
 
 export function Structure({ active }: { active: boolean }) {
   const [state, setState] = useState<StructureState>(loadStructure)
   const [draft, setDraft] = useState<Draft>(loadDraft)
+  const [runs, setRuns] = useState<Run[]>(loadRuns)
   // a learner who already built something, skipped ahead, or checked every material starts on Build
   const [stage, setStage] = useState<Stage>(() => {
     const s = loadStructure()
@@ -76,9 +79,20 @@ export function Structure({ active }: { active: boolean }) {
         <button type="button" aria-pressed={stage === 'build'} onClick={() => goBuild(!unlocked)}>
           {t('st.stage.build')}<small>{t('st.picked', { n: picked(draft), total: SLOTS.length })}</small>
         </button>
+        <button type="button" aria-pressed={stage === 'test'} onClick={() => setStage('test')}>
+          {t('st.stage.test')}<small>{lastPassed(runs) === null ? t('st.notRun') : t('st.passed', { n: lastPassed(runs)!, total: TESTS.length })}</small>
+        </button>
       </div>
 
-      {stage === 'build' && <Builder draft={draft} onChange={setDraft} />}
+      {stage === 'build' && <Builder draft={draft} onChange={setDraft} onDone={() => { setStage('test'); window.scrollTo(0, 0) }} />}
+      {stage === 'test' && (isComplete(draft)
+        ? <TestBench design={draft} onRuns={setRuns} onChangePart={() => { setStage('build'); window.scrollTo(0, 0) }} />
+        : (
+          <div className="card unlock">
+            <p className="flat">{t('st.finishFirst')}</p>
+            <button className="btn" type="button" onClick={() => setStage('build')}>{t('st.goBuild')}</button>
+          </div>
+        ))}
       {stage === 'materials' && (<>
 
       <section aria-labelledby="st-materials">
