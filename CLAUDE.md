@@ -14,8 +14,8 @@
 
 ## Stack
 - Vite + React + TypeScript, SVG for scenes, Vitest for tests, vite-plugin-pwa for offline use.
-- Structure (`src/views/Structure.tsx`, `src/views/structure/`, rules and data in `src/structure/` and `src/config/structure.json`): meet the materials, build a frame, test it, save it. Key idea: an adjustable panel needs a hinge and an angle stop. Saved as `samesun:structure`.
-- 3D (Power bench only): three and @react-three/fiber, pinned exact (+ @types/three, dev only). The 3D view is a lazy chunk, not precached; it is cached at runtime the first time it opens. 2D must always work on its own.
+- Structure (`src/views/Structure.tsx`, `src/views/structure/`, rules and data in `src/structure/` and `src/config/structure.json`): meet the materials, build a frame, test it, save it. Key idea: an adjustable panel needs a hinge and an angle stop. Saved as `samesun:structure`; saved designs go to Growth Story's "Build" step, tagged "From Structure". Optional 3D view of the frame (`Frame3D.tsx`), with the same rules as Power's 3D.
+- 3D (Power's bench and Structure's frame): three and @react-three/fiber, pinned exact (+ @types/three, dev only). three.js is built into one lazy chunk, `three3d` (see `vite.config.ts`); it and the 3D views are not precached, only cached at runtime the first time 3D opens. React must stay in the main bundle. 2D must always work on its own.
 - Ask before adding any other dependency.
 
 ## Hosting

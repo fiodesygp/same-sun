@@ -57,3 +57,12 @@
 @keyframes fade-in { from { opacity: 0 } }
 .shadow { animation: fade-in 1s ease-out }
 @media (prefers-reduced-motion: reduce) { .sway, .wave, .shadow { animation: none !important } }
+
+/* ---------- save and build it for real ---------- */
+.savebuild { display: grid; gap: var(--gap) }
+.sheet-match { margin: 0; border-left: 6px solid var(--deck-blue) }
+.mat-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px }
+.mat-list li { display: flex; gap: 10px; align-items: center }
+.mat-icon { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; background: var(--green-soft); color: var(--ink) }
+.result-row-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px }
+.frame3d { aspect-ratio: 1 / 1 }

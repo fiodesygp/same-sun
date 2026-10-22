@@ -1,6 +1,6 @@
 // Free wiring on one of the Power circuits (steps 1, 8-11 of the path): the board, the sun,
 // the checklist, hints after two tries, the Tester for Fix it, and the real-kit tip once solved.
-import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import model from '../../config/model.json'
 import { t, type Key } from '../../i18n/t'
 import {
@@ -8,44 +8,14 @@ import {
   type Part, type PartState, type Puzzle, type TermId, type Wire
 } from '../../lab/circuit'
 import { useWide } from '../../lib/useWide'
+import { can3DNow, Fallback3D, lazy3D } from '../../components/three/lazy'
 import { detectDevice, loadView, saveView, startView, type View } from '../../lib/view3d'
 import { Board, LANDSCAPE, PORTRAIT, type BoardProps } from './Board'
 import { TILTS, type Tilt } from './sky'
 
-// the 3D bench is its own chunk, fetched the first time someone opens it; a failed fetch makes a
-// fresh loader so the next try can work (once the device is online)
-const make3D = () => lazy(() => import('./Board3D'))
-let Board3D = make3D()
+// the 3D bench is its own chunk, fetched the first time someone opens it
+const Bench3D = lazy3D(() => import('./Board3D'))
 const device = typeof window === 'undefined' ? null : detectDevice()
-
-/**
- * Can the 3D chunk load right now? Online, yes; offline, only if an earlier visit cached it. Checking
- * first matters: a browser remembers a failed import for the rest of the page's life, so a doomed
- * offline try would also block 3D after the device comes back online.
- */
-async function can3DNow() {
-  if (navigator.onLine) return true
-  try {
-    return (await (await caches.open('samesun-3d')).keys()).length > 0
-  } catch {
-    return false
-  }
-}
-
-/** catches a 3D chunk that will not load, or a 3D view that crashes, and reports it */
-class Fallback3D extends Component<{ onFail: () => void; children: ReactNode }, { failed: boolean }> {
-  state = { failed: false }
-  static getDerivedStateFromError() {
-    return { failed: true }
-  }
-  componentDidCatch() {
-    Board3D = make3D()
-    this.props.onFail()
-  }
-  render() {
-    return this.state.failed ? null : this.props.children
-  }
-}
 
 const sameWire = (w: Wire, a: TermId, b: TermId) => (w[0] === a && w[1] === b) || (w[0] === b && w[1] === a)
 const CLOUD_MS = 2500
@@ -109,7 +79,7 @@ export function LevelLab({ levels, groupLabel, onSolved, water }: Props) {
   async function chooseView(v: View, remember = true) {
     setViewMsg(null)
     if (remember) saveView(v)
-    if (v === '3d' && !(await can3DNow())) {
+    if (v === '3d' && !(await can3DNow('Board3D'))) {
       setView('2d')
       setViewMsg('lab.view.offline')
       return
@@ -256,9 +226,9 @@ export function LevelLab({ levels, groupLabel, onSolved, water }: Props) {
         {viewMsg && <p className="notice flat" role="status">{t(viewMsg)}</p>}
         {view === '3d' ? (
           <>
-            <Fallback3D onFail={fail3D}>
+            <Fallback3D onFail={fail3D} onReset={Bench3D.reset}>
               <Suspense fallback={<p className="board3d-loading" role="status">{t('lab.view.loading')}</p>}>
-                <Board3D {...boardProps} tilt={tilt} onFail={fail3D} />
+                <Bench3D.C {...boardProps} tilt={tilt} onFail={fail3D} />
               </Suspense>
             </Fallback3D>
             <fieldset>

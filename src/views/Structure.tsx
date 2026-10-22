@@ -9,10 +9,11 @@ import { SLOTS, type Draft } from '../structure/options'
 import { allMaterialsChecked, answerMaterial, lastPassed, loadDraft, loadRuns, loadStructure, skipMaterials, type Run, type StructureState } from '../structure/progress'
 import { isComplete, TESTS } from '../structure/rules'
 import { Builder } from './structure/Builder'
+import { SaveBuild } from './structure/SaveBuild'
 import { TestBench } from './structure/TestBench'
 import { FacilityTag, MaterialView } from './structure/MaterialView'
 
-type Stage = 'materials' | 'build' | 'test'
+type Stage = 'materials' | 'build' | 'test' | 'save'
 const picked = (d: Draft) => SLOTS.filter(s => d[s] !== undefined).length
 
 export function Structure({ active }: { active: boolean }) {
@@ -82,11 +83,20 @@ export function Structure({ active }: { active: boolean }) {
         <button type="button" aria-pressed={stage === 'test'} onClick={() => setStage('test')}>
           {t('st.stage.test')}<small>{lastPassed(runs) === null ? t('st.notRun') : t('st.passed', { n: lastPassed(runs)!, total: TESTS.length })}</small>
         </button>
+        <button type="button" aria-pressed={stage === 'save'} onClick={() => setStage('save')}>
+          {t('st.stage.save')}<small>{t('st.stage.saveSub')}</small>
+        </button>
       </div>
 
       {stage === 'build' && <Builder draft={draft} onChange={setDraft} onDone={() => { setStage('test'); window.scrollTo(0, 0) }} />}
+      {stage === 'save' && (isComplete(draft) ? <SaveBuild design={draft} runs={runs} /> : (
+        <div className="card unlock">
+          <p className="flat">{t('st.finishFirst')}</p>
+          <button className="btn" type="button" onClick={() => setStage('build')}>{t('st.goBuild')}</button>
+        </div>
+      ))}
       {stage === 'test' && (isComplete(draft)
-        ? <TestBench design={draft} onRuns={setRuns} onChangePart={() => { setStage('build'); window.scrollTo(0, 0) }} />
+        ? <TestBench design={draft} onRuns={setRuns} onChangePart={() => { setStage('build'); window.scrollTo(0, 0) }} onSave={() => { setStage('save'); window.scrollTo(0, 0) }} />
         : (
           <div className="card unlock">
             <p className="flat">{t('st.finishFirst')}</p>

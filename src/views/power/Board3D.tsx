@@ -5,13 +5,17 @@
 // or while a part is moving.
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import { CanvasTexture, CatmullRomCurve3, DoubleSide, SRGBColorSpace, Spherical, Vector3, type Group, type PerspectiveCamera } from 'three'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { CatmullRomCurve3, DoubleSide, Vector3, type Group } from 'three'
+import { CameraRig, type CamApi } from '../../components/three/CameraRig'
+import { cellTexture } from '../../components/three/textures'
+import { CameraButtons } from '../../components/three/lazy'
 import { t } from '../../i18n/t'
 import { boardModel, type WireNet } from '../../lab/board'
 import { LEVELS, type TermId } from '../../lab/circuit'
 import type { BoardProps } from './Board'
 import { MAX_TURN, PLACE, TERM3D, VIEW, type V3 } from './layout3d'
+
+const CAM = { ...VIEW, maxTurn: MAX_TURN }
 
 type Props = BoardProps & {
   /** the panels' angle on the straw frame (only changes the look) */
@@ -37,26 +41,6 @@ function leadCurve(a: V3, b: V3, sag = 0.25) {
   const A = v(a), B = v(b), mid = A.clone().add(B).multiplyScalar(0.5)
   mid.y = Math.max(a[1], b[1]) + sag
   return new CatmullRomCurve3([A, mid, B])
-}
-
-/** solar cells and busbars painted onto a small canvas, used as the panel's top */
-function cellTexture(cols: number, rows: number) {
-  const c = document.createElement('canvas')
-  c.width = 64 * cols
-  c.height = 64 * rows
-  const g = c.getContext('2d')!
-  g.fillStyle = '#0C2A47'
-  g.fillRect(0, 0, c.width, c.height)
-  for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
-    g.fillStyle = '#1B3E66'
-    g.fillRect(i * 64 + 3, j * 64 + 3, 58, 58)
-    g.fillStyle = '#C9D3DA'
-    g.fillRect(i * 64 + 22, j * 64 + 5, 2, 54)
-    g.fillRect(i * 64 + 42, j * 64 + 5, 2, 54)
-  }
-  const tex = new CanvasTexture(c)
-  tex.colorSpace = SRGBColorSpace
-  return tex
 }
 
 function Tube({ curve, r = 0.045, color }: { curve: CatmullRomCurve3; r?: number; color: string }) {
@@ -100,57 +84,6 @@ function StrawPanel({ at, w, d, front, tilt, cols, rows }: { at: V3; w: number; 
       </group>
     </group>
   )
-}
-
-/** keeps the camera fitted, limited and controllable from buttons; tells the overlay to move */
-type CamApi = { turn: (d: number) => void; zoom: (k: number) => void; reset: () => void }
-function CameraRig({ apiRef, onMove }: { apiRef: React.RefObject<CamApi | null>; onMove: () => void }) {
-  const { camera, gl, size, invalidate } = useThree()
-  const ctl = useRef<OrbitControls | null>(null)
-  const fit = useRef(10)
-
-  useEffect(() => {
-    const cam = camera as PerspectiveCamera
-    const c = new OrbitControls(cam, gl.domElement)
-    c.enablePan = false
-    c.minAzimuthAngle = -MAX_TURN
-    c.maxAzimuthAngle = MAX_TURN
-    c.minPolarAngle = 0.55
-    c.maxPolarAngle = 1.2
-    c.target.set(...VIEW.target)
-    const move = () => { invalidate(); onMove() }
-    c.addEventListener('change', move)
-    ctl.current = c
-    const place = (az: number, polar: number, r: number) => {
-      const s = new Spherical(r, polar, az), p = new Vector3().setFromSpherical(s).add(c.target)
-      cam.position.copy(p)
-      c.update()
-      move()
-    }
-    const now = () => new Spherical().setFromVector3(cam.position.clone().sub(c.target))
-    apiRef.current = {
-      turn: d => { const s = now(); place(Math.max(-MAX_TURN, Math.min(MAX_TURN, s.theta + d)), s.phi, s.radius) },
-      zoom: k => { const s = now(); place(s.theta, s.phi, Math.max(c.minDistance, Math.min(c.maxDistance, s.radius * k))) },
-      reset: () => place(0, VIEW.polar, fit.current)
-    }
-    return () => {
-      c.removeEventListener('change', move)
-      c.dispose()
-      apiRef.current = null
-    }
-  }, [camera, gl, invalidate, onMove, apiRef])
-
-  // fit the bench to the canvas: far enough that the whole bench (and every terminal button) shows
-  useEffect(() => {
-    const cam = camera as PerspectiveCamera, c = ctl.current
-    if (!c || !size.width) return
-    const vf = rad(cam.fov), hf = 2 * Math.atan(Math.tan(vf / 2) * (size.width / size.height))
-    fit.current = Math.max(VIEW.fitWidth / 2 / Math.tan(hf / 2), VIEW.fitHeight / 2 / Math.tan(vf / 2))
-    c.maxDistance = fit.current
-    c.minDistance = fit.current * 0.5
-    apiRef.current?.reset()
-  }, [camera, size.width, size.height, apiRef])
-  return null
 }
 
 /** finds where 3D points land on screen, for the HTML buttons */
@@ -425,7 +358,7 @@ export default function Board3D(p: Props) {
         <Canvas frameloop="demand" shadows dpr={[1, 1.5]} camera={{ fov: 42, near: 0.1, far: 60 }} aria-hidden="true"
           onCreated={({ gl }) => gl.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); onFail() })}>
           <Bench p={p} tilt={tilt} wireCurves={curves} nets={m.wireNet} />
-          <CameraRig apiRef={cam} onMove={onMove} />
+          <CameraRig view={CAM} apiRef={cam} onMove={onMove} />
           <Projector points={points} onProject={setScreen} tick={tick} />
         </Canvas>
         {m.terms.map(k => screen[k] && (
@@ -442,13 +375,7 @@ export default function Board3D(p: Props) {
           </button>
         ))}
       </div>
-      <div className="cam-buttons" role="group" aria-label={t('lab.cam.label')}>
-        <button type="button" className="btn ghost" onClick={() => cam.current?.turn(-0.15)} aria-label={t('lab.cam.left')}><span aria-hidden="true">⟲</span></button>
-        <button type="button" className="btn ghost" onClick={() => cam.current?.turn(0.15)} aria-label={t('lab.cam.right')}><span aria-hidden="true">⟳</span></button>
-        <button type="button" className="btn ghost" onClick={() => cam.current?.zoom(0.85)} aria-label={t('lab.cam.in')}><span aria-hidden="true">+</span></button>
-        <button type="button" className="btn ghost" onClick={() => cam.current?.zoom(1 / 0.85)} aria-label={t('lab.cam.out')}><span aria-hidden="true">−</span></button>
-        <button type="button" className="btn ghost" onClick={() => cam.current?.reset()}>{t('lab.cam.reset')}</button>
-      </div>
+      <CameraButtons cam={cam} />
     </div>
   )
 }

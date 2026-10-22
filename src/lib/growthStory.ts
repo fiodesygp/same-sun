@@ -3,10 +3,13 @@
 import type { MissionId } from './learn'
 import { idbStore } from './storage'
 
-export const STAGES = ['s1', 'h1', 's2', 'h2', 's3', 'reflect'] as const
+export const STAGES = ['s1', 'h1', 's2', 'h2', 's3', 'reflect', 'build'] as const
 export type StageId = (typeof STAGES)[number]
-/** s = troop session (green), h = at home (yellow), r = Reflect, from Power (purple) */
-export const stageKind = (s: StageId) => (s === 'reflect' ? 'r' : s.startsWith('s') ? 's' : 'h')
+/** s = troop session (green), h = at home (yellow), r = Reflect, from Power (purple), b = Build, from Structure (blue) */
+export const stageKind = (s: StageId) => (s === 'reflect' ? 'r' : s === 'build' ? 'b' : s.startsWith('s') ? 's' : 'h')
+
+/** where an entry came from: a Power step, or Structure */
+export type EntryTag = MissionId | 'structure'
 
 export interface GrowthStoryEntry {
   id: number
@@ -16,8 +19,8 @@ export interface GrowthStoryEntry {
   story: string
   /** a shrunk JPEG as a data URL, or null */
   photo: string | null
-  /** the Power step this is from (a sketch photo, or Reflect) */
-  mission?: MissionId
+  /** where this is from: a Power step (a sketch photo, or Reflect), or Structure (a saved frame) */
+  mission?: EntryTag
 }
 
 export const growthStoryStore = idbStore<GrowthStoryEntry>('samesun', 'growthStory')

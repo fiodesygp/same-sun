@@ -94,9 +94,9 @@ function TestFigure({ r, d, live }: { r: TestResult; d: Design; live: boolean })
   return <Frame2D draft={d} angle={r.id === 'slip' ? 40 : angle} slide={slide} overlay={overlay} frameClass={live ? sway : undefined} label={`${testName(r.id)}: ${whyText(r)}`} />
 }
 
-type Props = { design: Design; onChangePart: () => void; onRuns: (runs: Run[]) => void }
+type Props = { design: Design; onChangePart: () => void; onRuns: (runs: Run[]) => void; onSave?: () => void }
 
-export function TestBench({ design: d, onChangePart, onRuns }: Props) {
+export function TestBench({ design: d, onChangePart, onRuns, onSave }: Props) {
   const results = runTests(d)
   const [shown, setShown] = useState(-1) // how many results are showing; -1 before a run
   const [runs, setRuns] = useState<Run[]>(loadRuns)
@@ -142,6 +142,7 @@ export function TestBench({ design: d, onChangePart, onRuns }: Props) {
       <div className="row wrap">
         <button className="btn" type="button" onClick={run} disabled={shown >= 0 && !done}>{t(done ? 'st.runAgain' : 'st.run')}</button>
         <button className="btn ghost" type="button" onClick={onChangePart}>{t('st.changePart')}</button>
+        {done && onSave && <button className="btn ghost" type="button" onClick={onSave}>{t('st.goSave')}</button>}
       </div>
       <p className="builder-said" role="status" aria-live="polite">{said}</p>
 

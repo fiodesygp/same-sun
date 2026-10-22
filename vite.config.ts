@@ -69,10 +69,10 @@ export default defineConfig({
         globPatterns: ['**/*.{html,js,css,woff2,svg,png,txt}'],
         // 404.html only redirects to the app; no need to keep it offline. The 3D bench (about 240 KB
         // zipped) is left out too, so learners on limited data only fetch it if they open 3D
-        globIgnores: ['**/404.html', '**/assets/Board3D-*.js'],
+        globIgnores: ['**/404.html', '**/assets/Board3D-*.js', '**/assets/Frame3D-*.js', '**/assets/three3d-*.js'],
         // ...and once they have, it stays cached so 3D works offline after that
         runtimeCaching: [{
-          urlPattern: ({ url }) => /\/assets\/Board3D-[^/]+\.js$/.test(url.pathname),
+          urlPattern: ({ url }) => /\/assets\/(Board3D|Frame3D|three3d)-[^/]+\.js$/.test(url.pathname),
           handler: 'CacheFirst',
           options: { cacheName: 'samesun-3d', expiration: { maxEntries: 4 } }
         }]
@@ -80,8 +80,18 @@ export default defineConfig({
     })
   ],
   build: {
-    // the lazy 3D bench (three.js) is one ~950 KB chunk on purpose; everything else stays small
-    chunkSizeWarningLimit: 1000
+    // three.js and the shared 3D helpers go in one chunk named "three3d", used only by the lazy 3D
+    // views (Power's bench, Structure's frame). It is left out of the precache and cached on first use.
+    chunkSizeWarningLimit: 1000,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          // only the matched modules: React itself must stay in the main bundle
+          includeDependenciesRecursively: false,
+          groups: [{ name: 'three3d', test: /node_modules[\\/](three|@react-three|zustand|its-fine|suspend-react|react-use-measure)[\\/]|components[\\/]three[\\/](CameraRig|textures)/ }]
+        }
+      }
+    }
   },
   test: {
     include: ['src/**/*.test.ts']

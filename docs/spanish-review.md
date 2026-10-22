@@ -120,6 +120,11 @@ Questions for these three:
 | Pass / Needs work / Ask your facilitator | Pasa / Necesita mejoras / Pregunta a tu facilitador/a | — |
 | Try next: | Prueba después: | Or "Intenta:"? |
 | Sun angle | Ángulo del sol | — |
+| Save / build it for real / Build it for real | Guardar / constrúyela de verdad / Constrúyela de verdad | — |
+| Build (Growth Story step) / From Structure | Construir / Desde Estructura | — |
+| This matches our printed sheet: … | Coincide con nuestra hoja impresa: … | — |
+| Sheet names: Cup + pipe-cleaner frame / Cup + straw + rubber-band frame / Craft sticks + rubber bands / Paper angle wedge | Vaso + estructura de limpiapipas / Vaso + estructura de pajillas y ligas / Palitos + ligas / Cuña de papel para el ángulo | The printed sheets are in English. Translate the names, or keep the English so they match the paper? |
+| Build steps (`st.how.*`) | — | Short instructions for the real build; please check they are clear and match the sheets. |
 
 ### 3D bench
 

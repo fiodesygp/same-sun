@@ -11,7 +11,7 @@ Same Sun is a short design-and-test game for the **miniAgriPV** project (Girl Sc
 
 - **Sun Day:** pick a plant, panel and day, predict, then watch a sunny Arizona day and see the Sun Score with feedback.
 - **Power:** meet the parts of the kit (a card and a quick check for each), then try 10 steps: the seven SCN 202 Solar Card Deck missions (circuits, measuring, switch and dial, series and parallel) and three bonus missions; then three harder wiring challenges, and a Sun Monitor.
-- **Structure:** meet the materials (cup, straws, rubber bands, pipe cleaners, craft sticks, cardstock, clothespins, tape), build a frame that holds the panel above the plant, and test it. An adjustable panel needs a hinge and an angle stop.
+- **Structure:** meet the materials (cup, straws, rubber bands, pipe cleaners, craft sticks, cardstock, clothespins, tape), build a frame that holds the panel above the plant, and test it (angle, slip, wobble, heat, shade and a facility check). An adjustable panel needs a hinge and an angle stop. Save the design, with its materials list and steps, to the Growth Story Card.
 - **Growth Story Card:** add a photo and a few words at each step of the real project.
 
 It works on phones, tablets and computers, in English and Spanish, and offline after the first visit. The Power bench can also be shown in 3D: that part (about 240 KB zipped) downloads only the first time someone opens it, then works offline too. Devices without WebGL, with reduced motion on, or that look low-power start in 2D.
@@ -64,6 +64,8 @@ If the tests or build fail, nothing is published on either host.
 - `src/config/model.json`: every simulation constant, to tune with the real kit
 - `src/i18n/en.json`, `src/i18n/es.json`: all UI text
 - `src/lab/`: the Power circuit checker
+- `src/structure/`, `src/config/structure.json`: Structure's materials, options and rule model (pure, unit tested)
+- `src/views/structure/`: Structure's builder, drawings, tests and save page
 - `src/views/power/`: the Power board (2D, and `Board3D.tsx` for 3D), steps, bench, Sun Monitor and part cards
 - `src/components/parts/`: the part drawings shared by the part cards, the board and the bench
 - `src/lab/board.ts`: what the board shows for a circuit, shared by the 2D and 3D views

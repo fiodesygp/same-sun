@@ -24,9 +24,9 @@ export function startView(saved: unknown, d: Device): View {
   return saved === '2d' || saved === '3d' ? saved : defaultView(d)
 }
 
-const KEY = 'benchView'
-export const loadView = () => load<unknown>(KEY, null)
-export const saveView = (v: View) => save(KEY, v)
+/** each 3D view remembers its own choice: Power's bench ('benchView'), Structure's frame ('frameView') */
+export const loadView = (key = 'benchView') => load<unknown>(key, null)
+export const saveView = (v: View, key = 'benchView') => save(key, v)
 
 /** what this browser can do (called once in the page) */
 export function detectDevice(): Device {
