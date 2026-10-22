@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { loadLearn, markDone, migrate, PATH, pathDone, saveEvidence } from './learn'
+import { challengesDone, CHALLENGES, loadLearn, markDone, migrate, PATH, saveEvidence, STEPS, stepsDone } from './learn'
 
 const mem = new Map<string, string>()
 globalThis.localStorage = {
@@ -12,7 +12,8 @@ describe('Build Lab path progress', () => {
 
   it('starts empty', () => {
     expect(loadLearn()).toEqual({})
-    expect(pathDone(loadLearn())).toBe(0)
+    expect(stepsDone(loadLearn())).toBe(0)
+    expect(challengesDone(loadLearn())).toBe(0)
   })
   it('saves evidence and done, and reloads them', () => {
     saveEvidence('m4', { polarityMatters: 'yes' })
@@ -21,7 +22,7 @@ describe('Build Lab path progress', () => {
     markDone('reflect')
     const again = loadLearn()
     expect(again.m4).toEqual({ done: true, evidence: { polarityMatters: 'yes', whatHappened: 'The fan spun backwards.' } })
-    expect(pathDone(again)).toBe(2)
+    expect(stepsDone(again)).toBe(2)
   })
   it('saving evidence keeps a mission done', () => {
     markDone('m1')
@@ -37,8 +38,10 @@ describe('Build Lab path progress', () => {
 })
 
 describe('the merged path', () => {
-  it('has 13 steps in order: 7 deck missions, then challenges and bonus steps', () => {
-    expect(PATH).toEqual(['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7', 'both', 'pump', 'all', 'fix', 'agripv', 'reflect'])
+  it('has 10 steps (7 deck missions, then 3 bonus cards) and 3 challenges, in order', () => {
+    expect(STEPS).toEqual(['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7', 'pump', 'agripv', 'reflect'])
+    expect(CHALLENGES).toEqual(['both', 'all', 'fix'])
+    expect(PATH).toEqual([...STEPS, ...CHALLENGES])
     expect(new Set(PATH).size).toBe(13)
   })
 })
@@ -52,7 +55,9 @@ describe('carrying old progress over', () => {
     expect(s.both).toEqual({ done: true, evidence: { solved: true } })
     expect(s.pump).toEqual({ done: true, evidence: { pumpRan: true } })
     expect(s.all?.done && s.fix?.done).toBe(true)
-    expect(pathDone(s)).toBe(5)
+    // levels 1-2 (fan, LED) and 4 (pump) count as steps; levels 3, 5 and 6 as challenges
+    expect(stepsDone(s)).toBe(2)
+    expect(challengesDone(s)).toBe(3)
   })
   it('only adds: Learn evidence is kept, and running it again changes nothing', () => {
     const learn = { m1: { done: false, evidence: { device: 'led', worked: ['led'] } }, m4: { done: true, evidence: { polarity: 'yes' } }, pump: { done: false, evidence: { ml: 40 } } }

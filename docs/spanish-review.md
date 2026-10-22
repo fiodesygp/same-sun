@@ -60,7 +60,9 @@ Questions for these three:
 | Checked / Not checked yet | Respondida / Sin responder | — |
 | Skip ahead to Try it | Saltar a Pruébalo | — |
 | Challenge (step badge) | Reto | Same word as the old level name "Reto" for New puzzle; clear enough? |
-| Steps done: 4 of 13 | Pasos hechos: 4 de 13 | — |
+| Steps done: 4 of 10 | Pasos hechos: 4 de 10 | — |
+| Challenges / Ready for more? Try these harder circuits. | Retos / ¿Quieres más? Prueba estos circuitos más difíciles. | — |
+| 0 of 3 challenges done | 0 de 3 retos hechos | — |
 | Wires | Cables | — |
 | Solar Power | Energía solar | — |
 | mission / bonus | misión / extra | — |

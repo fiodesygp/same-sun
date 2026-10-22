@@ -14,8 +14,9 @@ export type ChallengeId = (typeof CHALLENGES)[number]
 export type BonusId = (typeof BONUS)[number]
 export type MissionId = CoreId | ChallengeId | BonusId
 
-/** the 13 steps of "Try it", in order */
-export const PATH: MissionId[] = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7', 'both', 'pump', 'all', 'fix', 'agripv', 'reflect']
+/** "Try it": the 10 steps (deck missions, then the bonus cards), then the 3 harder challenges */
+export const STEPS: MissionId[] = [...CORE, ...BONUS]
+export const PATH: MissionId[] = [...STEPS, ...CHALLENGES]
 export const MISSIONS = PATH
 
 /** the old Build Lab levels (0-5) and the step each one became */
@@ -92,7 +93,9 @@ export function markDone(id: MissionId): LearnState {
   return next
 }
 
-/** How many of the 13 steps are done. */
-export const pathDone = (s: LearnState) => PATH.filter(id => s[id]?.done).length
+/** How many of the 10 steps are done (challenges are counted on their own). */
+export const stepsDone = (s: LearnState) => STEPS.filter(id => s[id]?.done).length
+/** How many of the 3 challenges are done. */
+export const challengesDone = (s: LearnState) => CHALLENGES.filter(id => s[id]?.done).length
 /** any step started or done: a returning learner goes straight to "Try it" */
 export const hasProgress = (s: LearnState) => PATH.some(id => s[id])

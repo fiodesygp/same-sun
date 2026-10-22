@@ -1,5 +1,5 @@
-// The 13 steps of Build Lab's "Try it" path: the Solar Card Deck missions in deck order, then the
-// Build Lab challenges and the bonus cards. For each: its kind and deck colour, how many "Try it"
+// Build Lab's "Try it" page: the Solar Card Deck missions in deck order and the bonus cards, then the
+// harder Build Lab challenges. For each: its kind and deck colour, how many "Try it"
 // lines and support cards it has, and when the learner may mark it done (pure, unit tested).
 import type { MissionId } from '../../lib/learn'
 
@@ -26,12 +26,12 @@ export const MISSION_DEFS: MissionDef[] = [
   { id: 'm5', kind: 'deck', colour: 'blue', steps: 3, info: 0 },
   { id: 'm6', kind: 'deck', colour: 'purple', steps: 3, info: 1 },
   { id: 'm7', kind: 'deck', colour: 'magenta', steps: 3, info: 2 },
-  { id: 'both', kind: 'challenge', colour: null, steps: 3, info: 0 },
   { id: 'pump', kind: 'bonus', colour: null, steps: 3, info: 0 },
-  { id: 'all', kind: 'challenge', colour: null, steps: 3, info: 0 },
-  { id: 'fix', kind: 'challenge', colour: null, steps: 3, info: 0 },
   { id: 'agripv', kind: 'bonus', colour: null, steps: 3, info: 1 },
-  { id: 'reflect', kind: 'bonus', colour: null, steps: 2, info: 0 }
+  { id: 'reflect', kind: 'bonus', colour: null, steps: 2, info: 0 },
+  { id: 'both', kind: 'challenge', colour: null, steps: 3, info: 0 },
+  { id: 'all', kind: 'challenge', colour: null, steps: 3, info: 0 },
+  { id: 'fix', kind: 'challenge', colour: null, steps: 3, info: 0 }
 ]
 
 export const def = (id: MissionId) => MISSION_DEFS.find(m => m.id === id)!

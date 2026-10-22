@@ -7,7 +7,7 @@
 
 ## Screens
 - Four tabs: Home, Sun Day, Build Lab, Growth Story.
-- Build Lab is one guided path in two stages: "Meet the parts" (10 part cards, each with a quick check) unlocks "Try it" (13 steps: the 7 SCN 202 Solar Card Deck missions, then the Build Lab challenges and the bonus cards, in `PATH` in `src/lib/learn.ts`), plus the Sun Monitor. Learners can skip ahead.
+- Build Lab is one guided path in two stages: "Meet the parts" (10 part cards, each with a quick check) unlocks "Try it": 10 steps (the 7 SCN 202 Solar Card Deck missions, then the 3 bonus cards), then 3 Build Lab challenges in their own section with their own counter (`STEPS` and `CHALLENGES` in `src/lib/learn.ts`), then the Sun Monitor. Learners can skip ahead.
 - The free-wiring circuits use the watts budget in `src/lab/`; the deck missions use the volts/amps/watts model in `src/sim/electric.ts`.
 - Saved progress: `samesun:learn` (steps), `samesun:parts` (quick checks). `migrate()` carries old Build Lab levels (`samesun:buildLabSolved`) into the path; it only adds and never deletes old keys.
 - Match the prototype. Tell me before changing a screen's content or flow.

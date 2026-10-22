@@ -3,7 +3,7 @@
 // bonus cards, in order). A learner can skip ahead, and anyone with saved progress starts on Try it.
 import { useEffect, useRef, useState } from 'react'
 import { t, type Key } from '../i18n/t'
-import { hasProgress, loadLearn, markDone, PATH, pathDone, saveEvidence, type LearnState, type MissionId } from '../lib/learn'
+import { challengesDone, CHALLENGES, CORE, hasProgress, loadLearn, markDone, saveEvidence, STEPS, stepsDone, type LearnState, type MissionId } from '../lib/learn'
 import { allChecked, answerCheck, loadParts, PART_IDS, skipParts, type PartsState } from '../lib/parts'
 import { forgetStars } from '../lib/progress'
 import { MissionView } from './buildLab/MissionView'
@@ -17,7 +17,7 @@ type Stage = 'parts' | 'try'
 /** what is open: a step, a part card, or the Sun Monitor */
 type Open = MissionId | 'monitor' | `part:${PartId}`
 
-const STEPS = PATH.length
+const TOTAL = STEPS.length
 
 export function BuildLab({ active, onSketch }: Props) {
   const [state, setState] = useState<LearnState>(loadLearn)
@@ -69,7 +69,7 @@ export function BuildLab({ active, onSketch }: Props) {
     )
   }
 
-  const n = pathDone(state), checked = parts.checked.length, unlocked = allChecked(parts)
+  const n = stepsDone(state), nc = challengesDone(state), checked = parts.checked.length, unlocked = allChecked(parts)
   let deckNo = 0
   const stepCard = (id: MissionId) => {
     const d = def(id), done = !!state[id]?.done, title = t(`learn.m.${id}.title`)
@@ -103,7 +103,7 @@ export function BuildLab({ active, onSketch }: Props) {
           {t('buildLab.stage.parts')}<small>{t('buildLab.checks', { n: checked, total: PART_IDS.length })}</small>
         </button>
         <button type="button" aria-pressed={stage === 'try'} onClick={() => goTry(!unlocked)}>
-          {t('buildLab.stage.try')}<small>{unlocked || parts.skipped || hasProgress(state) ? t('learn.progress', { n, total: STEPS }) : t('buildLab.skipAhead')}</small>
+          {t('buildLab.stage.try')}<small>{unlocked || parts.skipped || hasProgress(state) ? t('learn.progress', { n, total: TOTAL }) : t('buildLab.skipAhead')}</small>
         </button>
       </div>
 
@@ -145,27 +145,34 @@ export function BuildLab({ active, onSketch }: Props) {
         <>
           <div className="card learn-progress">
             <div className="learn-progress-row">
-              <b>{t('learn.progress', { n, total: STEPS })}</b>
+              <b>{t('learn.progress', { n, total: TOTAL })}</b>
             </div>
-            <div className="learn-bar" role="progressbar" aria-label={t('learn.progressLabel')} aria-valuemin={0} aria-valuemax={STEPS} aria-valuenow={n} aria-valuetext={t('learn.progress', { n, total: STEPS })}>
-              <i style={{ width: `${(n / STEPS) * 100}%` }} />
+            <div className="learn-bar" role="progressbar" aria-label={t('learn.progressLabel')} aria-valuemin={0} aria-valuemax={TOTAL} aria-valuenow={n} aria-valuetext={t('learn.progress', { n, total: TOTAL })}>
+              <i style={{ width: `${(n / TOTAL) * 100}%` }} />
             </div>
-            <details className="learn-checklist">
-              <summary>{t('learn.checklistTitle')}</summary>
-              <ul>
-                {PATH.map(id => (
+            {/* the seven missions' goals, always shown; each ticks when its mission is done */}
+            <div className="learn-checklist">
+              <h3 className="checklist-title" id="bl-learned">{t('learn.checklistTitle')}</h3>
+              <ul aria-labelledby="bl-learned">
+                {CORE.map(id => (
                   <li key={id} className={state[id]?.done ? 'ok' : undefined}>
-                    <span aria-hidden="true">{state[id]?.done ? '✓' : '○'}</span> {t(`learn.m.${id}.title`)}
+                    <span aria-hidden="true">{state[id]?.done ? '✓' : '○'}</span> {t(`learn.m.${id}.goal`)}
                     <span className="sr"> ({t(state[id]?.done ? 'learn.statusDone' : 'learn.statusTodo')})</span>
                   </li>
                 ))}
               </ul>
-            </details>
+            </div>
           </div>
 
           <section aria-labelledby="bl-steps">
             <h2 className="h2" id="bl-steps">{t('buildLab.stepsTitle')}</h2>
-            <div className="learn-grid">{PATH.map(stepCard)}</div>
+            <div className="learn-grid">{STEPS.map(stepCard)}</div>
+          </section>
+          <section aria-labelledby="bl-challenges">
+            <h2 className="h2" id="bl-challenges">{t('buildLab.challengesTitle')}</h2>
+            <p className="hint flat">{t('buildLab.challengesIntro')}</p>
+            <p className="challenge-count">{t('buildLab.challengesProgress', { n: nc, total: CHALLENGES.length })}</p>
+            <div className="learn-grid">{CHALLENGES.map(stepCard)}</div>
           </section>
           <section aria-labelledby="bl-tools">
             <h2 className="h2" id="bl-tools">{t('learn.toolsTitle')}</h2>

@@ -10,7 +10,7 @@ Same Sun is a short design-and-test game for the **miniAgriPV** project (Girl Sc
 **Our big question:** *In a desert where land, water, and shade are hard to come by, how can you use STEM to build a micro-lab that shows your family how one sunny space can grow food and power other things at once?*
 
 - **Sun Day:** pick a plant, panel and day, predict, then watch a sunny Arizona day and see the Sun Score with feedback.
-- **Build Lab:** meet the parts of the kit (a card and a quick check for each), then try 13 steps: the seven SCN 202 Solar Card Deck missions (circuits, measuring, switch and dial, series and parallel), wiring challenges and bonus missions, plus a Sun Monitor.
+- **Build Lab:** meet the parts of the kit (a card and a quick check for each), then try 10 steps: the seven SCN 202 Solar Card Deck missions (circuits, measuring, switch and dial, series and parallel) and three bonus missions; then three harder wiring challenges, and a Sun Monitor.
 - **Growth Story Card:** add a photo and a few words at each step of the real project.
 
 It works on phones, tablets and computers, in English and Spanish, and offline after the first visit. The Build Lab bench can also be shown in 3D: that part (about 240 KB zipped) downloads only the first time someone opens it, then works offline too. Devices without WebGL, with reduced motion on, or that look low-power start in 2D.
