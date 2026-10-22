@@ -40,9 +40,14 @@ export function Structure({ active }: { active: boolean }) {
     returnTo.current = null
   }, [open])
 
-  function goBuild(skip: boolean) {
+  // focusEmpty: open Build at the first slot that is not picked yet ("Start building")
+  const [focusEmpty, setFocusEmpty] = useState(false)
+  function goBuild(skip: boolean, focus = false) {
     if (skip) setState(skipMaterials())
+    setFocusEmpty(focus)
+    setOpen(null)
     setStage('build')
+    window.scrollTo(0, 0)
   }
 
   function show(id: MaterialId | null) {
@@ -54,6 +59,7 @@ export function Structure({ active }: { active: boolean }) {
   if (open) {
     return (
       <MaterialView id={open} checked={state.checked.includes(open)} onBack={() => show(null)}
+        onStartBuilding={open === MATERIAL_IDS[MATERIAL_IDS.length - 1] ? () => goBuild(!allMaterialsChecked(state), true) : undefined}
         onAnswer={c => { const r = answerMaterial(open, c); setState(r.state); return r.right }} />
     )
   }
@@ -88,7 +94,7 @@ export function Structure({ active }: { active: boolean }) {
         </button>
       </div>
 
-      {stage === 'build' && <Builder draft={draft} onChange={setDraft} onDone={() => { setStage('test'); window.scrollTo(0, 0) }} />}
+      {stage === 'build' && <Builder draft={draft} onChange={setDraft} focusFirstEmpty={focusEmpty} onFocused={() => setFocusEmpty(false)} onDone={() => { setStage('test'); window.scrollTo(0, 0) }} />}
       {stage === 'save' && (isComplete(draft) ? <SaveBuild design={draft} runs={runs} /> : (
         <div className="card unlock">
           <p className="flat">{t('st.finishFirst')}</p>
@@ -127,7 +133,7 @@ export function Structure({ active }: { active: boolean }) {
       <div className="card unlock" aria-live="polite">
         <p className="flat">{unlocked ? <b>{t('st.unlocked')}</b> : t('st.toUnlock', { n: MATERIAL_IDS.length - checked })}</p>
         {unlocked
-          ? <button className="btn" type="button" onClick={() => goBuild(false)}>{t('st.goBuild')}</button>
+          ? <button className="btn" type="button" onClick={() => goBuild(false, true)}>{t('st.startBuilding')}</button>
           : <button className="btn ghost" type="button" onClick={() => goBuild(true)}>{t('st.skip')}</button>}
       </div>
       </>)}

@@ -97,7 +97,8 @@ Questions for these three:
 | Safety & prep check (tag and test; was "Facility check") | Revisión de seguridad y preparación | Long on small phones; is it natural? |
 | sharp edge / an adult uses a tool first / nothing to prepare | borde filoso / un adulto usa una herramienta antes / nada que preparar | — |
 | Meet the materials | Conoce los materiales | — |
-| What it is / Good for / Watch out / Try it | Qué es / Sirve para / Cuidado / Pruébalo | — |
+| What it is / Good for / Watch out (material card tabs) | Qué es / Sirve para / Cuidado | — |
+| Start building | Empezar a construir | — |
 | Clear 24 oz cup | Vaso transparente de 24 oz | — |
 | Thick and thin straws (boba) | Popotes gruesos y delgados | We chose "popotes" (Mexican Spanish, common in Arizona; avoids "pajilla"). Please confirm. |
 | Rubber bands | Ligas | Or "gomitas", "elásticos"? |

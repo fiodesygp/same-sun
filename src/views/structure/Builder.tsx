@@ -1,7 +1,7 @@
 // Stage 2: build the frame one slot at a time. Each slot opens once the one before it is picked;
 // the drawing updates after every pick, and the status line says whether the pick fits, or in one
 // line why it will not attach. Picks that do not fit are allowed: testing them shows why.
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { t, type Key } from '../../i18n/t'
 import { OPTIONS, SLOTS, type Draft, type Slot } from '../../structure/options'
 import { EMPTY_DRAFT, saveDraft } from '../../structure/progress'
@@ -16,10 +16,30 @@ export function describe(d: Draft) {
   return t('st.scene.alt', { picks: picked.length ? picked.join('; ') : t('st.scene.none') })
 }
 
-type Props = { draft: Draft; onChange: (d: Draft) => void; onDone?: () => void }
+type Props = {
+  draft: Draft
+  onChange: (d: Draft) => void
+  onDone?: () => void
+  /** move to the first slot that is not picked yet (after "Start building") */
+  focusFirstEmpty?: boolean
+  onFocused?: () => void
+}
 
-export function Builder({ draft: d, onChange, onDone }: Props) {
+export function Builder({ draft: d, onChange, onDone, focusFirstEmpty, onFocused }: Props) {
   const [said, setSaid] = useState('')
+  const slotRefs = useRef<(HTMLLIElement | null)[]>([])
+
+  // "Start building": scroll to the first empty slot and put focus on its first option
+  useEffect(() => {
+    if (!focusFirstEmpty) return
+    const i = SLOTS.findIndex(s => d[s] === undefined && !(s === 'join' && d.posts === 'none'))
+    const li = i >= 0 ? slotRefs.current[i] : null
+    if (li) {
+      li.scrollIntoView({ block: 'center' })
+      li.querySelector<HTMLButtonElement>('.options button')?.focus({ preventScroll: true })
+    }
+    onFocused?.()
+  }, [focusFirstEmpty]) // eslint-disable-line react-hooks/exhaustive-deps
   const a = attach(d)
   // a slot opens once every slot before it is picked (the join is skipped when there are no posts)
   const open = (s: Slot) => SLOTS.slice(0, SLOTS.indexOf(s)).every(x => d[x] !== undefined)
@@ -57,7 +77,7 @@ export function Builder({ draft: d, onChange, onDone }: Props) {
           {SLOTS.map((s, i) => {
             const can = open(s), noJoin = s === 'join' && d.posts === 'none'
             return (
-              <li key={s} className={`slot card${can ? '' : ' locked'}`}>
+              <li key={s} ref={el => { slotRefs.current[i] = el }} className={`slot card${can ? '' : ' locked'}`}>
                 <fieldset disabled={!can || noJoin}>
                   <legend><span className="slot-n">{i + 1}</span> {t(SLOT_LABEL[s])}</legend>
                   <p className="hint flat">{noJoin ? t('st.noJoin') : can ? t(`st.slotHelp.${s}` as Key) : t('st.locked')}</p>

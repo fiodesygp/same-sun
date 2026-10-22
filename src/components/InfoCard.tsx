@@ -25,9 +25,11 @@ type Props = {
   backLabel: string
   onBack: () => void
   check: QuickCheck
+  /** shown after the quick check (for example "Start building" on the last card) */
+  footer?: ReactNode
 }
 
-export function InfoCard({ title, icon, figure, tabs, tag, backLabel, onBack, check }: Props) {
+export function InfoCard({ title, icon, figure, tabs, tag, backLabel, onBack, check, footer }: Props) {
   const [tab, setTab] = useState(tabs[0].id)
   const [answer, setAnswer] = useState<{ choice: string; right: boolean } | null>(null)
   const backRef = useRef<HTMLButtonElement>(null)
@@ -56,7 +58,7 @@ export function InfoCard({ title, icon, figure, tabs, tag, backLabel, onBack, ch
       <figure className="part-figure">{figure}</figure>
 
       <div className="card part-card">
-        <div className="part-tabs" role="tablist" aria-label={title} onKeyDown={onKey}>
+        <div className={`part-tabs tabs-${n}`} role="tablist" aria-label={title} onKeyDown={onKey}>
           {tabs.map(x => (
             <button key={x.id} type="button" role="tab" id={`pt-${x.id}`} aria-controls="part-panel" aria-selected={tab === x.id} tabIndex={tab === x.id ? 0 : -1}
               ref={el => { tabRefs.current[x.id] = el }} onClick={() => setTab(x.id)}>{x.label}</button>
@@ -83,6 +85,7 @@ export function InfoCard({ title, icon, figure, tabs, tag, backLabel, onBack, ch
             : check.checked ? <><span aria-hidden="true">✓ </span>{t('learn.check.before')}</> : ''}
         </p>
       </section>
+      {footer}
     </article>
   )
 }
