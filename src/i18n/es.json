@@ -1268,7 +1268,7 @@
   "photo.alt.lightMeter": "Un medidor de luz digital con un sensor blanco y redondo en un cable, y una pantalla.",
   "photo.alt.multimeter": "Un multímetro digital con selector, pantalla y puntas roja y negra.",
   "photo.alt.tachometer": "Un tacómetro digital de mano con pantalla y botones, en su estuche.",
-  "photo.alt.cup": "Dos vasos de plástico transparentes.",
+  "photo.alt.cup": "Dos vasos de plástico transparentes y vacíos sobre un fondo negro.",
   "photo.alt.straws": "Un popote grueso para bubble tea junto a un popote delgado.",
   "photo.alt.bands": "Un montoncito de ligas de colores.",
   "photo.alt.pipe": "Un manojo de limpiapipas blancos.",
@@ -1279,5 +1279,6 @@
   "photo.publicDomain": "Dominio público",
   "photo.changes.resized": "Reducida a 800 px, guardada de nuevo como JPEG, sin metadatos.",
   "photo.changes.kept": "En su tamaño original, guardada de nuevo como JPEG, sin metadatos.",
-  "photo.changes.shareAlike": "Esta copia editada se comparte con la misma licencia."
+  "photo.changes.shareAlike": "Esta copia editada se comparte con la misma licencia.",
+  "photo.changes.cropped": "Recortada y reducida a 800 px, guardada de nuevo como JPEG, sin metadatos."
 }

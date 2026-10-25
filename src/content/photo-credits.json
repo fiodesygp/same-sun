@@ -10,6 +10,7 @@
     "source": "https://www.flickr.com/photos/41898857@N04/51684009992",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "cropped": false,
     "changes": "Kept at its original size, re-encoded as JPEG, metadata removed"
   },
   {
@@ -23,6 +24,7 @@
     "source": "https://commons.wikimedia.org/wiki/File:Electronic-Component-Red-LED.jpg",
     "license": "Public domain",
     "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed"
   },
   {
@@ -36,6 +38,7 @@
     "source": "https://www.flickr.com/photos/41898857@N04/9300794439",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "cropped": false,
     "changes": "Kept at its original size, re-encoded as JPEG, metadata removed"
   },
   {
@@ -49,6 +52,7 @@
     "source": "https://www.flickr.com/photos/61841042@N00/51077534857",
     "license": "CC BY-SA 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed. This edited version is shared under the same license (CC BY-SA 2.0)"
   },
   {
@@ -62,6 +66,7 @@
     "source": "https://www.flickr.com/photos/41898857@N04/8792412597",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "cropped": false,
     "changes": "Kept at its original size, re-encoded as JPEG, metadata removed"
   },
   {
@@ -75,6 +80,7 @@
     "source": "https://commons.wikimedia.org/wiki/File:Potentiometer_knob_with_set_screw.jpg",
     "license": "Public domain",
     "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed"
   },
   {
@@ -88,6 +94,7 @@
     "source": "https://www.flickr.com/photos/41898857@N04/14784315730",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "cropped": false,
     "changes": "Kept at its original size, re-encoded as JPEG, metadata removed"
   },
   {
@@ -101,6 +108,7 @@
     "source": "https://www.flickr.com/photos/57519914@N00/3592693331",
     "license": "CC BY-SA 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed. This edited version is shared under the same license (CC BY-SA 2.0)"
   },
   {
@@ -114,6 +122,7 @@
     "source": "https://www.flickr.com/photos/41898857@N04/14967902051",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "cropped": false,
     "changes": "Kept at its original size, re-encoded as JPEG, metadata removed"
   },
   {
@@ -127,20 +136,22 @@
     "source": "https://www.flickr.com/photos/80758054@N00/5406525649",
     "license": "CC BY-SA 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed. This edited version is shared under the same license (CC BY-SA 2.0)"
   },
   {
     "id": "cup",
     "kind": "material",
     "file": "photos/materials/cup.jpg",
-    "width": 300,
-    "height": 268,
-    "title": "Cups, #1 PET plastic, accepted effective June 2012",
-    "author": "Department of Environmental Protection Recycling a",
-    "source": "https://www.flickr.com/photos/24222570@N05/7460480966",
+    "width": 800,
+    "height": 717,
+    "title": "Clear Plastic Cups (4877665249)",
+    "author": "JD Hancock",
+    "source": "https://commons.wikimedia.org/wiki/File:Clear_Plastic_Cups_(4877665249).jpg",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
-    "changes": "Kept at its original size, re-encoded as JPEG, metadata removed"
+    "cropped": true,
+    "changes": "Cropped and resized: cropped to two cups (a lamp with a brand name removed), resized to 800 px on the long side, re-encoded as JPEG, metadata removed"
   },
   {
     "id": "straws",
@@ -153,6 +164,7 @@
     "source": "https://commons.wikimedia.org/wiki/File:A_paper_straw_for_bubble_tea_and_the_popular_straw.jpg",
     "license": "Public domain",
     "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed"
   },
   {
@@ -166,6 +178,7 @@
     "source": "https://commons.wikimedia.org/wiki/File:Rubber_bands_20210918_142044.jpg",
     "license": "CC BY-SA 4.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed. This edited version is shared under the same license (CC BY-SA 4.0)"
   },
   {
@@ -179,6 +192,7 @@
     "source": "https://commons.wikimedia.org/wiki/File:Pipe_cleaner_white1.jpg",
     "license": "CC BY-SA 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed. This edited version is shared under the same license (CC BY-SA 3.0)"
   },
   {
@@ -192,6 +206,7 @@
     "source": "https://commons.wikimedia.org/wiki/File:Coloured_and_natural_craft_sticks.jpg",
     "license": "CC0 1.0",
     "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed"
   },
   {
@@ -205,6 +220,7 @@
     "source": "https://commons.wikimedia.org/wiki/File:Coloured,_textured_craft_card.jpg",
     "license": "CC BY-SA 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed. This edited version is shared under the same license (CC BY-SA 3.0)"
   },
   {
@@ -218,6 +234,7 @@
     "source": "https://commons.wikimedia.org/wiki/File:Clothespin_made_in_Russia.jpg",
     "license": "CC0 1.0",
     "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed"
   },
   {
@@ -231,6 +248,7 @@
     "source": "https://commons.wikimedia.org/wiki/File:A_Roll_of_Masking_Tape_(32410678777).jpg",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "cropped": false,
     "changes": "Resized to 800 px on the long side, re-encoded as JPEG, metadata removed"
   }
 ]

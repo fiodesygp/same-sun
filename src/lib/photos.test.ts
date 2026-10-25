@@ -36,6 +36,12 @@ describe('photo credits', () => {
       expect(latin1(b).includes('Photoshop'), c.id).toBe(false)
     }
   })
+  it('the cup photo is cropped and resized, and says so', () => {
+    const cup = photoFor('cup')!
+    expect(cup.cropped).toBe(true)
+    expect(cup.changes).toMatch(/^Cropped and resized/)
+    expect(Math.max(cup.width, cup.height)).toBe(800)
+  })
   it('every photo has alt text in English and Spanish', () => {
     for (const c of PHOTO_CREDITS) {
       expect((en as Record<string, string>)[`photo.alt.${c.id}`], c.id).toBeTruthy()

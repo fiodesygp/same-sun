@@ -73,6 +73,6 @@ If the tests or build fail, nothing is published on either host.
 - `docs/`: the prototype (`docs/prototype/same-sun-prototype.html`) and the game concept
 - `CLAUDE.md`: project rules for contributors
 
-Photos: the part and material cards can show a real photo next to the drawing. All photos are openly licensed (Wikimedia Commons and Flickr via Openverse); authors, licenses, sources and changes are in `src/content/photo-credits.json` and in "Photo credits" on the Home page. They are about 1 MB in all, downloaded only when a card first shows one.
+Photos: the part and material cards can show a real photo next to the drawing. All photos are openly licensed (Wikimedia Commons and Flickr via Openverse); authors, licenses, sources and changes are in `src/content/photo-credits.json` and in "Photo credits" on the Home page. They are about 1.1 MB in all, downloaded only when a card first shows one.
 
 Fonts: Montserrat and Source Sans 3, self-hosted under the SIL Open Font License (`public/fonts/`).

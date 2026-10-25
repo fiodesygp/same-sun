@@ -18,7 +18,7 @@ export const licenseKey = (c: Credit) => (c.license === 'Public domain' ? 'photo
 
 /** what was changed, as i18n keys: resized or kept at its size, re-encoded, metadata removed, share-alike */
 export function changeKeys(c: Credit) {
-  const keys = [Math.max(c.width, c.height) === 800 ? 'photo.changes.resized' : 'photo.changes.kept']
+  const keys = [c.cropped ? 'photo.changes.cropped' : Math.max(c.width, c.height) === 800 ? 'photo.changes.resized' : 'photo.changes.kept']
   if (shareAlike(c)) keys.push('photo.changes.shareAlike')
   return keys
 }

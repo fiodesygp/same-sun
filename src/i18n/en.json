@@ -1268,7 +1268,7 @@
   "photo.alt.lightMeter": "A digital light meter with a round white sensor on a cable and a screen.",
   "photo.alt.multimeter": "A digital multimeter with a dial, a screen, and red and black probes.",
   "photo.alt.tachometer": "A handheld digital tachometer with a screen and buttons, in its case.",
-  "photo.alt.cup": "Two clear plastic cups.",
+  "photo.alt.cup": "Two empty clear plastic cups on a black background.",
   "photo.alt.straws": "A thick bubble-tea straw next to a thin drinking straw.",
   "photo.alt.bands": "A small pile of colourful rubber bands.",
   "photo.alt.pipe": "A bundle of white pipe cleaners.",
@@ -1279,5 +1279,6 @@
   "photo.publicDomain": "Public domain",
   "photo.changes.resized": "Resized to 800 px, re-encoded as JPEG, metadata removed.",
   "photo.changes.kept": "Kept at its original size, re-encoded as JPEG, metadata removed.",
-  "photo.changes.shareAlike": "This edited copy is shared under the same license."
+  "photo.changes.shareAlike": "This edited copy is shared under the same license.",
+  "photo.changes.cropped": "Cropped and resized to 800 px, re-encoded as JPEG, metadata removed."
 }
