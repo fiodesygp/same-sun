@@ -1,5 +1,6 @@
 // One material's card: What it is · Good for · Watch out, its safety & prep check, and a quick check.
 // The learner makes every choice in Build, so the card does not suggest picks.
+import { CardImage } from '../../components/CardImage'
 import { InfoCard } from '../../components/InfoCard'
 import { MaterialIcon, MaterialIllustration } from '../../components/materials/art'
 import { t, type Key } from '../../i18n/t'
@@ -27,7 +28,7 @@ export function FacilityTag({ id }: { id: MaterialId }) {
 export function MaterialView({ id, checked, onAnswer, onBack, onStartBuilding }: Props) {
   const k = (s: string) => `st.mat.${id}.${s}` as Key
   return (
-    <InfoCard title={t(k('name'))} icon={<MaterialIcon id={id} />} figure={<MaterialIllustration id={id} />} backLabel={t('st.back')} onBack={onBack}
+    <InfoCard title={t(k('name'))} icon={<MaterialIcon id={id} />} figure={<CardImage id={id} drawing={<MaterialIllustration id={id} />} />} backLabel={t('st.back')} onBack={onBack}
       tag={<FacilityTag id={id} />}
       tabs={[
         { id: 'what', label: t('st.tab.what'), content: <p className="measure">{t(k('what'))}</p> },

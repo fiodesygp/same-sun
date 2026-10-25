@@ -69,12 +69,17 @@ export default defineConfig({
         globPatterns: ['**/*.{html,js,css,woff2,svg,png,txt}'],
         // 404.html only redirects to the app; no need to keep it offline. The 3D bench (about 240 KB
         // zipped) is left out too, so learners on limited data only fetch it if they open 3D
-        globIgnores: ['**/404.html', '**/assets/Board3D-*.js', '**/assets/Frame3D-*.js', '**/assets/three3d-*.js'],
+        globIgnores: ['**/404.html', '**/assets/Board3D-*.js', '**/assets/Frame3D-*.js', '**/assets/three3d-*.js', '**/photos/**'],
         // ...and once they have, it stays cached so 3D works offline after that
         runtimeCaching: [{
           urlPattern: ({ url }) => /\/assets\/(Board3D|Frame3D|three3d)-[^/]+\.js$/.test(url.pathname),
           handler: 'CacheFirst',
           options: { cacheName: 'samesun-3d', expiration: { maxEntries: 4 } }
+        }, {
+          // the part and material photos (about 1 MB in all) are fetched when a card first shows one
+          urlPattern: ({ url }) => /\/photos\/(parts|materials)\/[^/]+\.jpg$/.test(url.pathname),
+          handler: 'CacheFirst',
+          options: { cacheName: 'samesun-photos', expiration: { maxEntries: 40 } }
         }]
       }
     })

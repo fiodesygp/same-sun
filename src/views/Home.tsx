@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { LINKS } from '../config/links'
 import { Scene } from '../components/Scene'
 import type { TabId } from '../components/Header'
-import { t } from '../i18n/t'
+import { t, type Key } from '../i18n/t'
 import { growthStoryStore } from '../lib/growthStory'
+import { changeKeys, licenseKey, PHOTO_CREDITS } from '../lib/photos'
 import { loadLearn, STEPS, stepsDone } from '../lib/learn'
 import { bestScore } from '../lib/runs'
 import { MATERIAL_IDS } from '../structure/materials'
@@ -121,6 +122,19 @@ export function Home({ onGo, active }: Props) {
 
       <footer className="home-foot">
         <p>{t('home.credits')}</p>
+        <details className="photo-credits">
+          <summary>{t('home.photoCredits')}</summary>
+          <p>{t('home.photoCreditsLede')}</p>
+          <ul>
+            {PHOTO_CREDITS.map(c => (
+              <li key={c.id}>
+                <b>{t(c.kind === 'part' ? (`learn.part.${c.id}.name` as Key) : (`st.mat.${c.id}.name` as Key))}</b>:{' '}
+                <a href={c.source} target="_blank" rel="noopener noreferrer">{c.title}</a>, {c.author},{' '}
+                <a href={c.licenseUrl} target="_blank" rel="noopener noreferrer">{licenseKey(c) ? t(licenseKey(c) as Key) : c.license}</a>. {changeKeys(c).map(k => t(k as Key)).join(' ')}
+              </li>
+            ))}
+          </ul>
+        </details>
         <p>{t('home.estimates')}</p>
         {LINKS.projectSite && (
           <a href={LINKS.projectSite} target="_blank" rel="noopener noreferrer">

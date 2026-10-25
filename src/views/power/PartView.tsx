@@ -1,4 +1,5 @@
 // One part's card: What it is · How it works · Try it · Numbers, and a quick check.
+import { CardImage } from '../../components/CardImage'
 import { InfoCard } from '../../components/InfoCard'
 import { PartIllustration } from '../../components/parts/art'
 import { t, type Key } from '../../i18n/t'
@@ -20,7 +21,7 @@ export function PartView({ id, checked, onAnswer, onBack, onMission }: Props) {
   const p = part(id)
   const k = (s: string) => `learn.part.${id}.${s}` as Key
   return (
-    <InfoCard title={t(k('name'))} icon={<PartIcon id={id} />} figure={<PartIllustration id={id} />} backLabel={t('learn.back')} onBack={onBack}
+    <InfoCard title={t(k('name'))} icon={<PartIcon id={id} />} figure={<CardImage id={id} drawing={<PartIllustration id={id} />} />} backLabel={t('learn.back')} onBack={onBack}
       tabs={[
         { id: 'what', label: t('learn.partTab.what'), content: <p className="measure">{t(k('what'))}</p> },
         { id: 'how', label: t('learn.partTab.how'), content: <p className="measure">{t(k('how'))}</p> },

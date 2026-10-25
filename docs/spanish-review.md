@@ -127,6 +127,18 @@ Questions for these three:
 | Sheet names | Spanish name, then the English sheet name in brackets: Marco de vaso + limpiapipas (Cup + pipe-cleaner frame) / Marco de vaso + popotes + ligas (Cup + straw + rubber-band frame) / Palitos + ligas (Craft sticks + rubber bands) / Cuña de papel para el ángulo (Paper angle wedge) | "Popotes" is now used everywhere for straws (cards, builder, steps, sheet names). Please confirm it is the right word for these learners. |
 | Build steps (`st.how.*`) | — | Short instructions for the real build; please check they are clear and match the sheets. |
 
+### Photos on the cards
+
+| English | Spanish now | To check |
+|---|---|---|
+| Photo / Drawing (toggle) | Foto / Dibujo | — |
+| Photo: {author}, {license} | Foto: {autor}, {licencia} | — |
+| Edited copy shared under the same license. | Copia editada compartida con la misma licencia. | — |
+| Motor only — the fan blade goes on the shaft | Solo el motor: la hélice va en el eje | — |
+| Photo credits | Créditos de las fotos | — |
+| Public domain | Dominio público | — |
+| Photo alt texts (`photo.alt.*`) | — | One short sentence per photo; please check. |
+
 ### 3D bench
 
 | English | Spanish now | To check |
