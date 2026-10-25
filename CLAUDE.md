@@ -6,7 +6,7 @@
 - Source of truth: `docs/prototype/same-sun-prototype.html` for screens, wording, layout, colors and the simulation. `docs/game-concept.md` is background. Where they disagree, follow the prototype.
 
 ## Screens
-- Five tabs: Home, Sun Day, Power (was "Build Lab"; Spanish "Energía"), Structure ("Estructura"), Growth Story. In code the tab is `power` (`src/views/Power.tsx`, `src/views/power/`); old storage keys such as `samesun:buildLabSolved` keep their names so saved progress loads.
+- Five tabs: Home, Sun Day, Power (was "Build Lab"; Spanish "Energía"), Structure ("Estructura"), Growth Story. On screens narrower than 390 px the English Growth Story tab reads "Story" (Spanish stays "Mi historia"); screen readers always hear the full name. In code the tab is `power` (`src/views/Power.tsx`, `src/views/power/`); old storage keys such as `samesun:buildLabSolved` keep their names so saved progress loads.
 - Power is one guided path in two stages: "Meet the parts" (10 part cards, each with a quick check) unlocks "Try it": 10 steps (the 7 SCN 202 Solar Card Deck missions, then the 3 bonus cards), then 3 Power challenges in their own section with their own counter (`STEPS` and `CHALLENGES` in `src/lib/learn.ts`), then the Sun Monitor. Learners can skip ahead.
 - The free-wiring circuits use the watts budget in `src/lab/`; the deck missions use the volts/amps/watts model in `src/sim/electric.ts`.
 - Saved progress: `samesun:learn` (steps), `samesun:parts` (quick checks). `migrate()` carries old Build Lab (now Power) levels (`samesun:buildLabSolved`) into the path; it only adds and never deletes old keys.

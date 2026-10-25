@@ -84,7 +84,12 @@ export function Header({ tab, onSelect, lang, onLang }: Props) {
               onKeyDown={e => onKeyDown(e, i)}
             >
               <span className="tab-icon" aria-hidden="true">{ICONS[x.id]}</span>
-              <span className="tab-label">{t(x.label)}</span>
+              {x.id === 'growthStory' ? (
+                // under 390 px the English label does not fit a fifth of the bar, so it shortens to "Story"
+                <span className="tab-label"><span className="label-full">{t(x.label)}</span><span className="label-short" aria-hidden="true">{t('tabs.growthStoryShort')}</span></span>
+              ) : (
+                <span className="tab-label">{t(x.label)}</span>
+              )}
             </button>
           ))}
         </nav>
