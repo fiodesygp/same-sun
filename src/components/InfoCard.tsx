@@ -2,6 +2,7 @@
 // (the ARIA tabs pattern, arrow keys move between them) and a one-question quick check.
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { t } from '../i18n/t'
+import { tabColumns } from '../lib/tabFit'
 
 export type CardTab = { id: string; label: string; content: ReactNode }
 export type QuickCheck = {
@@ -34,8 +35,31 @@ export function InfoCard({ title, icon, figure, tabs, tag, backLabel, onBack, ch
   const [answer, setAnswer] = useState<{ choice: string; right: boolean } | null>(null)
   const backRef = useRef<HTMLButtonElement>(null)
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const listRef = useRef<HTMLDivElement>(null)
+  const [cols, setCols] = useState<number>()
   useEffect(() => backRef.current?.focus(), [])
   const ids = tabs.map(x => x.id), n = ids.length
+  const labels = tabs.map(x => x.label).join('|')
+
+  // wide screens: one row of tabs only if every label fits on one line, else 2 x 2 (see learn.css)
+  useEffect(() => {
+    const list = listRef.current
+    if (!list) return
+    const fit = () => {
+      const buttons = [...list.querySelectorAll('button')]
+      if (!buttons.length) return
+      const range = document.createRange()
+      const widths = buttons.map(b => { range.selectNodeContents(b); return range.getBoundingClientRect().width })
+      const bs = getComputedStyle(buttons[0]), ls = getComputedStyle(list)
+      const extra = ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'].reduce((a, k) => a + parseFloat(bs[k as 'paddingLeft']), 0) + 1
+      setCols(tabColumns(widths, { width: list.clientWidth, gap: parseFloat(ls.columnGap) || 0, extra }))
+    }
+    fit()
+    document.fonts?.ready.then(fit)
+    const ro = new ResizeObserver(fit)
+    ro.observe(list)
+    return () => ro.disconnect()
+  }, [labels])
 
   function onKey(e: React.KeyboardEvent) {
     const i = ids.indexOf(tab)
@@ -61,7 +85,7 @@ export function InfoCard({ title, icon, figure, tabs, tag, backLabel, onBack, ch
 
       <div className="info-text">
       <div className="card part-card">
-        <div className={`part-tabs tabs-${n}`} role="tablist" aria-label={title} onKeyDown={onKey}>
+        <div className={`part-tabs tabs-${n}`} role="tablist" aria-label={title} onKeyDown={onKey} ref={listRef} data-cols={cols}>
           {tabs.map(x => (
             <button key={x.id} type="button" role="tab" id={`pt-${x.id}`} aria-controls="part-panel" aria-selected={tab === x.id} tabIndex={tab === x.id ? 0 : -1}
               ref={el => { tabRefs.current[x.id] = el }} onClick={() => setTab(x.id)}>{x.label}</button>

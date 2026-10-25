@@ -172,4 +172,7 @@
   .info-view .photo-credit, .info-view .photo-caption { text-align: left }
   /* the text column stays in view while the page scrolls */
   .info-text { position: sticky; top: calc(var(--header-h, 72px) + 12px); max-width: 70ch }
+  /* tab labels stay on one line: one row if they all fit, else 2 x 2 (InfoCard measures them) */
+  .info-view .part-tabs button { white-space: nowrap }
+  .info-view .part-tabs[data-cols="2"] { grid-template-columns: 1fr 1fr }
 }
