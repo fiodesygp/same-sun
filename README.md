@@ -38,6 +38,27 @@ npm run preview    # serve the build at http://localhost:4173/same-sun/ (offline
 
 To try it on a phone on the same Wi-Fi: `npm run dev -- --host`, then open the Network address Vite prints, ending in `/same-sun/`.
 
+### Keyboard check (optional)
+
+```sh
+npm run check:focus
+```
+
+This builds the app, serves it with `vite preview` on port 4317 and opens it in headless Chrome. At 1280 px, in English and Spanish, with the Drawing and the Photo view, it presses real keys on a Power part card and a Structure material card. It checks that:
+
+- Tab goes Back → Photo/Drawing toggle → picture (the photo credit links) → the selected tab → tab text → quick check → end of page.
+- Shift+Tab goes back the same way.
+- The tab list is one Tab stop, and the arrow keys move between tabs.
+
+It prints each focus order and exits with an error if anything is wrong.
+
+It is not part of `npm test` and needs no extra packages, but it does need:
+
+- **Google Chrome or Chromium** installed. It looks in the usual places on macOS, Linux and Windows. If yours is elsewhere, point to it: `CHROME_PATH=/path/to/chrome npm run check:focus`.
+- **Node.js 22 or newer**, for the built-in WebSocket.
+
+The script is [`scripts/check-focus.mjs`](scripts/check-focus.mjs).
+
 ## How deployment works
 
 The same code deploys to two places. Both rebuild on every push to `main`.
