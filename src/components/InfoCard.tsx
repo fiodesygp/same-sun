@@ -47,7 +47,7 @@ export function InfoCard({ title, icon, figure, tabs, tag, backLabel, onBack, ch
   }
 
   return (
-    <article className="mission-view" aria-labelledby="part-title">
+    <article className="mission-view info-view" aria-labelledby="part-title">
       <button className="back" type="button" ref={backRef} onClick={onBack}>{backLabel}</button>
       <header className="mission-head deck-tool part-head">
         <span className="part-icon">{icon}</span>
@@ -55,8 +55,11 @@ export function InfoCard({ title, icon, figure, tabs, tag, backLabel, onBack, ch
         {tag && <div className="part-tag">{tag}</div>}
       </header>
 
-      <figure className="part-figure">{figure}</figure>
+      {/* wide screens: picture on the left, tabs and quick check on the right (source order = focus order) */}
+      <div className="info-cols">
+      <figure className="part-figure info-media">{figure}</figure>
 
+      <div className="info-text">
       <div className="card part-card">
         <div className={`part-tabs tabs-${n}`} role="tablist" aria-label={title} onKeyDown={onKey}>
           {tabs.map(x => (
@@ -86,6 +89,8 @@ export function InfoCard({ title, icon, figure, tabs, tag, backLabel, onBack, ch
         </p>
       </section>
       {footer}
+      </div>
+      </div>
     </article>
   )
 }
