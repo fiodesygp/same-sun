@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { LINKS } from '../config/links'
-import { Scene } from '../components/Scene'
+import { HomeHero } from '../components/HomeHero'
 import type { TabId } from '../components/Header'
 import { t, type Key } from '../i18n/t'
 import { growthStoryStore } from '../lib/growthStory'
@@ -11,7 +11,6 @@ import { MATERIAL_IDS } from '../structure/materials'
 import { lastPassed, loadRuns, loadStructure } from '../structure/progress'
 import { TESTS } from '../structure/rules'
 
-const HERO_DESIGN = { panels: 'both', height: 'high', weather: 'october', fan: true, pump: true } as const
 // the sun crosses the sky once every 40 s; the scene is redrawn about 12 times a second
 const DAY_MS = 40000, FRAME_MS = 80, SUNRISE = 6.4, SUNSET = 18.6
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -72,7 +71,7 @@ export function Home({ onGo, active }: Props) {
     <>
       <div className="splash">
         <div className="sky-band">
-          <Scene className="band-scene" design={HERO_DESIGN} hour={null} growth={0.7} idleHour={hour} led shadows={false} label={t('home.heroLabel')} />
+          <HomeHero className="band-scene" day={(hour - SUNRISE) / (SUNSET - SUNRISE)} />
         </div>
         <div className="splash-body">
           <div className="splash-title">
